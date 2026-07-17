@@ -1,0 +1,199 @@
+%!LW recipe=beamer
+\documentclass[10pt, aspectratio=169, t]{beamer}
+\usetheme[
+    block=fill,
+    progressbar=foot,
+    numbering=fraction
+]{metropolis}
+\usepackage{xspace}
+\usepackage{appendixnumberbeamer}
+\usepackage{luatexja}
+\usepackage[haranoaji, deluxe, expert]{luatexja-preset}
+\renewcommand{\kanjifamilydefault}{\gtdefault}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, fit, calc}
+\usepackage{luatexja-fontspec}
+\metroset{sectionpage=none}
+
+\definecolor{emphasis}{HTML}{029E73}   % green : 鍵となる発見・結論
+\definecolor{neutral}{gray}{0.55}      % gray  : 文脈・補足
+\newcommand{\HL}[1]{\textcolor{emphasis}{#1}}
+
+\makeatletter
+\setlength{\metropolis@progressinheadfoot@linewidth}{1pt}
+\makeatother
+
+\title{副テーマ研究計画}
+\subtitle{トークン予算統制下における AI コードレビュー・\\オーケストレーション構成の欠陥検出性能比較}
+\date{2026/07/16}
+\author{高原 大明}
+\institute{}
+
+\begin{document}
+\maketitle
+
+\begin{frame}{概要：同一予算下で 4 構成を比較し，コスト対検出率の Pareto front を描く}
+    \begin{block}{研究の問い}
+        同一トークン予算の下で，どの AI コードレビュー構成が最も費用対効果よく欠陥を検出するか．\\
+        構成の優位性は\alert{観点分割}によるものか，単なる\alert{計算量増加}によるものか．
+    \end{block}
+    \vspace{4pt}
+    \begin{itemize}
+        \item 単一 / 観点別並列 / 敵対的批評 / multi-run 集約と複数の構成が提案されているが，\\
+        \alert{計算コストを揃えた統制比較は存在しない}
+        \item 実 OSS の既知バグを PR に再注入し，正解データを統制したベンチマークを構築する
+        \item \textbf{新規性}：国内外とも本交点の先行研究は確認できず（2026 年 7 月時点の調査）
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{背景：multi-agent レビューは提案が先行し，統制検証が追いついていない}
+    \begin{itemize}
+        \item 商用・研究の両面で multi-agent 型レビューの提案が急増
+        \begin{itemize}
+            \item 役割分担型（CodeAgent, EMNLP 2024），multi-role 欠陥検出（ICML 2025 Spotlight）など
+        \end{itemize}
+        \item 一方で実証研究は課題を報告
+        \begin{itemize}
+            \item 商用レビューエージェント 13 種中 12 種がシグナル比 60\% 未満（\alert{ノイズ過多}）
+            \item 偽陽性コストを含めた評価の需要が高まっている
+        \end{itemize}
+    \end{itemize}
+    \begin{block}{マルチエージェント研究全体の潮流（2025--2026）}
+        提案フェーズ → \alert{批判・統制検証フェーズ}へ移行．\\
+        一般推論ドメインでは「予算を揃えると multi-agent debate 等の優位が消える・逆転する」\\
+        との報告が複数（EMNLP 2024 ほか）
+    \end{block}
+    \vspace{5pt}
+    業務で AI コードレビュー基盤の設計・運用にも携わっており，\\
+    構成選択が\alert{経験則に頼っている}現状に課題意識
+\end{frame}
+
+\begin{frame}{研究ギャップ：「予算統制 × コードレビュー」の交点が空白}
+    \small
+    1. 勝因（観点分割 vs 計算量）の ablation なし\quad
+    2. defect injection ベンチは商用先行で\alert{中立性がない}
+    \par\normalsize
+    \vspace{4pt}
+    \begin{center}
+    \begin{tikzpicture}[
+        cell/.style={draw, minimum width=46mm, minimum height=11mm, align=center, font=\small},
+        lab/.style={font=\small\bfseries, align=center}
+    ]
+        % 軸ラベル
+        \node[lab] (colA) at (0, 0.85) {一般推論ドメイン};
+        \node[lab] (colB) at (5.4, 0.85) {コードレビュー};
+        \node[lab, rotate=90] at (-3.3, -0.7) {統制なし};
+        \node[lab, rotate=90] at (-3.3, -2.3) {\alert{統制あり}};
+        % セル
+        \node[cell] at (0, -0.7) {MAD・Reflexion 等の提案群};
+        \node[cell] at (5.4, -0.7) {CodeAgent / CR-Bench 等\\{\footnotesize（高々 2 構成の比較まで）}};
+        \node[cell] at (0, -2.3) {Token Economies (EMNLP 2024)\\{\footnotesize 「予算を揃えると優位が消える」}};
+        \node[cell, draw=emphasis, thick, fill=emphasis!10] at (5.4, -2.3) {\HL{\textbf{空白 —— 本研究}}\\{\footnotesize 4 構成 × 予算統制 × 実バグ再注入}};
+    \end{tikzpicture}
+    \end{center}
+    \vspace{2pt}
+    \begin{center}
+        → \alert{偽陽性コストが非対称な検出タスク}で一般ドメインの知見が成り立つかを検証
+    \end{center}
+\end{frame}
+
+\begin{frame}{研究課題：3 つの RQ で「構成の価値」と「計算量の効果」を切り分ける}
+    \vspace{2pt}
+    \begin{center}
+    \begin{tabularx}{0.94\textwidth}{lX}
+        \toprule
+        RQ1 & トークン予算を統制したとき，4 構成の間に欠陥検出率・偽陽性率の差があるか \\
+        \midrule
+        \alert{RQ2} & 観点別並列の優位性（があるとすれば）は，同一予算の multi-run 集約\\
+            & （= \alert{純粋な計算量増加}）と比較しても残るか \quad {\footnotesize ← 本研究の核心}\\
+        \midrule
+        RQ3 & 欠陥の種別（ロジック / セキュリティ / 並行性 / API 誤用など）によって\\
+            & 有利な構成は異なるか \\
+        \bottomrule
+    \end{tabularx}
+    \end{center}
+\end{frame}
+
+\begin{frame}{実験計画：実バグの遡り再注入と予算統制で 4 構成を比較する}
+    \begin{columns}[T]
+        \begin{column}{0.46\textwidth}
+            \textbf{ベンチマーク（defect injection）}
+            \begin{itemize}
+                \item 実 OSS のバグ修正コミットを遡り「バグ入り PR」を再現（50--100 件）
+                \item 合成バグのみの評価は検出能力を過大評価するとの報告あり → \alert{実バグの遡り再注入}を採用
+                \item leakage 検査・バグ種別の層別を含む
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \textbf{比較する 4 構成（総予算を統一）}
+            \vspace{2pt}
+            {\small
+            \begin{tabularx}{\textwidth}{lX}
+                \toprule
+                Single & 単一レビュアが全観点を担当 \\
+                Parallel & 観点別レビュアを並列に立て集約 \\
+                Adversarial & レビュア + 反証する批評エージェント \\
+                Multi-run & 同一プロンプト $N$ 回の集約\\
+                & （\alert{計算量統制の対照群}） \\
+                \bottomrule
+            \end{tabularx}
+            }
+        \end{column}
+    \end{columns}
+    \vspace{6pt}
+    \begin{center}
+    \begin{tikzpicture}[
+        node distance=3mm,
+        box/.style={draw, rounded corners=1pt, minimum height=6mm, inner sep=1.6mm, font=\footnotesize},
+        arr/.style={-{Stealth[length=2mm]}}
+    ]
+        \node[box] (commit) {バグ修正コミット};
+        \node[box, right=of commit] (pr) {バグ入り PR 再現};
+        \node[box, right=of pr, fill=mDarkTeal!15] (review) {4 構成 × 予算統制でレビュー};
+        \node[box, right=of review] (metrics) {検出率・偽陽性率・コスト};
+        \draw[arr] (commit) -- (pr);
+        \draw[arr] (pr) -- (review);
+        \draw[arr] (review) -- (metrics);
+    \end{tikzpicture}
+    \end{center}
+\end{frame}
+
+\begin{frame}{評価指標：欠陥検出率・偽陽性率とコスト効率の両面から比較する}
+    \vspace{2pt}
+    \begin{center}
+    \begin{tabularx}{0.94\textwidth}{lX}
+        \toprule
+        従属変数 & 欠陥検出率（recall），偽陽性率，F1 \\
+                & コスト効率：\$ / 検出 1 件，トークン / 検出 1 件 \\
+                & 副次：指摘の位置精度，バグ種別ごとの検出率（RQ3） \\
+        \midrule
+        独立変数 & レビュー構成 4 種 × モデル 2--3 種 × トークン予算 2--3 水準 \\
+        \bottomrule
+    \end{tabularx}
+    \end{center}
+\end{frame}
+
+\begin{frame}{発表計画：SIG-AGI 第 33 回で予備結果を発表する}
+    \vspace{4pt}
+    \begin{center}
+    \begin{tabular}{ll}
+        \toprule
+        2026/7/24 & \alert{SIG-AGI 第 33 回 発表申込締切}（タイトル + 概要のみ） \\
+        2026/8/7 & 原稿提出（ショート 4 ページ：問題提起 + パイロット実験） \\
+        2026/8/21 & \alert{SIG-AGI 第 33 回 発表}（東大本郷 + オンライン） \\
+        2026/9--12 & ベンチマーク拡充・本実験 \\
+        \bottomrule
+    \end{tabular}
+    \end{center}
+    \vspace{4pt}
+    研究会で予備結果を発表して議論を集める．
+\end{frame}
+
+\appendix
+\begin{frame}[standout]
+    % fin
+\end{frame}
+\end{document}
