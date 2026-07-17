@@ -1,0 +1,13 @@
+# 個人的な下書き (メール文面等) — 公開 repo に含めない
+drafts/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
