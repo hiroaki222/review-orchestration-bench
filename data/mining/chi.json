@@ -1,0 +1,2141 @@
+{
+  "repo": "chi",
+  "repo_head": "8b258c7bb28f97a5f2a856ff7ef962578fec9215",
+  "filters": {
+    "max_source_lines": 100,
+    "max_source_files": 5
+  },
+  "config": {
+    "subject_include": "(?i)\\b(?:fix(?:es|ed|ing)?|bug(?:s|gy|fix(?:es)?)?|panic(?:s|ked)?|rac(?:e|es|y)|nil|leak(?:s|ed|y)?|incorrect(?:ly)?|wrong(?:ly)?)\\b",
+    "subject_exclude": "(?i)\\b(typo|revert|bump)\\b",
+    "source": "^(?!.*_test\\.go$).*\\.go$",
+    "test": ".*_test\\.go$"
+  },
+  "summary": {
+    "total_commits": 745,
+    "subject_matched": 105,
+    "candidates": 105,
+    "passed": 84,
+    "passed_with_test": 38,
+    "since_2026_01": 5,
+    "since_2026_04": 4,
+    "since_2026_06": 2
+  },
+  "candidates": [
+    {
+      "sha": "7fcb8a20364d7b72e2d5a0e413ae80346e1c99c8",
+      "date": "2026-07-05T17:55:42+02:00",
+      "subject": "middleware: document printPrettyStack and harden NoColor panic test (#1131)",
+      "source_files": 1,
+      "source_lines": 3,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/recoverer.go",
+          "lines": 3,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/recoverer_test.go",
+          "lines": 7,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "878fe71fc9e506a63ea6957ed09c9ce84f789e97",
+      "date": "2026-07-05T17:38:14+02:00",
+      "subject": "Fix defaultLogEntry.Panic not respecting NoColor setting (#1050)",
+      "source_files": 2,
+      "source_lines": 11,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/logger.go",
+          "lines": 2,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/recoverer.go",
+          "lines": 9,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/recoverer_test.go",
+          "lines": 27,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "818fdcfc4786168651768377ba647cf9dd5b3953",
+      "date": "2026-05-21T02:15:38+08:00",
+      "subject": "fix: set Request.Pattern from RoutePattern() (#1097)",
+      "source_files": 1,
+      "source_lines": 2,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux.go",
+          "lines": 2,
+          "kind": "source"
+        },
+        {
+          "path": "pattern_test.go",
+          "lines": 20,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "4ef87eaf2cfb27d3126d48194e1a84806acc1aed",
+      "date": "2026-05-16T19:31:44+05:00",
+      "subject": "middleware: fix httpFancyWriter.ReadFrom double-counting bytes with Tee (#1085)",
+      "source_files": 1,
+      "source_lines": 4,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/wrap_writer.go",
+          "lines": 4,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/wrap_writer_test.go",
+          "lines": 25,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "05f1ef7bb50b8a8cb33a9dd3ba1c5b94bff0f723",
+      "date": "2026-02-05T16:50:34+05:45",
+      "subject": "fix(middleware): add missing return in RouteHeaders empty check (#1045)",
+      "source_files": 1,
+      "source_lines": 1,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/route_headers.go",
+          "lines": 1,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/route_headers_test.go",
+          "lines": 212,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "9040e95a07b47df59d96f3cb0e4bac107a931d46",
+      "date": "2025-08-26T08:19:23-03:00",
+      "subject": "fix/608 - Fix flaky Throttle middleware test by synchronizing token usage (#1016)",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/throttle_test.go",
+          "lines": 70,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "1c2d011f59c4b2fc2127f308f2b4171db2567f19",
+      "date": "2025-08-15T18:26:41+03:00",
+      "subject": "Avoid potential nil dereference (#1008)",
+      "source_files": 1,
+      "source_lines": 4,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/url_format.go",
+          "lines": 4,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "e846b8304c769c4f1a51c9de06bebfaa4576bd88",
+      "date": "2025-02-05T19:48:50+03:00",
+      "subject": "Apply fieldalignment fixes to optimize struct memory layout (#974)",
+      "source_files": 2,
+      "source_lines": 6,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/throttle.go",
+          "lines": 2,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/wrap_writer.go",
+          "lines": 4,
+          "kind": "source"
+        },
+        {
+          "path": "mux_test.go",
+          "lines": 8,
+          "kind": "test"
+        },
+        {
+          "path": "path_value_test.go",
+          "lines": 2,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "72fbe460b5553948fdeaa9a9787bdb14390f1454",
+      "date": "2025-02-05T14:40:59Z",
+      "subject": "Fix non-constant format strings in t.Fatalf (#972)",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/get_head_test.go",
+          "lines": 12,
+          "kind": "test"
+        },
+        {
+          "path": "middleware/url_format_test.go",
+          "lines": 10,
+          "kind": "test"
+        },
+        {
+          "path": "mux_test.go",
+          "lines": 114,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "d9d5e318c2701f0dfd1decf6f77566501d720d20",
+      "date": "2024-12-14T17:45:45+01:00",
+      "subject": "fix: allow multiple informational status (#961)",
+      "source_files": 1,
+      "source_lines": 6,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/wrap_writer.go",
+          "lines": 6,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "6ceb498b221efa11f559602beb2463b8b52c2161",
+      "date": "2024-09-26T10:44:06-07:00",
+      "subject": "Fix `Mux.Find` not correctly handling nested routes (#954)",
+      "source_files": 1,
+      "source_lines": 21,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux.go",
+          "lines": 21,
+          "kind": "source"
+        },
+        {
+          "path": "mux_test.go",
+          "lines": 50,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "73350509aa6e198d6677df0f09c5611446e96da4",
+      "date": "2024-09-18T23:41:00+09:00",
+      "subject": "Fix condition in TestRedirectSlashes (#856)",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/strip_test.go",
+          "lines": 66,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "df0303d61b1dc0933b60c550f9a02e7784a42ed5",
+      "date": "2024-09-18T07:09:34-07:00",
+      "subject": "Fixed incorrect comment about routing (#887)",
+      "source_files": 1,
+      "source_lines": 2,
+      "has_test": false,
+      "files": [
+        {
+          "path": "chi.go",
+          "lines": 2,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "134f373b64a79c16e0d4e72acf47a355ae37dfe9",
+      "date": "2024-09-18T17:00:48+03:00",
+      "subject": "Fix grammar error (#917)",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": false,
+      "files": [
+        {
+          "path": "README.md",
+          "lines": 2,
+          "kind": "other"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "39703bcb03f609a904ec39e2fc82c2f2e3582134",
+      "date": "2024-09-17T15:57:04+02:00",
+      "subject": "govet: Fix non-constant format string (#952)",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux_test.go",
+          "lines": 20,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "6fedde2a70dc2adce0a3dc41b8aebc0b2bec8185",
+      "date": "2024-08-23T18:23:19+04:00",
+      "subject": "Make Context.RoutePattern() nil-safe (#927)",
+      "source_files": 1,
+      "source_lines": 5,
+      "has_test": true,
+      "files": [
+        {
+          "path": "context.go",
+          "lines": 5,
+          "kind": "source"
+        },
+        {
+          "path": "context_test.go",
+          "lines": 6,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "f10dc4a9cab53a47f600f518fcccaa044666e95f",
+      "date": "2024-06-08T01:13:37+02:00",
+      "subject": "fix(middleware): Close created writer in the compressor middleware (#919)",
+      "source_files": 1,
+      "source_lines": 2,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/compress.go",
+          "lines": 2,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/compress_test.go",
+          "lines": 46,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "f4ab9b1f050bdcf14bd096399e8bd57363406514",
+      "date": "2023-10-19T05:30:59+05:30",
+      "subject": "fix: #846 (#847)",
+      "source_files": 1,
+      "source_lines": 6,
+      "has_test": true,
+      "files": [
+        {
+          "path": "context.go",
+          "lines": 6,
+          "kind": "source"
+        },
+        {
+          "path": "context_test.go",
+          "lines": 7,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "355dd04bad970f83ad19dc6856bc209f2402732d",
+      "date": "2023-10-19T02:59:47+03:00",
+      "subject": "Fix typos in comments and variable names (#849)",
+      "source_files": 3,
+      "source_lines": 18,
+      "has_test": true,
+      "files": [
+        {
+          "path": "CHANGELOG.md",
+          "lines": 2,
+          "kind": "other"
+        },
+        {
+          "path": "_examples/versions/main.go",
+          "lines": 2,
+          "kind": "source"
+        },
+        {
+          "path": "context.go",
+          "lines": 2,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/compress.go",
+          "lines": 14,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/realip_test.go",
+          "lines": 2,
+          "kind": "test"
+        },
+        {
+          "path": "middleware/recoverer_test.go",
+          "lines": 8,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "bfe33938e68ffc28181c3e81a2734c244471a074",
+      "date": "2023-08-08T14:18:55+02:00",
+      "subject": "Fix GoDoc link to lead to the v5 module documentation (#834)",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": false,
+      "files": [
+        {
+          "path": "README.md",
+          "lines": 2,
+          "kind": "other"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "12e93227b3775086dc02731309531a44776cfcf0",
+      "date": "2023-07-13T11:54:39-04:00",
+      "subject": "fixed small edge case in tests of v5.0.9 for older Go versions",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux_test.go",
+          "lines": 4,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "7f280968675bcc9f310008fc6b8abff0b923734c",
+      "date": "2023-05-02T13:37:05+03:00",
+      "subject": "Spelling and grammar fixes (#820)",
+      "source_files": 4,
+      "source_lines": 10,
+      "has_test": true,
+      "files": [
+        {
+          "path": "CHANGELOG.md",
+          "lines": 6,
+          "kind": "other"
+        },
+        {
+          "path": "_examples/graceful/main.go",
+          "lines": 2,
+          "kind": "source"
+        },
+        {
+          "path": "_examples/rest/main.go",
+          "lines": 2,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/compress.go",
+          "lines": 4,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/middleware_test.go",
+          "lines": 2,
+          "kind": "test"
+        },
+        {
+          "path": "middleware/throttle_test.go",
+          "lines": 2,
+          "kind": "test"
+        },
+        {
+          "path": "mux.go",
+          "lines": 2,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "9db25e5b381fbd6350583b857e74ecaffe355819",
+      "date": "2022-06-26T22:32:16+09:00",
+      "subject": "middleware: fix broken comment on go doc (#735)",
+      "source_files": 1,
+      "source_lines": 13,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/logger.go",
+          "lines": 13,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "b750c805b4ee0952be12031a9b64014a8ae99c6f",
+      "date": "2022-01-04T04:13:36+09:00",
+      "subject": "middleware: fix set Vary header (#640)",
+      "source_files": 1,
+      "source_lines": 2,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/compress.go",
+          "lines": 2,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "ba10645980b4076b0f9a057574457db9bcf6ebd8",
+      "date": "2022-01-03T13:23:27-05:00",
+      "subject": "fix warning in test",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux_test.go",
+          "lines": 3,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "df44563f0692b1e677f18220b9be165e481cf51b",
+      "date": "2021-08-30T20:31:12+03:00",
+      "subject": "Fix middleware.Recoverer under Go 1.17+ (again) (#654)",
+      "source_files": 1,
+      "source_lines": 8,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/recoverer.go",
+          "lines": 8,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/recoverer_test.go",
+          "lines": 22,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "188a1675b7071f85360770e66daab3a51a977eeb",
+      "date": "2021-06-29T16:51:52+01:00",
+      "subject": "Fix middleware.Recoverer under Go 1.17+ (#633)",
+      "source_files": 1,
+      "source_lines": 17,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/recoverer.go",
+          "lines": 17,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/recoverer_test.go",
+          "lines": 22,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "a6f8a3eb80120068d55bcd444ca5121f059055ef",
+      "date": "2021-06-25T15:49:43+03:00",
+      "subject": "fix comments and messages for users routes in todos-resource (#631)",
+      "source_files": 1,
+      "source_lines": 22,
+      "has_test": false,
+      "files": [
+        {
+          "path": "_examples/todos-resource/users.go",
+          "lines": 22,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "248d06cc6a671e893af50c576200e8354eed08f2",
+      "date": "2021-04-25T13:30:31+02:00",
+      "subject": "Fix support for httptest.ResponseRecorder (#584)",
+      "source_files": 1,
+      "source_lines": 22,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/logger_test.go",
+          "lines": 17,
+          "kind": "test"
+        },
+        {
+          "path": "middleware/wrap_writer.go",
+          "lines": 22,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/wrap_writer_test.go",
+          "lines": 2,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "969d7fcccb46710a67a9380877cfb50610490b6a",
+      "date": "2021-03-25T08:56:33-04:00",
+      "subject": "fix #587 by reverting 894714a and 00cc734 (#606)",
+      "source_files": 1,
+      "source_lines": 14,
+      "has_test": false,
+      "files": [
+        {
+          "path": "mux.go",
+          "lines": 14,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "34d54d6d59fc819667102f56ba72d98e4a4ed896",
+      "date": "2021-03-07T07:33:48-05:00",
+      "subject": "methodTyp as uint to fix go 1.14 compatibility (#599)",
+      "source_files": 1,
+      "source_lines": 3,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux_test.go",
+          "lines": 26,
+          "kind": "test"
+        },
+        {
+          "path": "tree.go",
+          "lines": 3,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "2d3ff237c6b65d1aa8085a9716e4cda747ffc90c",
+      "date": "2021-02-28T09:33:39-08:00",
+      "subject": "Fix last set of missing v5 paths (#593)",
+      "source_files": 4,
+      "source_lines": 14,
+      "has_test": false,
+      "files": [
+        {
+          "path": "_examples/versions/main.go",
+          "lines": 8,
+          "kind": "source"
+        },
+        {
+          "path": "_examples/versions/presenter/v1/article.go",
+          "lines": 2,
+          "kind": "source"
+        },
+        {
+          "path": "_examples/versions/presenter/v2/article.go",
+          "lines": 2,
+          "kind": "source"
+        },
+        {
+          "path": "_examples/versions/presenter/v3/article.go",
+          "lines": 2,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "423901dfd545582a6dba2eb4357abffed13b2b9b",
+      "date": "2021-02-05T22:28:56-03:00",
+      "subject": "Fixing RegisterMethod method value generation (#573)",
+      "source_files": 1,
+      "source_lines": 5,
+      "has_test": false,
+      "files": [
+        {
+          "path": "tree.go",
+          "lines": 5,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "82aabd6698118027dfccffce117ed3f8c70510e6",
+      "date": "2021-02-06T03:26:32+02:00",
+      "subject": "Fix data race in TestServerBaseContext (#575)",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux_test.go",
+          "lines": 3,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "681ea79f56a292fa2abab261f05c217da61e74da",
+      "date": "2020-12-25T02:28:05+09:00",
+      "subject": "Fix: validate empty path param (#567)",
+      "source_files": 1,
+      "source_lines": 2,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux_test.go",
+          "lines": 2,
+          "kind": "test"
+        },
+        {
+          "path": "tree.go",
+          "lines": 2,
+          "kind": "source"
+        },
+        {
+          "path": "tree_test.go",
+          "lines": 7,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "87e5387928b553b5de3a75d5105a34871bc9b8b3",
+      "date": "2020-12-05T20:07:21+01:00",
+      "subject": "Fix RedirectSlashes, Closes #504 (#505)",
+      "source_files": 1,
+      "source_lines": 5,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/strip.go",
+          "lines": 5,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/strip_test.go",
+          "lines": 12,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "655cfcdb1855cb4d0f691a593bfe479b87d570ba",
+      "date": "2020-12-05T10:38:37-05:00",
+      "subject": "naming convention fix from PR",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/url_format_test.go",
+          "lines": 2,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "f3105d4f534ddf08d2bd0cc351cec4053e765e6e",
+      "date": "2020-11-24T14:57:13-05:00",
+      "subject": "Prevent mounting a nil handler (#552)",
+      "source_files": 1,
+      "source_lines": 11,
+      "has_test": false,
+      "files": [
+        {
+          "path": "mux.go",
+          "lines": 11,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "5704d7ee98edd3fe55169b506531bdd061667c70",
+      "date": "2020-05-22T09:51:03-04:00",
+      "subject": "fix: handle methodnotallowed with path variables (#512)",
+      "source_files": 1,
+      "source_lines": 4,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux_test.go",
+          "lines": 16,
+          "kind": "test"
+        },
+        {
+          "path": "tree.go",
+          "lines": 4,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "12ebe3332f86ee21554ecfbef430bdf376be7f5f",
+      "date": "2020-04-01T13:43:29-04:00",
+      "subject": "middleware.WrapResponseWriter fix superfluous WriteHeader call",
+      "source_files": 1,
+      "source_lines": 5,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/wrap_writer.go",
+          "lines": 5,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "d80b8f3f3c7fdb449622bdee65d8fff5155acf30",
+      "date": "2020-01-11T20:40:23+01:00",
+      "subject": "Panic for invalid content-type wildcard",
+      "source_files": 1,
+      "source_lines": 4,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/compress.go",
+          "lines": 4,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/compress_test.go",
+          "lines": 61,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "3658d98ee4dc2e8e25a4b7cf759ad0dd42f4c075",
+      "date": "2020-01-08T21:55:02-05:00",
+      "subject": "fix regexp routing to include default value when param is not matched",
+      "source_files": 1,
+      "source_lines": 7,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux_test.go",
+          "lines": 32,
+          "kind": "test"
+        },
+        {
+          "path": "tree.go",
+          "lines": 7,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "221acf29d02b708ec13791ff562888a730bfe6a7",
+      "date": "2019-10-31T10:07:31Z",
+      "subject": "Fix cast panic and just return nil if invalid",
+      "source_files": 1,
+      "source_lines": 3,
+      "has_test": false,
+      "files": [
+        {
+          "path": "context.go",
+          "lines": 3,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "906b567ebae89be14ccf532cdf29dd57645adc4a",
+      "date": "2019-10-03T06:24:41-04:00",
+      "subject": "middleware: fix routing issue in throttler",
+      "source_files": 1,
+      "source_lines": 87,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/throttle.go",
+          "lines": 87,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "5f3370888b7e60285616cb050e329599eec38ebd",
+      "date": "2019-07-20T00:21:40+02:00",
+      "subject": "Fixed encoding test",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/compress_test.go",
+          "lines": 2,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "3ee2f9a37ff10b5e497566fc4c0d5726cad7f50f",
+      "date": "2019-02-24T13:52:45-05:00",
+      "subject": "middleware: Compress encoding precedence fix",
+      "source_files": 1,
+      "source_lines": 2,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/compress.go",
+          "lines": 2,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "85905ae4dd0a60afa490c062913f0c3ae168ac7e",
+      "date": "2019-02-24T11:35:16-05:00",
+      "subject": "fixes a regression for wildcard param checking",
+      "source_files": 1,
+      "source_lines": 7,
+      "has_test": false,
+      "files": [
+        {
+          "path": "tree.go",
+          "lines": 7,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "403a33cc14d759085d69fff973da96eefd02cc9c",
+      "date": "2019-02-24T11:16:32-05:00",
+      "subject": "middleware: fix Compress to call correct ResponseWriter in the stack",
+      "source_files": 1,
+      "source_lines": 50,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/compress.go",
+          "lines": 50,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "1a6bb108ccf279c8dac6f9bad857d773b4f9b421",
+      "date": "2019-01-17T17:35:40-05:00",
+      "subject": "middleware: fix Compress to return passed down status code",
+      "source_files": 1,
+      "source_lines": 4,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/compress.go",
+          "lines": 4,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "bb7ee27ff4734d4bf046551a9a0b6ac36516d805",
+      "date": "2019-01-08T15:09:28-05:00",
+      "subject": "middleware: fixes #334 to preserve query params after RedirectSlashes",
+      "source_files": 1,
+      "source_lines": 7,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/strip.go",
+          "lines": 7,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/strip_test.go",
+          "lines": 12,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "cd12532e9858f735c2cac6cc8a398dfd987676dd",
+      "date": "2019-01-08T14:44:10-05:00",
+      "subject": "fixes #333, which adds additional check to ensure wildcard is used at end of a url pattern",
+      "source_files": 1,
+      "source_lines": 3,
+      "has_test": true,
+      "files": [
+        {
+          "path": "CHANGELOG.md",
+          "lines": 18,
+          "kind": "other"
+        },
+        {
+          "path": "mux_test.go",
+          "lines": 26,
+          "kind": "test"
+        },
+        {
+          "path": "tree.go",
+          "lines": 3,
+          "kind": "source"
+        },
+        {
+          "path": "tree_test.go",
+          "lines": 6,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "c88f06fe6419037c86b3b26a4a67470621f458ad",
+      "date": "2019-01-08T13:36:51-05:00",
+      "subject": "fixes #347 deprecate http.CloseNotifier",
+      "source_files": 4,
+      "source_lines": 45,
+      "has_test": true,
+      "files": [
+        {
+          "path": "_examples/limits/main.go",
+          "lines": 9,
+          "kind": "source"
+        },
+        {
+          "path": "_examples/router-walk/main.go",
+          "lines": 2,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/compress.go",
+          "lines": 13,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/middleware_test.go",
+          "lines": 4,
+          "kind": "test"
+        },
+        {
+          "path": "middleware/wrap_writer.go",
+          "lines": 21,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "adf3c28a98c68e52c8baa1bbf1221e72dec8b963",
+      "date": "2019-01-08T13:11:27-05:00",
+      "subject": "fixes #343, add documentation to note StripSlashes incompat with http.FileServer",
+      "source_files": 1,
+      "source_lines": 3,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/strip.go",
+          "lines": 3,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "9861155d5f23d6aaf4a0c408c5c74740064a026a",
+      "date": "2019-01-08T12:53:40-05:00",
+      "subject": "fixes #362, return 404 when routing to empty mux",
+      "source_files": 1,
+      "source_lines": 3,
+      "has_test": false,
+      "files": [
+        {
+          "path": "mux.go",
+          "lines": 3,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "08d9051ef6546d57c5dca8eae13e6df362e2d568",
+      "date": "2019-01-07T20:17:51-05:00",
+      "subject": "tiny fix: formatting of previous PR",
+      "source_files": 1,
+      "source_lines": 2,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/compress.go",
+          "lines": 2,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "0ae339de6d3e40d1aca7b22617a8267b7537f08c",
+      "date": "2018-12-21T08:46:56-05:00",
+      "subject": "fix travis",
+      "source_files": 1,
+      "source_lines": 6,
+      "has_test": false,
+      "files": [
+        {
+          "path": ".travis.yml",
+          "lines": 4,
+          "kind": "other"
+        },
+        {
+          "path": "_examples/versions/main.go",
+          "lines": 6,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "0ebf7795c516423a110473652e9ba3a59a504863",
+      "date": "2018-10-24T06:12:33-04:00",
+      "subject": "fix travis for go 1.7 and go 1.8",
+      "source_files": 1,
+      "source_lines": 18,
+      "has_test": false,
+      "files": [
+        {
+          "path": ".travis.yml",
+          "lines": 2,
+          "kind": "other"
+        },
+        {
+          "path": "tree.go",
+          "lines": 18,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "a8101e5e7527df085501350abb310d77778f7e48",
+      "date": "2018-10-14T10:51:12-07:00",
+      "subject": "fix golint installation",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": false,
+      "files": [
+        {
+          "path": ".travis.yml",
+          "lines": 2,
+          "kind": "other"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "57eb9c7a7506f90cf1307afb1ad82dea87a00cfe",
+      "date": "2018-08-16T08:23:23+01:00",
+      "subject": "Fix doc codeblock in Context.RoutePattern",
+      "source_files": 1,
+      "source_lines": 14,
+      "has_test": false,
+      "files": [
+        {
+          "path": "context.go",
+          "lines": 14,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "0c5e7abb4e562fa14dd2548cb57b28f979a7dcd9",
+      "date": "2018-07-10T06:45:11-07:00",
+      "subject": "Update rest example to fix #314, nil pointer dereference (#328)",
+      "source_files": 1,
+      "source_lines": 10,
+      "has_test": false,
+      "files": [
+        {
+          "path": "_examples/rest/main.go",
+          "lines": 10,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "e223a795a06a5598451cf022558c17c779f5a7ab",
+      "date": "2018-02-02T11:41:35-08:00",
+      "subject": "bug fix: wroteHeader should be set when Flush is done (#300)",
+      "source_files": 1,
+      "source_lines": 6,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/wrap_writer.go",
+          "lines": 6,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/wrap_writer_test.go",
+          "lines": 33,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "575dd3a13719315a5ff5ca7906edc7062673293a",
+      "date": "2017-11-20T07:10:20-08:00",
+      "subject": "Fix #277 by setting param values for empty segments",
+      "source_files": 1,
+      "source_lines": 2,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux_test.go",
+          "lines": 20,
+          "kind": "test"
+        },
+        {
+          "path": "tree.go",
+          "lines": 2,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "c82a10ad80a5eab1d6b77ff5e96bdb774757d5a6",
+      "date": "2017-11-15T19:47:40+01:00",
+      "subject": "Fix missing profile subpages (#279)",
+      "source_files": 1,
+      "source_lines": 6,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/profiler.go",
+          "lines": 6,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "1cbc3a2b40e78d7612f5ea153d87d537907e8b15",
+      "date": "2017-11-08T17:29:18-05:00",
+      "subject": "Fix lint warnings",
+      "source_files": 2,
+      "source_lines": 5,
+      "has_test": false,
+      "files": [
+        {
+          "path": ".travis.yml",
+          "lines": 1,
+          "kind": "other"
+        },
+        {
+          "path": "middleware/get_head.go",
+          "lines": 1,
+          "kind": "source"
+        },
+        {
+          "path": "tree.go",
+          "lines": 4,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "40c607ea5d9f34240e783bcdbb701e049fb666d6",
+      "date": "2017-10-27T14:50:12-04:00",
+      "subject": "Fixed a panic when using the `Router` returned from `*Mux.With(...)` as an http.Handler (#276)",
+      "source_files": 1,
+      "source_lines": 7,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux.go",
+          "lines": 7,
+          "kind": "source"
+        },
+        {
+          "path": "mux_test.go",
+          "lines": 20,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "e0ba5d4039fb63e170f45708841a5a2535489413",
+      "date": "2017-10-20T23:36:20+03:00",
+      "subject": "Fix 'elasped' misspelling of 'elapsed' (#273)",
+      "source_files": 1,
+      "source_lines": 2,
+      "has_test": false,
+      "files": [
+        {
+          "path": "_examples/logging/main.go",
+          "lines": 2,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "624e6e12e9bc3b3073f539dab52abecdec01d769",
+      "date": "2017-09-07T18:24:55+02:00",
+      "subject": "Fix: regex matching only part of parameter (#258)",
+      "source_files": 1,
+      "source_lines": 9,
+      "has_test": true,
+      "files": [
+        {
+          "path": "tree.go",
+          "lines": 9,
+          "kind": "source"
+        },
+        {
+          "path": "tree_test.go",
+          "lines": 25,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "2f332444aaaa1e2c9bc8209b96eb149d0bcb20bc",
+      "date": "2017-07-25T09:18:50-04:00",
+      "subject": "Fix WrapWriter.ReadFrom() with Tee (#235)",
+      "source_files": 1,
+      "source_lines": 4,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/wrap_writer.go",
+          "lines": 4,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "c2f2a1283d7a53116ecae90c01a9a164fbabbbf3",
+      "date": "2017-07-09T03:21:51+10:00",
+      "subject": "Recursive not found fix for trailing slash routes (#223)",
+      "source_files": 1,
+      "source_lines": 6,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux.go",
+          "lines": 6,
+          "kind": "source"
+        },
+        {
+          "path": "mux_test.go",
+          "lines": 13,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "5c9943c3abb9d590777c4b9385801e53b6c7fa1a",
+      "date": "2017-06-21T15:02:41-04:00",
+      "subject": "docgen: fix reflection of pointer value for caller frame",
+      "source_files": 1,
+      "source_lines": 10,
+      "has_test": false,
+      "files": [
+        {
+          "path": "docgen/util.go",
+          "lines": 10,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "1ad86a46e2e881d9dae7844d33aaac4165a55893",
+      "date": "2017-06-21T20:48:03+02:00",
+      "subject": "While recovering from panic, print it's argument along with stack (#187)",
+      "source_files": 1,
+      "source_lines": 3,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/recoverer.go",
+          "lines": 3,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "7c1f98d4428e3642e0a7f8cabba5772a4e32f584",
+      "date": "2017-06-21T11:30:49-04:00",
+      "subject": "Update import path in example, thank you @samwierema for the fix",
+      "source_files": 1,
+      "source_lines": 8,
+      "has_test": false,
+      "files": [
+        {
+          "path": "_examples/logging/main.go",
+          "lines": 8,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "dd7b63d4413eab6849719b4de94aaf9d05b8d2bc",
+      "date": "2017-06-10T21:55:06-04:00",
+      "subject": "Fix #185 to make best effort to parse content type",
+      "source_files": 1,
+      "source_lines": 1,
+      "has_test": false,
+      "files": [
+        {
+          "path": "render/content_type.go",
+          "lines": 1,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "5f645ae32b572998bed8ceaf80318569ef3b69fc",
+      "date": "2017-05-15T09:38:45-04:00",
+      "subject": "Remove trailing space, fix #197 thanks @dim",
+      "source_files": 1,
+      "source_lines": 2,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/compress.go",
+          "lines": 2,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "f262230f5155fe761ddca49f01f78d8383bcb145",
+      "date": "2017-05-13T14:37:05-04:00",
+      "subject": "render: fixes #193",
+      "source_files": 1,
+      "source_lines": 14,
+      "has_test": false,
+      "files": [
+        {
+          "path": "render/responder.go",
+          "lines": 14,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "822e7b85e22b3f7a573782c3674edf8e732fb427",
+      "date": "2017-03-14T17:31:29-04:00",
+      "subject": "Find routes by raw url path, fixes #148",
+      "source_files": 1,
+      "source_lines": 6,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux.go",
+          "lines": 6,
+          "kind": "source"
+        },
+        {
+          "path": "mux_test.go",
+          "lines": 40,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "d573d1cfc43e866ab2c987c443468380a4e0cd5f",
+      "date": "2017-02-14T11:35:15+01:00",
+      "subject": "Fix example in middleware.Profiler godoc",
+      "source_files": 1,
+      "source_lines": 2,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/profiler.go",
+          "lines": 2,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "5091bb07e2331509a6a13f1bbe88771115df44c2",
+      "date": "2016-12-16T18:07:58-05:00",
+      "subject": "Fix GetRequestID API",
+      "source_files": 2,
+      "source_lines": 6,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/logger.go",
+          "lines": 2,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/request_id.go",
+          "lines": 4,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "08a4f980e3f489687965541f6f6bd8436df13784",
+      "date": "2016-12-09T13:39:53-05:00",
+      "subject": "Fixes #117",
+      "source_files": 2,
+      "source_lines": 57,
+      "has_test": true,
+      "files": [
+        {
+          "path": ".travis.yml",
+          "lines": 2,
+          "kind": "other"
+        },
+        {
+          "path": "middleware/closenotify.go",
+          "lines": 14,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/closenotify_17.go",
+          "lines": 43,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/closenotify_test.go",
+          "lines": 44,
+          "kind": "test"
+        },
+        {
+          "path": "middleware/throttler_test.go",
+          "lines": 12,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "17a97751f9bccb85194cb2f24a5e952893aed652",
+      "date": "2016-11-30T14:03:03+11:00",
+      "subject": "Fix missing MethodNotAllowed in Router interface",
+      "source_files": 1,
+      "source_lines": 4,
+      "has_test": false,
+      "files": [
+        {
+          "path": "chi.go",
+          "lines": 4,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "96dad7e79079d9cff7a8e30a31b79879d32c52b5",
+      "date": "2016-11-22T20:28:55-05:00",
+      "subject": "Fix #115",
+      "source_files": 1,
+      "source_lines": 21,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux_test.go",
+          "lines": 27,
+          "kind": "test"
+        },
+        {
+          "path": "tree.go",
+          "lines": 21,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "954ac7918b9dcc0b956682bba6bd083f5b93c78f",
+      "date": "2016-11-17T10:35:09+07:00",
+      "subject": "Update not found handlers recursively fix #110",
+      "source_files": 1,
+      "source_lines": 14,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux.go",
+          "lines": 14,
+          "kind": "source"
+        },
+        {
+          "path": "mux_test.go",
+          "lines": 52,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "85bd9ea986850717c03472f5531a1cf0498d2967",
+      "date": "2016-11-10T20:20:04-05:00",
+      "subject": "Fix travis",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": false,
+      "files": [
+        {
+          "path": ".travis.yml",
+          "lines": 2,
+          "kind": "other"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "18b0822853e29daeaae47c8cb0b47f8e8e357cc2",
+      "date": "2016-11-10T16:06:31-05:00",
+      "subject": "Provide ability to set MethodNotAllowed handler on a *Mux, fixes #101",
+      "source_files": 1,
+      "source_lines": 23,
+      "has_test": false,
+      "files": [
+        {
+          "path": "mux.go",
+          "lines": 23,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "ad6cbd5e08514f23fef6baea599087fb6e8b5a00",
+      "date": "2016-10-20T21:36:42+01:00",
+      "subject": "Fix all ineffassign warnings",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/throttler_test.go",
+          "lines": 2,
+          "kind": "test"
+        },
+        {
+          "path": "mux_test.go",
+          "lines": 4,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "6ca1005b79b8827a2b0fc9115d21fad1616e7847",
+      "date": "2016-08-17T16:16:12-07:00",
+      "subject": "Fix context value chaining",
+      "source_files": 3,
+      "source_lines": 49,
+      "has_test": true,
+      "files": [
+        {
+          "path": "context.go",
+          "lines": 34,
+          "kind": "source"
+        },
+        {
+          "path": "mux.go",
+          "lines": 7,
+          "kind": "source"
+        },
+        {
+          "path": "mux_test.go",
+          "lines": 56,
+          "kind": "test"
+        },
+        {
+          "path": "tree.go",
+          "lines": 8,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "7137916b62a43c45046f0516adac098f15bb338d",
+      "date": "2016-08-15T17:09:35+02:00",
+      "subject": "Fix example in README.md",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": false,
+      "files": [
+        {
+          "path": "README.md",
+          "lines": 6,
+          "kind": "other"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "baa2aaa23447b035875e066e7e7bdcdc9838e183",
+      "date": "2016-08-04T11:43:36-04:00",
+      "subject": "Add test: Expect panic() on late r.Use()",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware_test.go",
+          "lines": 22,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "70d738b66884ce0ccbdc2d5961f833cbb220b7bb",
+      "date": "2016-08-02T19:03:33-04:00",
+      "subject": "middleware.Compress: Fix http: multiple response.WriteHeader calls",
+      "source_files": 1,
+      "source_lines": 1,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/compress.go",
+          "lines": 1,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "1bde682f4f1c351e587d15ba52fe71c957aa1840",
+      "date": "2016-07-05T15:20:20-04:00",
+      "subject": "Fix example responder",
+      "source_files": 1,
+      "source_lines": 27,
+      "has_test": false,
+      "files": [
+        {
+          "path": "_examples/render/main.go",
+          "lines": 27,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "3d334c4e8deb7a43c98159beb5e9fd7c25b73775",
+      "date": "2016-07-04T17:06:34-04:00",
+      "subject": "Fix references to \"context\" pkg",
+      "source_files": 3,
+      "source_lines": 9,
+      "has_test": false,
+      "files": [
+        {
+          "path": "_examples/render/main.go",
+          "lines": 3,
+          "kind": "source"
+        },
+        {
+          "path": "render/presenter.go",
+          "lines": 3,
+          "kind": "source"
+        },
+        {
+          "path": "render/respond.go",
+          "lines": 3,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "24e003c3c81514d3f9eb41ada10f0e6f8ef40a0a",
+      "date": "2016-07-04T13:46:08-04:00",
+      "subject": "Remove JSON `[]` for nil array by default",
+      "source_files": 1,
+      "source_lines": 7,
+      "has_test": false,
+      "files": [
+        {
+          "path": "render/respond.go",
+          "lines": 7,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "b0ae0ac6c6b8757eee25b1111933608f4b19afda",
+      "date": "2016-07-14T17:23:19-04:00",
+      "subject": "Fix middleware test case",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/strip_test.go",
+          "lines": 11,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "3e75f5173360368fdb31ab6e64be44668ce6b493",
+      "date": "2016-06-23T13:48:31-04:00",
+      "subject": "Fix merge for v2",
+      "source_files": 1,
+      "source_lines": 4,
+      "has_test": true,
+      "files": [
+        {
+          "path": "middleware/strip.go",
+          "lines": 4,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/strip_test.go",
+          "lines": 10,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "dcbb8f81eea01aaaa5b6f9bffc229e9e9e0256bb",
+      "date": "2016-06-22T17:59:16-04:00",
+      "subject": "Ensure we dont route to an empty mux, fixes #42",
+      "source_files": 1,
+      "source_lines": 6,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux.go",
+          "lines": 6,
+          "kind": "source"
+        },
+        {
+          "path": "mux_test.go",
+          "lines": 46,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "1c32e6be0b0972a85829f4af53088ece8892b7f9",
+      "date": "2016-06-22T10:51:57-04:00",
+      "subject": "merge: fix mux tests",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux_test.go",
+          "lines": 10,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "a7a13a0125c5107ba939fed73e434423ab48cfef",
+      "date": "2016-06-20T17:00:45-04:00",
+      "subject": "Update README a bit, and fix examples",
+      "source_files": 2,
+      "source_lines": 6,
+      "has_test": false,
+      "files": [
+        {
+          "path": "README.md",
+          "lines": 85,
+          "kind": "other"
+        },
+        {
+          "path": "_examples/rest/main.go",
+          "lines": 4,
+          "kind": "source"
+        },
+        {
+          "path": "_examples/simple/main.go",
+          "lines": 2,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "fcf86143a13a9215f5aa65d34326fca12bd90166",
+      "date": "2016-05-08T09:54:35-04:00",
+      "subject": "Add some notes and fix middlewares",
+      "source_files": 10,
+      "source_lines": 55,
+      "has_test": true,
+      "files": [
+        {
+          "path": "chi.go",
+          "lines": 5,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/closenotify.go",
+          "lines": 1,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/profiler.go",
+          "lines": 20,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/request_id.go",
+          "lines": 1,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/throttler.go",
+          "lines": 2,
+          "kind": "source"
+        },
+        {
+          "path": "middleware/throttler_test.go",
+          "lines": 16,
+          "kind": "test"
+        },
+        {
+          "path": "middleware/timeout.go",
+          "lines": 1,
+          "kind": "source"
+        },
+        {
+          "path": "mux.go",
+          "lines": 5,
+          "kind": "source"
+        },
+        {
+          "path": "render/content_type.go",
+          "lines": 14,
+          "kind": "source"
+        },
+        {
+          "path": "render/render.go",
+          "lines": 3,
+          "kind": "source"
+        },
+        {
+          "path": "util.go",
+          "lines": 3,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "745e3ba40030a46a79f040c3ddd0aef6e7603e42",
+      "date": "2015-12-07T11:47:53-05:00",
+      "subject": "Code review fixes",
+      "source_files": 1,
+      "source_lines": 5,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux.go",
+          "lines": 5,
+          "kind": "source"
+        },
+        {
+          "path": "mux_test.go",
+          "lines": 2,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "dae0ee44961e2537718ea55e899a667edddbf219",
+      "date": "2015-12-07T11:26:12-05:00",
+      "subject": "Fixes panic on HTTP method not in methodMap",
+      "source_files": 1,
+      "source_lines": 20,
+      "has_test": true,
+      "files": [
+        {
+          "path": "mux.go",
+          "lines": 20,
+          "kind": "source"
+        },
+        {
+          "path": "mux_test.go",
+          "lines": 5,
+          "kind": "test"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "7c7fe4e3060fc363862ed12b383c9175e9472fc2",
+      "date": "2015-11-11T15:05:27-05:00",
+      "subject": "Fix goimports command",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": false,
+      "files": [
+        {
+          "path": ".travis.yml",
+          "lines": 6,
+          "kind": "other"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "7f0c7f4cc7ed6e4fed8e045be72630853b725ae6",
+      "date": "2015-11-11T17:48:55+01:00",
+      "subject": "Add request context to panic message",
+      "source_files": 1,
+      "source_lines": 10,
+      "has_test": false,
+      "files": [
+        {
+          "path": "middleware/recoverer.go",
+          "lines": 10,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "a6c4604f05321d7ebe0e0ce7664fcf5411584825",
+      "date": "2015-11-05T17:44:11-05:00",
+      "subject": "Fix for standard middleware chaining",
+      "source_files": 1,
+      "source_lines": 14,
+      "has_test": false,
+      "files": [
+        {
+          "path": "util.go",
+          "lines": 14,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    },
+    {
+      "sha": "fe3ba72e6eea52f5c28e79b0a2ca08c7e31acae9",
+      "date": "2015-10-28T14:57:36-04:00",
+      "subject": "Fix table in README",
+      "source_files": 0,
+      "source_lines": 0,
+      "has_test": false,
+      "files": [
+        {
+          "path": "README.md",
+          "lines": 10,
+          "kind": "other"
+        }
+      ],
+      "passes_filter": false
+    },
+    {
+      "sha": "22780923d9779228922c68cf7225dcffb7bec62f",
+      "date": "2015-10-28T10:42:25-04:00",
+      "subject": "Fix for when prefix matches a static and wildcard node",
+      "source_files": 1,
+      "source_lines": 17,
+      "has_test": false,
+      "files": [
+        {
+          "path": "tree.go",
+          "lines": 17,
+          "kind": "source"
+        }
+      ],
+      "passes_filter": true
+    }
+  ]
+}
