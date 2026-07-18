@@ -1,6 +1,10 @@
 # 個人的な下書き (メール文面等) — 公開 repo に含めない
 drafts/
 
+# ベンチマーク対象リポの clone 置き場 (repos/fetch.sh で再取得可能)
+repos/*
+!repos/fetch.sh
+
 # LaTeX build artifacts
 *.aux
 *.log
