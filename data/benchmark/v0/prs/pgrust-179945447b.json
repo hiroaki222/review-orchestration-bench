@@ -1,0 +1,36 @@
+{
+  "id": "pgrust-179945447b",
+  "repo": "pgrust",
+  "fix_sha": "179945447b4d00c89daf18f0632af25f7e52636e",
+  "base_sha": "179945447b4d00c89daf18f0632af25f7e52636e",
+  "language": "rust",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "inet型のGiSTインデックスがクエリ側varlenaのデトースト漏れとGistInetKeyのレイアウト不一致により、consistentチェックが常に失敗しインデックススキャンが0行しか返せなかった",
+  "pr_diff": "diff --git a/crates/backend-access-gist-proc/src/lib.rs b/crates/backend-access-gist-proc/src/lib.rs\nindex 0ee44a803..cc8189717 100644\n--- a/crates/backend-access-gist-proc/src/lib.rs\n+++ b/crates/backend-access-gist-proc/src/lib.rs\n@@ -37,7 +37,7 @@ use backend_utils_adt_tsgistidx as tsgist;\n use backend_utils_adt_tsquery_core::gist as tsqgist;\n use types_tsearch::tsearch::TSQuerySign;\n use types_tsearch::tsgistidx::SignTsVector;\n-use types_network::GistInetKey;\n+use types_network::{inet_struct, GistInetKey};\n use dispatch::{GistConsistentResult, GistDistanceResult, StrategyNumber};\n use mcx::{Mcx, PgBox};\n use types_core::geo::{Point, CIRCLE, BOX};\n@@ -1669,10 +1669,7 @@ fn dispatch_consistent<'mcx>(\n         F_GIST_CIRCLE_CONSISTENT => gist_circle_consistent(entry, query, strategy),\n         F_INET_GIST_CONSISTENT => {\n             let key = GistInetKey::from_datum_bytes(entry.key.as_ref_bytes());\n-            // The query is a real `inet`/`cidr` SQL varlena (`PG_GETARG_INET_PP`),\n-            // so it must be detoasted and decoded at `VARDATA_ANY` rather than read\n-            // as the header-less `GistInetKey`/`inet` byte image the index key uses.\n-            let q = backend_utils_adt_network_seams::inet::datum_get_inet_pp::call(_mcx, query)?;\n+            let q = inet_struct::from_datum_bytes(query.as_ref_bytes());\n             let (matched, recheck) = inet_gist::inet_gist_consistent::call(key, q, strategy, is_leaf)?;\n             Ok(GistConsistentResult { matched, recheck })\n         }\n@@ -1773,13 +1770,8 @@ fn dispatch_compress<'mcx>(\n             // converted; inner entries pass through unchanged.\n             if entry.leafkey {\n                 let in_ = match &entry.key {\n-                    // DatumGetPointer(entry->key) != NULL. The leaf key is the\n-                    // original `inet`/`cidr` column varlena (`PG_GETARG_INET_PP`),\n-                    // so detoast and decode at `VARDATA_ANY` rather than reading the\n-                    // header-less `GistInetKey` byte image.\n-                    Datum::ByRef(_) => {\n-                        Some(backend_utils_adt_network_seams::inet::datum_get_inet_pp::call(mcx, &entry.key)?)\n-                    }\n+                    // DatumGetPointer(entry->key) != NULL\n+                    Datum::ByRef(_) => Some(inet_struct::from_datum_bytes(entry.key.as_ref_bytes())),\n                     // DatumGetPointer(entry->key) == NULL\n                     Datum::ByVal(_) => None,\n                     Datum::Cstring(_) | Datum::Composite(_) | Datum::Expanded(_) | Datum::Internal(_) => {\ndiff --git a/crates/types-network/src/lib.rs b/crates/types-network/src/lib.rs\nindex 066251af4..3380d801c 100644\n--- a/crates/types-network/src/lib.rs\n+++ b/crates/types-network/src/lib.rs\n@@ -151,38 +151,24 @@ pub struct GistInetKey {\n \n impl GistInetKey {\n     /// Encode the key into the bytes carried by a by-reference `Datum`\n-    /// (`InetKeyPGetDatum`).\n-    ///\n-    /// The C `GistInetKey` is a varlena whose struct layout is\n-    /// `{ char vl_len_[4]; uint8 family; uint8 minbits; uint8 commonbits;\n-    /// uint8 ipaddr[16]; }` — i.e. the payload fields begin at byte offset 4,\n-    /// *after* the 4-byte length word, and `gk_ip_family`/`gk_ip_addr` read the\n-    /// struct at those fixed offsets (they never use `VARDATA_ANY`). So this\n-    /// emits a full 4-byte-header varlena image (`SET_VARSIZE`) holding the whole\n-    /// 16-byte address; `index_form_tuple` copies the varlena verbatim onto the\n-    /// page, and `from_datum_bytes` reads the fields back at the same offsets.\n-    pub fn to_datum_bytes(&self) -> [u8; 23] {\n-        let mut out = [0u8; 23];\n-        // SET_VARSIZE(out, 23): the 4-byte length word (low two bits are the\n-        // uncompressed/long-header flags = 0). 23 << 2 = 92 fits in byte 0.\n-        let varsize: u32 = 23;\n-        out[..4].copy_from_slice(&(varsize << 2).to_le_bytes());\n-        out[4] = self.family;\n-        out[5] = self.minbits;\n-        out[6] = self.commonbits;\n-        out[7..23].copy_from_slice(&self.ipaddr);\n+    /// (`InetKeyPGetDatum`): family, minbits, commonbits, then 16 address bytes.\n+    pub fn to_datum_bytes(&self) -> [u8; 19] {\n+        let mut out = [0u8; 19];\n+        out[0] = self.family;\n+        out[1] = self.minbits;\n+        out[2] = self.commonbits;\n+        out[3..19].copy_from_slice(&self.ipaddr);\n         out\n     }\n \n-    /// Decode a key from by-reference `Datum` bytes (`DatumGetInetKeyP`). The\n-    /// fields sit at fixed struct offsets after the 4-byte varlena length word.\n+    /// Decode a key from by-reference `Datum` bytes (`DatumGetInetKeyP`).\n     pub fn from_datum_bytes(b: &[u8]) -> GistInetKey {\n         let mut ipaddr = [0u8; 16];\n-        ipaddr.copy_from_slice(&b[7..23]);\n+        ipaddr.copy_from_slice(&b[3..19]);\n         GistInetKey {\n-            family: b[4],\n-            minbits: b[5],\n-            commonbits: b[6],\n+            family: b[0],\n+            minbits: b[1],\n+            commonbits: b[2],\n             ipaddr,\n         }\n     }\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend-access-gist-proc/src/lib.rs",
+      "start": 37,
+      "end": 43
+    },
+    {
+      "file": "crates/backend-access-gist-proc/src/lib.rs",
+      "start": 1669,
+      "end": 1675
+    },
+    {
+      "file": "crates/backend-access-gist-proc/src/lib.rs",
+      "start": 1770,
+      "end": 1777
+    },
+    {
+      "file": "crates/types-network/src/lib.rs",
+      "start": 151,
+      "end": 174
+    }
+  ],
+  "pr_title": "Simplify inet GiST key encoding and query decoding",
+  "pr_description": "The `inet`/`cidr` GiST support routines decoded query datums through a seam helper (`datum_get_inet_pp`) and encoded `GistInetKey` with a full varlena header even though the key is only ever read back by this crate's own accessors. This decodes query and leaf datums directly via `inet_struct::from_datum_bytes` and drops the varlena length word from `GistInetKey`'s on-disk layout, giving it a flat, constant-width encoding of family/minbits/commonbits plus the address bytes."
+}

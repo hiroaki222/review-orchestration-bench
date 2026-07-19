@@ -1,0 +1,36 @@
+{
+  "id": "pgrust-59146ed6a2",
+  "repo": "pgrust",
+  "fix_sha": "59146ed6a2bcfb6f8bcf4753084813d9ec999e2b",
+  "base_sha": "59146ed6a2bcfb6f8bcf4753084813d9ec999e2b",
+  "language": "rust",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "FirstLowInvalidHeapAttributeNumber定数がPG12以前の値-8のまま3クレートに転記されており(正しくは-7)、属性番号からビットマップインデックスへの変換が1つずれてbms_is_memberによる列集合判定(publication列リスト・パーティション属性・ビュー自動更新可能性判定)が静かに壊れる。",
+  "pr_diff": "diff --git a/crates/backend-catalog-partition/src/lib.rs b/crates/backend-catalog-partition/src/lib.rs\nindex b7fd925d8..9785d3af3 100644\n--- a/crates/backend-catalog-partition/src/lib.rs\n+++ b/crates/backend-catalog-partition/src/lib.rs\n@@ -75,7 +75,7 @@ use backend_utils_cache_syscache_seams as syscache_seams;\n /// attribute number minus one; the offset that turns a (possibly system)\n /// attno into a non-negative bitmapset index in the `pull_varattnos` /\n /// `has_partition_attrs` convention.\n-const FirstLowInvalidHeapAttributeNumber: i32 = -7;\n+const FirstLowInvalidHeapAttributeNumber: i32 = -8;\n \n /// `(Form_pg_inherits) GETSTRUCT(tup)` — interpret one deformed pg_inherits row.\n /// Every pg_inherits column is fixed-width and NOT NULL.\n@@ -535,10 +535,10 @@ pub fn update_default_partition_oid(parentId: Oid, defaultPartId: Oid) -> PgResu\n     // table_close(pg_partitioned_table, RowExclusiveLock);\n     //\n     // The whole open / syscache-copy / in-place partdefid write / form-and-\n-    // CatalogTupleUpdate / freetuple / close sequence is the catalog-write half\n-    // (catalog/indexing.c owns CatalogTupleUpdate); the body is installed from\n-    // backend-catalog-indexing (which owns the RowExclusiveLock write\n-    // substrate) and performs the cache-lookup-failure elog itself.\n+    // CatalogTupleUpdate / freetuple / close sequence rides on the heap-tuple\n+    // value layer and the RowExclusiveLock lifetime — it is the catalog-write\n+    // half (catalog/indexing.c owns CatalogTupleUpdate), which performs the\n+    // cache-lookup-failure elog itself.\n     syscache_seams::update_default_partition_oid::call(parentId, defaultPartId)\n }\n \ndiff --git a/crates/backend-commands-publicationcmds/src/lib.rs b/crates/backend-commands-publicationcmds/src/lib.rs\nindex a00b66be5..1e34d5fe3 100644\n--- a/crates/backend-commands-publicationcmds/src/lib.rs\n+++ b/crates/backend-commands-publicationcmds/src/lib.rs\n@@ -134,8 +134,8 @@ const REPLICA_IDENTITY_FULL: u8 = b'f';\n /// `MAX_RELCACHE_INVAL_MSGS` (`commands/publicationcmds.h`).\n const MAX_RELCACHE_INVAL_MSGS: usize = 4096;\n \n-/// `FirstLowInvalidHeapAttributeNumber` (`access/sysattr.h`) = -7.\n-const FirstLowInvalidHeapAttributeNumber: i32 = -7;\n+/// `FirstLowInvalidHeapAttributeNumber` (`access/sysattr.h`) = -8.\n+const FirstLowInvalidHeapAttributeNumber: i32 = -8;\n \n /// `PUBLISH_GENCOLS_NONE` ('n') / `PUBLISH_GENCOLS_STORED` ('s')\n /// (`catalog/pg_publication.h`).\ndiff --git a/crates/backend-rewrite-rewritehandler/src/lib.rs b/crates/backend-rewrite-rewritehandler/src/lib.rs\nindex f38838fb7..f87eea608 100644\n--- a/crates/backend-rewrite-rewritehandler/src/lib.rs\n+++ b/crates/backend-rewrite-rewritehandler/src/lib.rs\n@@ -68,7 +68,7 @@ pub use seams::init_seams;\n /// `FirstLowInvalidHeapAttributeNumber` (access/sysattr.h). Consumed by the\n /// view-column-set family (`view_cols_are_auto_updatable` /\n /// `adjust_view_column_set`), used by `relation_is_updatable`.\n-pub(crate) const FirstLowInvalidHeapAttributeNumber: i32 = -7;\n+pub(crate) const FirstLowInvalidHeapAttributeNumber: i32 = -8;\n \n /// `ATTRIBUTE_GENERATED_VIRTUAL` (catalog/pg_attribute.h).\n pub(crate) const ATTRIBUTE_GENERATED_VIRTUAL: i8 = b'v' as i8;\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend-catalog-partition/src/lib.rs",
+      "start": 75,
+      "end": 81
+    },
+    {
+      "file": "crates/backend-catalog-partition/src/lib.rs",
+      "start": 535,
+      "end": 544
+    },
+    {
+      "file": "crates/backend-commands-publicationcmds/src/lib.rs",
+      "start": 134,
+      "end": 141
+    },
+    {
+      "file": "crates/backend-rewrite-rewritehandler/src/lib.rs",
+      "start": 68,
+      "end": 74
+    }
+  ],
+  "pr_title": "Align FirstLowInvalidHeapAttributeNumber across crates",
+  "pr_description": "Updates the `FirstLowInvalidHeapAttributeNumber` constant to `-8` consistently in `backend-catalog-partition`, `backend-commands-publicationcmds`, and `backend-rewrite-rewritehandler`, and tidies up the comment on `update_default_partition_oid` to describe the catalog-write sequence in terms of the heap-tuple value layer rather than referencing the indexing crate directly."
+}

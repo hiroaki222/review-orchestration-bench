@@ -1,0 +1,36 @@
+{
+  "id": "fastapi-da0ffab0b2",
+  "repo": "fastapi",
+  "fix_sha": "da0ffab0b260475499294d3dc767409d7bca5c34",
+  "base_sha": "da0ffab0b260475499294d3dc767409d7bca5c34",
+  "language": "python",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "__call__を持つクラス自体(インスタンスでなく)を依存関係に使った場合、クラスなのに__call__のasync/generator判定が誤って適用され依存解決が不正になる",
+  "pr_diff": "diff --git a/fastapi/dependencies/models.py b/fastapi/dependencies/models.py\nindex 6c4bf18b3..af168a177 100644\n--- a/fastapi/dependencies/models.py\n+++ b/fastapi/dependencies/models.py\n@@ -110,8 +110,6 @@ class Dependant:\n             _impartial(self.call)\n         ) or inspect.isgeneratorfunction(_unwrapped_call(self.call)):\n             return True\n-        if inspect.isclass(_unwrapped_call(self.call)):\n-            return False\n         dunder_call = getattr(_impartial(self.call), \"__call__\", None)  # noqa: B004\n         if dunder_call is None:\n             return False  # pragma: no cover\n@@ -136,8 +134,6 @@ class Dependant:\n             _impartial(self.call)\n         ) or inspect.isasyncgenfunction(_unwrapped_call(self.call)):\n             return True\n-        if inspect.isclass(_unwrapped_call(self.call)):\n-            return False\n         dunder_call = getattr(_impartial(self.call), \"__call__\", None)  # noqa: B004\n         if dunder_call is None:\n             return False  # pragma: no cover\n@@ -166,8 +162,6 @@ class Dependant:\n             _unwrapped_call(self.call)\n         ):\n             return True\n-        if inspect.isclass(_unwrapped_call(self.call)):\n-            return False\n         dunder_call = getattr(_impartial(self.call), \"__call__\", None)  # noqa: B004\n         if dunder_call is None:\n             return False  # pragma: no cover\n@@ -182,6 +176,7 @@ class Dependant:\n             _impartial(dunder_unwrapped_call)\n         ) or iscoroutinefunction(_unwrapped_call(dunder_unwrapped_call)):\n             return True\n+        # if inspect.isclass(self.call): False, covered by default return\n         return False\n \n     @cached_property\n",
+  "ground_truth": [
+    {
+      "file": "fastapi/dependencies/models.py",
+      "start": 110,
+      "end": 115
+    },
+    {
+      "file": "fastapi/dependencies/models.py",
+      "start": 134,
+      "end": 139
+    },
+    {
+      "file": "fastapi/dependencies/models.py",
+      "start": 162,
+      "end": 167
+    },
+    {
+      "file": "fastapi/dependencies/models.py",
+      "start": 176,
+      "end": 182
+    }
+  ],
+  "pr_title": "Simplify Dependant call-kind detection",
+  "pr_description": "The is_coroutine/is_async_gen_callable/is_gen_callable checks on `Dependant` each had an early `inspect.isclass` short-circuit ahead of the `__call__` lookup. Consolidates this to rely on the existing `dunder_call` fallback, which already returns `False` when there's no `__call__` to inspect, removing the duplicated class check across the three properties."
+}

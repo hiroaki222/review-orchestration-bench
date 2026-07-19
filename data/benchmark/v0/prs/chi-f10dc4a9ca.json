@@ -1,0 +1,21 @@
+{
+  "id": "chi-f10dc4a9ca",
+  "repo": "chi",
+  "fix_sha": "f10dc4a9cab53a47f600f518fcccaa044666e95f",
+  "base_sha": "f10dc4a9cab53a47f600f518fcccaa044666e95f",
+  "language": "go",
+  "category": "resource-leak",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "compressResponseWriter.Closeがcw.writer()(isCompressableで分岐)を経由していたため、非圧縮時に実際にラップされたエンコーダwriterがCloseされずリソースがリークしていた",
+  "pr_diff": "diff --git a/middleware/compress.go b/middleware/compress.go\nindex 7ba95fd..28240c4 100644\n--- a/middleware/compress.go\n+++ b/middleware/compress.go\n@@ -371,7 +371,7 @@ func (cw *compressResponseWriter) Push(target string, opts *http.PushOptions) er\n }\n \n func (cw *compressResponseWriter) Close() error {\n-\tif c, ok := cw.w.(io.WriteCloser); ok {\n+\tif c, ok := cw.writer().(io.WriteCloser); ok {\n \t\treturn c.Close()\n \t}\n \treturn errors.New(\"chi/middleware: io.WriteCloser is unavailable on the writer\")\n",
+  "ground_truth": [
+    {
+      "file": "middleware/compress.go",
+      "start": 371,
+      "end": 377
+    }
+  ],
+  "pr_title": "Close the underlying writer directly in compressResponseWriter",
+  "pr_description": "Close() was routing through the writer() accessor, which exists to pick between the raw and compressed writer during encoding selection. Since Close only needs the concrete writer instance, this asserts on cw.w directly and skips the extra indirection."
+}

@@ -1,0 +1,26 @@
+{
+  "id": "chi-6fedde2a70",
+  "repo": "chi",
+  "fix_sha": "6fedde2a70dc2adce0a3dc41b8aebc0b2bec8185",
+  "base_sha": "6fedde2a70dc2adce0a3dc41b8aebc0b2bec8185",
+  "language": "go",
+  "category": "type-safety",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "Context.RoutePattern()がnilレシーバで呼ばれるとnilポインタ参照でパニックする可能性があった",
+  "pr_diff": "diff --git a/context.go b/context.go\nindex aacf6ef..e2cd908 100644\n--- a/context.go\n+++ b/context.go\n@@ -109,7 +109,7 @@ func (x *Context) URLParam(key string) string {\n // RoutePattern builds the routing pattern string for the particular\n // request, at the particular point during routing. This means, the value\n // will change throughout the execution of a request in a router. That is\n-// why it's advised to only use this value after calling the next handler.\n+// why its advised to only use this value after calling the next handler.\n //\n // For example,\n //\n@@ -121,9 +121,6 @@ func (x *Context) URLParam(key string) string {\n //\t\t})\n //\t}\n func (x *Context) RoutePattern() string {\n-\tif x == nil {\n-\t\treturn \"\"\n-\t}\n \troutePattern := strings.Join(x.RoutePatterns, \"\")\n \troutePattern = replaceWildcards(routePattern)\n \tif routePattern != \"/\" {\n",
+  "ground_truth": [
+    {
+      "file": "context.go",
+      "start": 109,
+      "end": 115
+    },
+    {
+      "file": "context.go",
+      "start": 121,
+      "end": 126
+    }
+  ],
+  "pr_title": "Simplify Context.RoutePattern nil handling",
+  "pr_description": "`Context.RoutePattern` is always called on a `Context` obtained from the request's own context value, so it is never invoked on a nil receiver in practice. This drops the defensive nil check to keep the method body focused on building the pattern string, and tidies the wording of the doc comment above it."
+}

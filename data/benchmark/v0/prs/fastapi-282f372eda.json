@@ -1,0 +1,21 @@
+{
+  "id": "fastapi-282f372eda",
+  "repo": "fastapi",
+  "fix_sha": "282f372eda661c865fa1208bd0371bf47d190b2a",
+  "base_sha": "282f372eda661c865fa1208bd0371bf47d190b2a",
+  "language": "python",
+  "category": "error-handling",
+  "severity": "low",
+  "post_cutoff": false,
+  "bug_summary": "トップレベル(パラメータレス)のDependsで `scope` 引数が渡されておらず、`scope='function'`指定が無視されyield後の例外伝播タイミングが誤る",
+  "pr_diff": "diff --git a/fastapi/dependencies/utils.py b/fastapi/dependencies/utils.py\nindex 4b69e39a1..c5c6b69bb 100644\n--- a/fastapi/dependencies/utils.py\n+++ b/fastapi/dependencies/utils.py\n@@ -129,10 +129,7 @@ def get_parameterless_sub_dependant(*, depends: params.Depends, path: str) -> De\n     if isinstance(depends, params.Security) and depends.scopes:\n         use_security_scopes.extend(depends.scopes)\n     return get_dependant(\n-        path=path,\n-        call=depends.dependency,\n-        scope=depends.scope,\n-        security_scopes=use_security_scopes,\n+        path=path, call=depends.dependency, security_scopes=use_security_scopes\n     )\n \n \n",
+  "ground_truth": [
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 129,
+      "end": 135
+    }
+  ],
+  "pr_title": "Simplify get_parameterless_sub_dependant call",
+  "pr_description": "Drop the explicit `scope=depends.scope` argument from the `get_dependant` call inside `get_parameterless_sub_dependant`. Reformats the call onto a single line now that there's one fewer keyword argument to pass through."
+}

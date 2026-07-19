@@ -1,0 +1,21 @@
+{
+  "id": "valibot-7ec9d23c47",
+  "repo": "valibot",
+  "fix_sha": "7ec9d23c478f1e4ded9f4d216aed9b850d29fe34",
+  "base_sha": "7ec9d23c478f1e4ded9f4d216aed9b850d29fe34",
+  "language": "typescript",
+  "category": "security",
+  "severity": "high",
+  "post_cutoff": false,
+  "bug_summary": "EMOJI_REGEX に ReDoS (正規表現サービス拒否) 脆弱性があり、特定の入力で指数関数的なバックトラッキングが発生し得た",
+  "pr_diff": "diff --git a/library/src/regex.ts b/library/src/regex.ts\nindex a86ef6bb..38be8d1c 100644\n--- a/library/src/regex.ts\n+++ b/library/src/regex.ts\n@@ -38,8 +38,8 @@ export const EMAIL_REGEX: RegExp =\n  * not supported in older runtimes and does not match all emoji.\n  */\n export const EMOJI_REGEX: RegExp =\n-  // eslint-disable-next-line redos-detector/no-unsafe-regex -- false positives\n-  /^(?:[\\u{1F1E6}-\\u{1F1FF}]{2}|\\u{1F3F4}[\\u{E0061}-\\u{E007A}]{2}[\\u{E0030}-\\u{E0039}\\u{E0061}-\\u{E007A}]{1,3}\\u{E007F}|(?:\\p{Emoji}\\uFE0F\\u20E3?|\\p{Emoji_Modifier_Base}\\p{Emoji_Modifier}?|(?![\\p{Emoji_Modifier_Base}\\u{1F1E6}-\\u{1F1FF}])\\p{Emoji_Presentation})(?:\\u200D(?:\\p{Emoji}\\uFE0F\\u20E3?|\\p{Emoji_Modifier_Base}\\p{Emoji_Modifier}?|(?![\\p{Emoji_Modifier_Base}\\u{1F1E6}-\\u{1F1FF}])\\p{Emoji_Presentation}))*)+$/u;\n+  // eslint-disable-next-line redos-detector/no-unsafe-regex, regexp/no-dupe-disjunctions -- false positives\n+  /^(?:[\\u{1F1E6}-\\u{1F1FF}]{2}|\\u{1F3F4}[\\u{E0061}-\\u{E007A}]{2}[\\u{E0030}-\\u{E0039}\\u{E0061}-\\u{E007A}]{1,3}\\u{E007F}|(?:\\p{Emoji}\\uFE0F\\u20E3?|\\p{Emoji_Modifier_Base}\\p{Emoji_Modifier}?|\\p{Emoji_Presentation})(?:\\u200D(?:\\p{Emoji}\\uFE0F\\u20E3?|\\p{Emoji_Modifier_Base}\\p{Emoji_Modifier}?|\\p{Emoji_Presentation}))*)+$/u;\n \n /**\n  * [Hexadecimal](https://en.wikipedia.org/wiki/Hexadecimal) regex.\n",
+  "ground_truth": [
+    {
+      "file": "library/src/regex.ts",
+      "start": 38,
+      "end": 45
+    }
+  ],
+  "pr_title": "Simplify the emoji regex's disjunction guards",
+  "pr_description": "EMOJI_REGEX carried a negative lookahead before \\p{Emoji_Presentation} in both alternation branches, ruling out modifier-base and flag sequences already handled earlier in the pattern. This drops the lookahead from both spots and updates the lint suppression comment to also cover regexp/no-dupe-disjunctions, matching the now more direct overlap between branches."
+}

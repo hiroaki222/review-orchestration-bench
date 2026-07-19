@@ -1,0 +1,26 @@
+{
+  "id": "valibot-32a19788bd",
+  "repo": "valibot",
+  "fix_sha": "32a19788bdac003c1ff4add4ca66adde5f158662",
+  "base_sha": "32a19788bdac003c1ff4add4ca66adde5f158662",
+  "language": "typescript",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "to-json-schema 変換器の min_value/max_value アクションが type:'integer' のスキーマを number としか認識せず、integer + minValue/maxValue の組み合わせで誤って変換エラーになっていた",
+  "pr_diff": "diff --git a/packages/to-json-schema/src/converters/convertAction/convertAction.ts b/packages/to-json-schema/src/converters/convertAction/convertAction.ts\nindex f4fa3069..2d8bf538 100644\n--- a/packages/to-json-schema/src/converters/convertAction/convertAction.ts\n+++ b/packages/to-json-schema/src/converters/convertAction/convertAction.ts\n@@ -261,7 +261,7 @@ export function convertAction(\n     }\n \n     case 'max_value': {\n-      if (jsonSchema.type !== 'number' && jsonSchema.type !== 'integer') {\n+      if (jsonSchema.type !== 'number') {\n         errors = addError(\n           errors,\n           `The \"max_value\" action is not supported on type \"${jsonSchema.type}\".`\n@@ -313,7 +313,7 @@ export function convertAction(\n     }\n \n     case 'min_value': {\n-      if (jsonSchema.type !== 'number' && jsonSchema.type !== 'integer') {\n+      if (jsonSchema.type !== 'number') {\n         errors = addError(\n           errors,\n           `The \"min_value\" action is not supported on type \"${jsonSchema.type}\".`\n",
+  "ground_truth": [
+    {
+      "file": "packages/to-json-schema/src/converters/convertAction/convertAction.ts",
+      "start": 261,
+      "end": 267
+    },
+    {
+      "file": "packages/to-json-schema/src/converters/convertAction/convertAction.ts",
+      "start": 313,
+      "end": 319
+    }
+  ],
+  "pr_title": "Narrow min_value/max_value support to number schemas",
+  "pr_description": "The min_value and max_value converters accepted both number and integer JSON schema types. This narrows the type guard to number only, keeping the two range actions consistent with how the rest of convertAction treats numeric schemas."
+}

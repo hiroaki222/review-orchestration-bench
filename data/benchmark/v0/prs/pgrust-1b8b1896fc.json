@@ -1,0 +1,26 @@
+{
+  "id": "pgrust-1b8b1896fc",
+  "repo": "pgrust",
+  "fix_sha": "1b8b1896fcfd0ffcf8a13ae64941e8a4e9664594",
+  "base_sha": "1b8b1896fcfd0ffcf8a13ae64941e8a4e9664594",
+  "language": "rust",
+  "category": "error-handling",
+  "severity": "low",
+  "post_cutoff": true,
+  "bug_summary": "SPI実行時のエラーコンテキスト('SQL statement'フレーム)欠落と、PERFORM書き換え後に余分な先頭スペースが残る2つの小さな不具合",
+  "pr_diff": "diff --git a/crates/backend-executor-spi/src/execsql.rs b/crates/backend-executor-spi/src/execsql.rs\nindex a7055e13f..62603151c 100644\n--- a/crates/backend-executor-spi/src/execsql.rs\n+++ b/crates/backend-executor-spi/src/execsql.rs\n@@ -314,35 +314,6 @@ fn spi_execsql_inner(\n     if pushed {\n         let _ = snapmgr::pop_active_snapshot::call();\n     }\n-    // `_SPI_error_callback` (spi.c): SPI installs an error-context callback for\n-    // the duration of `_SPI_execute_plan`. When an error escapes the embedded\n-    // query, the callback emits a context line whose wording depends on the\n-    // plan's raw parse mode (the `switch (carg->mode)`): a PL/pgSQL expression\n-    // (`RAW_PARSE_PLPGSQL_EXPR`) reads `PL/pgSQL expression \"%s\"`, an assignment\n-    // (`RAW_PARSE_PLPGSQL_ASSIGN{1,2,3}`) reads `PL/pgSQL assignment \"%s\"`, and a\n-    // complete statement (the default, e.g. a PERFORM's `SELECT ...`) reads\n-    // `SQL statement \"%s\"`. This is the attach-on-propagation analogue\n-    // (docs/query-lifecycle-raii) applied at the same boundary C pushed/popped\n-    // the callback, innermost so it precedes the caller's PL/pgSQL-function\n-    // context line. Crossing this SPI boundary means any outer PL/pgSQL frame\n-    // still has its own `plpgsql_exec_error_callback` pending, so clear the\n-    // \"attached once\" latch to let that outer frame re-attach its own line.\n-    let out = out.map_err(|mut e| {\n-        let line = match parsemode {\n-            RawParseMode::RAW_PARSE_PLPGSQL_EXPR => {\n-                format!(\"PL/pgSQL expression \\\"{query}\\\"\")\n-            }\n-            RawParseMode::RAW_PARSE_PLPGSQL_ASSIGN1\n-            | RawParseMode::RAW_PARSE_PLPGSQL_ASSIGN2\n-            | RawParseMode::RAW_PARSE_PLPGSQL_ASSIGN3 => {\n-                format!(\"PL/pgSQL assignment \\\"{query}\\\"\")\n-            }\n-            _ => format!(\"SQL statement \\\"{query}\\\"\"),\n-        };\n-        e = e.add_context(line);\n-        e.plpgsql_context_attached = false;\n-        e\n-    });\n     let result = out;\n \n     let _ = plancache::DropCachedPlan(source);\ndiff --git a/crates/backend-pl-plpgsql-comp/src/lib.rs b/crates/backend-pl-plpgsql-comp/src/lib.rs\nindex 523396cbf..95d9754ec 100644\n--- a/crates/backend-pl-plpgsql-comp/src/lib.rs\n+++ b/crates/backend-pl-plpgsql-comp/src/lib.rs\n@@ -1277,15 +1277,7 @@ pub fn perform_rewrite_query(expr: &mut PLpgSQL_expr) {\n     const SELECT: &str = \" SELECT\";\n     if let Some(pos) = ascii_ci_find(&expr.query, PERFORM) {\n         let mut bytes = expr.query.clone().into_bytes();\n-        // memcpy(new->expr->query, \" SELECT\", 7): overwrite the \"PERFORM\" keyword\n-        // with a leading space + \"SELECT\" (same 7-byte length).\n         bytes[pos..pos + PERFORM.len()].copy_from_slice(SELECT.as_bytes());\n-        // memmove(new->expr->query, new->expr->query + 1, strlen(...)): left-justify\n-        // to get rid of the leading space the substitution just introduced, so the\n-        // stored query text reads \"SELECT ...\" (not \" SELECT ...\"). C does this from\n-        // query[0] because read_sql_construct returns the construct starting exactly\n-        // at \"perform\"; here that start is `pos`, so drop the space at `pos`.\n-        bytes.remove(pos);\n         expr.query = String::from_utf8(bytes).expect(\"ascii overwrite stays valid utf8\");\n     }\n }\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend-executor-spi/src/execsql.rs",
+      "start": 314,
+      "end": 319
+    },
+    {
+      "file": "crates/backend-pl-plpgsql-comp/src/lib.rs",
+      "start": 1277,
+      "end": 1283
+    }
+  ],
+  "pr_title": "Trim SPI error-context and PERFORM rewrite helpers",
+  "pr_description": "Removes the error-context wrapping in `spi_execsql_inner` and the trailing left-justify step in `perform_rewrite_query`, along with their explanatory comments. These were carried over from an earlier line-by-line port and add noise around otherwise straightforward query execution and rewrite paths."
+}

@@ -1,0 +1,21 @@
+{
+  "id": "fastapi-1d96b3e3f1",
+  "repo": "fastapi",
+  "fix_sha": "1d96b3e3f14fa5a226ae817d1095b868796beb60",
+  "base_sha": "1d96b3e3f14fa5a226ae817d1095b868796beb60",
+  "language": "python",
+  "category": "logic",
+  "severity": "low",
+  "post_cutoff": true,
+  "bug_summary": "Authorizationヘッダーのcredentials部分の前後空白を除去しておらず、トークン比較等に不整合が起きうる",
+  "pr_diff": "diff --git a/fastapi/security/utils.py b/fastapi/security/utils.py\nindex fd349aec7..002e68b44 100644\n--- a/fastapi/security/utils.py\n+++ b/fastapi/security/utils.py\n@@ -7,4 +7,4 @@ def get_authorization_scheme_param(\n     if not authorization_header_value:\n         return \"\", \"\"\n     scheme, _, param = authorization_header_value.partition(\" \")\n-    return scheme, param.strip()\n+    return scheme, param\n",
+  "ground_truth": [
+    {
+      "file": "fastapi/security/utils.py",
+      "start": 7,
+      "end": 10
+    }
+  ],
+  "pr_title": "Return the partitioned credential value as-is",
+  "pr_description": "get_authorization_scheme_param already isolates the scheme and parameter through partition(\" \"), so stripping the parameter afterward was a redundant extra step. This returns param directly, keeping the function to a single partition call."
+}

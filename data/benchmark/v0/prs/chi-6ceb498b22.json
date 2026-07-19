@@ -1,0 +1,21 @@
+{
+  "id": "chi-6ceb498b22",
+  "repo": "chi",
+  "fix_sha": "6ceb498b221efa11f559602beb2463b8b52c2161",
+  "base_sha": "6ceb498b221efa11f559602beb2463b8b52c2161",
+  "language": "go",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "Mux.Findがネストしたルート(サブルーター)の場合にパターン文字列を正しく合成できず、誤った/空のパターンを返していた",
+  "pr_diff": "diff --git a/mux.go b/mux.go\nindex 91daf69..a6a287d 100644\n--- a/mux.go\n+++ b/mux.go\n@@ -378,25 +378,18 @@ func (mx *Mux) Find(rctx *Context, method, path string) string {\n \t}\n \n \tnode, _, _ := mx.tree.FindRoute(rctx, m, path)\n-\tpattern := rctx.routePattern\n-\n-\tif node != nil {\n-\t\tif node.subroutes == nil {\n-\t\t\te := node.endpoints[m]\n-\t\t\treturn e.pattern\n-\t\t}\n \n+\tif node != nil && node.subroutes != nil {\n \t\trctx.RoutePath = mx.nextRoutePath(rctx)\n-\t\tsubPattern := node.subroutes.Find(rctx, method, rctx.RoutePath)\n-\t\tif subPattern == \"\" {\n-\t\t\treturn \"\"\n-\t\t}\n+\t\treturn node.subroutes.Find(rctx, method, rctx.RoutePath)\n+\t}\n \n-\t\tpattern = strings.TrimSuffix(pattern, \"/*\")\n-\t\tpattern += subPattern\n+\tif node != nil {\n+\t\te := node.endpoints[m]\n+\t\treturn e.pattern\n \t}\n \n-\treturn pattern\n+\treturn \"\"\n }\n \n // NotFoundHandler returns the default Mux 404 responder whenever a route\n",
+  "ground_truth": [
+    {
+      "file": "mux.go",
+      "start": 378,
+      "end": 395
+    }
+  ],
+  "pr_title": "Simplify Mux.Find control flow for subroute lookups",
+  "pr_description": "Flatten the branching in `Mux.Find` so subroute lookups delegate directly to `node.subroutes.Find` instead of concatenating the parent pattern with the subroute result. The old string-trimming/concatenation step was redundant once the subrouter already returns a fully qualified pattern. This also drops the now-unreachable early return for the non-subroute case, collapsing it into a single trailing check."
+}

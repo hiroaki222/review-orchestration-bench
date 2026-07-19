@@ -1,0 +1,21 @@
+{
+  "id": "fastapi-8f99a2b734",
+  "repo": "fastapi",
+  "fix_sha": "8f99a2b7347aeaff09ca3f06eaecf52a786ef2dc",
+  "base_sha": "8f99a2b7347aeaff09ca3f06eaecf52a786ef2dc",
+  "language": "python",
+  "category": "error-handling",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "Pydantic v2互換スキーマの名前remap処理で \"$ref\" キーの存在チェックがなく、存在しない場合にKeyErrorでクラッシュ",
+  "pr_diff": "diff --git a/fastapi/_compat/v2.py b/fastapi/_compat/v2.py\nindex 7196a6190..5cd49343b 100644\n--- a/fastapi/_compat/v2.py\n+++ b/fastapi/_compat/v2.py\n@@ -304,7 +304,7 @@ def _remap_definitions_and_field_mappings(\n     old_name_to_new_name_map = {}\n     for field_key, schema in field_mapping.items():\n         model = field_key[0].type_\n-        if model not in model_name_map or \"$ref\" not in schema:\n+        if model not in model_name_map:\n             continue\n         new_name = model_name_map[model]\n         old_name = schema[\"$ref\"].split(\"/\")[-1]\n",
+  "ground_truth": [
+    {
+      "file": "fastapi/_compat/v2.py",
+      "start": 304,
+      "end": 310
+    }
+  ],
+  "pr_title": "Simplify definition remap condition in Pydantic v2 compat layer",
+  "pr_description": "The loop that remaps model names in `_remap_definitions_and_field_mappings` guarded on both `model not in model_name_map` and `\"$ref\" not in schema` before proceeding. This trims the condition down to the `model_name_map` check, keeping the skip condition focused on the one thing the loop actually branches on."
+}

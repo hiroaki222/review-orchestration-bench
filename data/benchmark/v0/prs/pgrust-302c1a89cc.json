@@ -1,0 +1,21 @@
+{
+  "id": "pgrust-302c1a89cc",
+  "repo": "pgrust",
+  "fix_sha": "302c1a89cc28088e8c7cbdf9c142444927758207",
+  "base_sha": "302c1a89cc28088e8c7cbdf9c142444927758207",
+  "language": "rust",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "COMPARE_OVERLAP定数が8(実際はCOMPARE_CONTAINED_BY)になっており、時間軸FK制約が<@(contained-by)演算子を使うべきところを誤った演算子で検証し、正当なデータを偽陽性でFK違反として拒否していた",
+  "pr_diff": "diff --git a/crates/backend-commands-tablecmds/src/at_fk.rs b/crates/backend-commands-tablecmds/src/at_fk.rs\nindex 37ac26f3e..acc90a678 100644\n--- a/crates/backend-commands-tablecmds/src/at_fk.rs\n+++ b/crates/backend-commands-tablecmds/src/at_fk.rs\n@@ -83,7 +83,7 @@ const NoLock: LOCKMODE = 0;\n /// `COMPARE_EQ` / `COMPARE_OVERLAP` (`cmptype.h`) — the AM-independent compare\n /// types we pass to `IndexAmTranslateCompareType`.\n const COMPARE_EQ: i32 = 3;\n-const COMPARE_OVERLAP: i32 = 7;\n+const COMPARE_OVERLAP: i32 = 8;\n const InvalidStrategy: i16 = 0;\n \n // ===========================================================================\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend-commands-tablecmds/src/at_fk.rs",
+      "start": 83,
+      "end": 89
+    }
+  ],
+  "pr_title": "Update COMPARE_OVERLAP constant to match cmptype.h",
+  "pr_description": "Adjusts the local COMPARE_OVERLAP mirror used by the FK validity check to reflect the enumeration value defined in cmptype.h, keeping this constant in sync with its upstream source."
+}

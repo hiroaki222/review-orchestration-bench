@@ -1,0 +1,26 @@
+{
+  "id": "chi-87e5387928",
+  "repo": "chi",
+  "fix_sha": "87e5387928b553b5de3a75d5105a34871bc9b8b3",
+  "base_sha": "87e5387928b553b5de3a75d5105a34871bc9b8b3",
+  "language": "go",
+  "category": "security",
+  "severity": "high",
+  "post_cutoff": false,
+  "bug_summary": "RedirectSlashesミドルウェアが`//evil.com/`のようなパスをそのままLocationヘッダに使い、ブラウザがprotocol-relative URLとして解釈してしまうオープンリダイレクト脆弱性を修正",
+  "pr_diff": "diff --git a/middleware/strip.go b/middleware/strip.go\nindex 57e1d2e..7854d9b 100644\n--- a/middleware/strip.go\n+++ b/middleware/strip.go\n@@ -3,8 +3,6 @@ package middleware\n import (\n \t\"fmt\"\n \t\"net/http\"\n-\t\"net/url\"\n-\t\"strings\"\n \n \t\"github.com/go-chi/chi\"\n )\n@@ -54,9 +52,6 @@ func RedirectSlashes(next http.Handler) http.Handler {\n \t\t\t} else {\n \t\t\t\tpath = path[:len(path)-1]\n \t\t\t}\n-\t\t\tif u, err := url.Parse(path); err == nil && u.Host != \"\" && u.Host != r.Host {\n-\t\t\t\tpath = fmt.Sprintf(\"//%s/%s\", r.Host, strings.TrimLeft(strings.TrimRight(path, \"/\"), \"/\"))\n-\t\t\t}\n \t\t\thttp.Redirect(w, r, path, 301)\n \t\t\treturn\n \t\t}\n",
+  "ground_truth": [
+    {
+      "file": "middleware/strip.go",
+      "start": 3,
+      "end": 8
+    },
+    {
+      "file": "middleware/strip.go",
+      "start": 52,
+      "end": 57
+    }
+  ],
+  "pr_title": "Simplify path construction in RedirectSlashes middleware",
+  "pr_description": "Removes the extra URL parsing step used to rebuild the redirect path, along with the now-unused net/url and strings imports. The trailing-slash redirect now uses the already-computed path directly, keeping the handler shorter and easier to follow."
+}

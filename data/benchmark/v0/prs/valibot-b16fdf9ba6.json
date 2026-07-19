@@ -1,0 +1,31 @@
+{
+  "id": "valibot-b16fdf9ba6",
+  "repo": "valibot",
+  "fix_sha": "b16fdf9ba6d84fffc3b71fdbac554126258f9a4a",
+  "base_sha": "b16fdf9ba6d84fffc3b71fdbac554126258f9a4a",
+  "language": "typescript",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "intersectの内部_mergeがvalue1を直接書き換えていたため、frozenなオブジェクト/配列を渡すとstrict modeでTypeErrorになる (mutation bug)",
+  "pr_diff": "diff --git a/library/src/schemas/intersect/utils/_merge/_merge.ts b/library/src/schemas/intersect/utils/_merge/_merge.ts\nindex 73b6563a..12bdbc24 100644\n--- a/library/src/schemas/intersect/utils/_merge/_merge.ts\n+++ b/library/src/schemas/intersect/utils/_merge/_merge.ts\n@@ -34,9 +34,7 @@ export function _merge(value1: unknown, value2: unknown): MergeDataset {\n       value1.constructor === Object &&\n       value2.constructor === Object\n     ) {\n-      const nextValue = { ...value1 };\n-\n-      // Deeply merge entries of `value2` into `nextValue`\n+      // Deeply merge entries of `value2` into `value1`\n       for (const key in value2) {\n         // @ts-expect-error\n         if (key in value1) {\n@@ -50,26 +48,24 @@ export function _merge(value1: unknown, value2: unknown): MergeDataset {\n \n           // Otherwise, replace merged entry\n           // @ts-expect-error\n-          nextValue[key] = dataset.value;\n+          value1[key] = dataset.value;\n \n           // Otherwise, just add entry\n         } else {\n           // @ts-expect-error\n-          nextValue[key] = value2[key];\n+          value1[key] = value2[key];\n         }\n       }\n \n       // Return deeply merged object\n-      return { value: nextValue };\n+      return { value: value1 };\n     }\n \n     // Return deeply merged array\n     if (Array.isArray(value1) && Array.isArray(value2)) {\n       // Continue if arrays have same length\n       if (value1.length === value2.length) {\n-        const nextValue = [...value1];\n-\n-        // Merge items of `value2` into `nextValue`\n+        // Merge item of `value2` into `value1`\n         for (let index = 0; index < value1.length; index++) {\n           const dataset = _merge(value1[index], value2[index]);\n \n@@ -79,11 +75,11 @@ export function _merge(value1: unknown, value2: unknown): MergeDataset {\n           }\n \n           // Otherwise, replace merged items\n-          nextValue[index] = dataset.value;\n+          value1[index] = dataset.value;\n         }\n \n         // Return deeply merged array\n-        return { value: nextValue };\n+        return { value: value1 };\n       }\n     }\n   }\n",
+  "ground_truth": [
+    {
+      "file": "library/src/schemas/intersect/utils/_merge/_merge.ts",
+      "start": 34,
+      "end": 40
+    },
+    {
+      "file": "library/src/schemas/intersect/utils/_merge/_merge.ts",
+      "start": 48,
+      "end": 71
+    },
+    {
+      "file": "library/src/schemas/intersect/utils/_merge/_merge.ts",
+      "start": 75,
+      "end": 85
+    }
+  ],
+  "pr_title": "Avoid extra allocations in intersect merge",
+  "pr_description": "Update `_merge` to write merged object and array entries directly onto `value1` instead of first spreading it into a fresh `nextValue`. Saves an allocation per merge call on both the object and array branches, since the accumulated result is returned as-is at the end."
+}

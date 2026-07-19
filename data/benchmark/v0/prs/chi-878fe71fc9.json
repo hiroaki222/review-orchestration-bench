@@ -1,0 +1,31 @@
+{
+  "id": "chi-878fe71fc9",
+  "repo": "chi",
+  "fix_sha": "878fe71fc9e506a63ea6957ed09c9ce84f789e97",
+  "base_sha": "878fe71fc9e506a63ea6957ed09c9ce84f789e97",
+  "language": "go",
+  "category": "logic",
+  "severity": "low",
+  "post_cutoff": true,
+  "bug_summary": "defaultLogEntry.PanicがNoColor設定を無視し、常にANSIカラー付きでパニックスタックトレースを出力していた",
+  "pr_diff": "diff --git a/middleware/logger.go b/middleware/logger.go\nindex ba5391f..4d30a9a 100644\n--- a/middleware/logger.go\n+++ b/middleware/logger.go\n@@ -166,7 +166,7 @@ func (l *defaultLogEntry) Write(status, bytes int, header http.Header, elapsed t\n }\n \n func (l *defaultLogEntry) Panic(v interface{}, stack []byte) {\n-\tprintPrettyStack(v, l.useColor)\n+\tPrintPrettyStack(v)\n }\n \n func init() {\ndiff --git a/middleware/recoverer.go b/middleware/recoverer.go\nindex effa612..81342df 100644\n--- a/middleware/recoverer.go\n+++ b/middleware/recoverer.go\n@@ -52,13 +52,9 @@ func Recoverer(next http.Handler) http.Handler {\n var recovererErrorWriter io.Writer = os.Stderr\n \n func PrintPrettyStack(rvr interface{}) {\n-\tprintPrettyStack(rvr, true)\n-}\n-\n-func printPrettyStack(rvr interface{}, useColor bool) {\n \tdebugStack := debug.Stack()\n \ts := prettyStack{}\n-\tout, err := s.parse(debugStack, rvr, useColor)\n+\tout, err := s.parse(debugStack, rvr)\n \tif err == nil {\n \t\trecovererErrorWriter.Write(out)\n \t} else {\n@@ -70,8 +66,9 @@ func printPrettyStack(rvr interface{}, useColor bool) {\n type prettyStack struct {\n }\n \n-func (s prettyStack) parse(debugStack []byte, rvr interface{}, useColor bool) ([]byte, error) {\n+func (s prettyStack) parse(debugStack []byte, rvr interface{}) ([]byte, error) {\n \tvar err error\n+\tuseColor := true\n \tbuf := &bytes.Buffer{}\n \n \tcW(buf, false, bRed, \"\\n\")\n",
+  "ground_truth": [
+    {
+      "file": "middleware/logger.go",
+      "start": 166,
+      "end": 172
+    },
+    {
+      "file": "middleware/recoverer.go",
+      "start": 52,
+      "end": 60
+    },
+    {
+      "file": "middleware/recoverer.go",
+      "start": 66,
+      "end": 74
+    }
+  ],
+  "pr_title": "Drop the useColor parameter from pretty stack printing",
+  "pr_description": "PrintPrettyStack and the underlying parse helper threaded a useColor flag through printPrettyStack purely to satisfy one call site. This collapses printPrettyStack/PrintPrettyStack into a single function and drops the parameter from prettyStack.parse, keeping the color behavior inline instead of passed around."
+}

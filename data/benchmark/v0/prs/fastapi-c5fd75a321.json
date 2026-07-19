@@ -1,0 +1,26 @@
+{
+  "id": "fastapi-c5fd75a321",
+  "repo": "fastapi",
+  "fix_sha": "c5fd75a321496b1f8212744bde217ec8ea956154",
+  "base_sha": "c5fd75a321496b1f8212744bde217ec8ea956154",
+  "language": "python",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "Json[list[str]]型のフィールドがシーケンス扱いされgetlistで複数値として誤って読まれてしまいバリデーションに失敗する",
+  "pr_diff": "diff --git a/fastapi/dependencies/utils.py b/fastapi/dependencies/utils.py\nindex b8f7f948c..e5ac51d53 100644\n--- a/fastapi/dependencies/utils.py\n+++ b/fastapi/dependencies/utils.py\n@@ -51,7 +51,7 @@ from fastapi.logger import logger\n from fastapi.security.oauth2 import SecurityScopes\n from fastapi.types import DependencyCacheKey\n from fastapi.utils import create_model_field, get_path_param_names\n-from pydantic import BaseModel, Json\n+from pydantic import BaseModel\n from pydantic.fields import FieldInfo\n from starlette.background import BackgroundTasks as StarletteBackgroundTasks\n from starlette.concurrency import run_in_threadpool\n@@ -726,19 +726,11 @@ def _validate_value_with_model_field(\n         return v_, []\n \n \n-def _is_json_field(field: ModelField) -> bool:\n-    return any(type(item) is Json for item in field.field_info.metadata)\n-\n-\n def _get_multidict_value(\n     field: ModelField, values: Mapping[str, Any], alias: Union[str, None] = None\n ) -> Any:\n     alias = alias or get_validation_alias(field)\n-    if (\n-        (not _is_json_field(field))\n-        and is_sequence_field(field)\n-        and isinstance(values, (ImmutableMultiDict, Headers))\n-    ):\n+    if is_sequence_field(field) and isinstance(values, (ImmutableMultiDict, Headers)):\n         value = values.getlist(alias)\n     else:\n         value = values.get(alias, None)\n",
+  "ground_truth": [
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 51,
+      "end": 57
+    },
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 726,
+      "end": 736
+    }
+  ],
+  "pr_title": "Simplify multidict value resolution for sequence fields",
+  "pr_description": "_get_multidict_value special-cased Json-typed fields to bypass getlist, adding an extra field_info.metadata scan on every lookup. This removes the _is_json_field helper and lets is_sequence_field alone decide whether to pull from getlist, keeping the resolution path uniform across field types."
+}

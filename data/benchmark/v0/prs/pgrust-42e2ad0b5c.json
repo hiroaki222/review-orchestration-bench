@@ -1,0 +1,31 @@
+{
+  "id": "pgrust-42e2ad0b5c",
+  "repo": "pgrust",
+  "fix_sha": "42e2ad0b5cbfdd4c1fbd268792f1c6a8b006a0a9",
+  "base_sha": "42e2ad0b5cbfdd4c1fbd268792f1c6a8b006a0a9",
+  "language": "rust",
+  "category": "type-safety",
+  "severity": "high",
+  "post_cutoff": true,
+  "bug_summary": "アライメント保証のないバイトバッファをsockaddr_storage/sockaddr_unへ直接キャストして参照を作っていたため、Rustの未整列参照に対する未定義動作検出でSIGABRTしバックエンドが落ちていた(psqlの単純な接続でも再現)。",
+  "pr_diff": "diff --git a/crates/common-ip/src/lib.rs b/crates/common-ip/src/lib.rs\nindex dcfd4f4ed..d2a47be17 100644\n--- a/crates/common-ip/src/lib.rs\n+++ b/crates/common-ip/src/lib.rs\n@@ -229,20 +229,7 @@ fn getnameinfo_unix(\n     }\n \n     if let Some(s) = service {\n-        /*\n-         * `addr.addr` is an unaligned byte buffer; copy it into a properly\n-         * aligned local `sockaddr_un` (as C effectively has, since its structs\n-         * are aligned) rather than forming a misaligned reference.\n-         */\n-        let mut sun: libc::sockaddr_un = unsafe { MaybeUninit::zeroed().assume_init() };\n-        let n = (addr.salen as usize).min(size_of::<libc::sockaddr_un>());\n-        unsafe {\n-            ptr::copy_nonoverlapping(\n-                addr.addr.as_ptr(),\n-                (&mut sun as *mut libc::sockaddr_un).cast::<u8>(),\n-                n,\n-            );\n-        }\n+        let sun = unsafe { &*(addr.addr.as_ptr().cast::<libc::sockaddr_un>()) };\n         let path: Vec<u8> = sun.sun_path.iter().map(|c| *c as u8).collect();\n         /*\n          * Check whether it looks like an abstract socket, but it could also\n@@ -310,15 +297,9 @@ fn getnameinfo_system(\n }\n \n /// Read `ss_family` from a `SockAddr`'s `sockaddr_storage` bytes.\n-///\n-/// `addr.addr` is a raw byte buffer with no guaranteed alignment, so we read\n-/// `ss_family` (offset 0) with an unaligned read rather than forming a\n-/// reference to a misaligned `sockaddr_storage` (which is UB and aborts under\n-/// Rust's misaligned-pointer-dereference check).\n fn sockaddr_family(addr: &SockAddr) -> i32 {\n-    let p = addr.addr.as_ptr().cast::<libc::sockaddr_storage>();\n-    let fam = unsafe { ptr::addr_of!((*p).ss_family).read_unaligned() };\n-    fam as i32\n+    let ss = unsafe { &*(addr.addr.as_ptr().cast::<libc::sockaddr_storage>()) };\n+    ss.ss_family as i32\n }\n \n /// Build a `struct addrinfo` hint from the lookup-relevant fields C passes.\n@@ -484,31 +465,6 @@ mod tests {\n         assert_eq!(service, \"???\");\n     }\n \n-    #[test]\n-    fn sockaddr_family_reads_from_misaligned_buffer() {\n-        /*\n-         * Build a SockAddr whose `addr` bytes are deliberately offset so the\n-         * sockaddr_storage view is misaligned, then confirm sockaddr_family\n-         * reads ss_family without forming a misaligned reference (no abort).\n-         */\n-        // Build a real (aligned) sockaddr_in, then copy its bytes into the\n-        // SockAddr byte buffer so the family sits at the platform-correct\n-        // offset within sockaddr_storage (e.g. offset 1 on macOS).\n-        let mut sin: libc::sockaddr_in = unsafe { MaybeUninit::zeroed().assume_init() };\n-        sin.sin_family = libc::AF_INET as libc::sa_family_t;\n-        let mut sa = SockAddr::zeroed();\n-        let n = size_of::<libc::sockaddr_in>();\n-        unsafe {\n-            ptr::copy_nonoverlapping(\n-                (&sin as *const libc::sockaddr_in).cast::<u8>(),\n-                sa.addr.as_mut_ptr(),\n-                n,\n-            );\n-        }\n-        sa.salen = n as u32;\n-        assert_eq!(sockaddr_family(&sa), libc::AF_INET);\n-    }\n-\n     #[test]\n     fn system_getnameinfo_loopback_round_trips() {\n         let hint = AddrInfoHint {\n",
+  "ground_truth": [
+    {
+      "file": "crates/common-ip/src/lib.rs",
+      "start": 229,
+      "end": 235
+    },
+    {
+      "file": "crates/common-ip/src/lib.rs",
+      "start": 297,
+      "end": 305
+    },
+    {
+      "file": "crates/common-ip/src/lib.rs",
+      "start": 465,
+      "end": 470
+    }
+  ],
+  "pr_title": "Simplify sockaddr parsing to skip the intermediate copy",
+  "pr_description": "Read `ss_family` and the `sockaddr_un` fields directly off the `SockAddr` byte buffer via a pointer cast instead of first copying the bytes into a locally allocated, aligned struct with `ptr::copy_nonoverlapping`. `sockaddr_family` and `getnameinfo_unix` both go through the direct-cast path now, cutting out the staging buffer. Removes the accompanying misaligned-buffer test since the copy step it exercised is gone."
+}

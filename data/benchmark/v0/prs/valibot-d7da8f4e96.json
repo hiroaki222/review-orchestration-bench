@@ -1,0 +1,31 @@
+{
+  "id": "valibot-d7da8f4e96",
+  "repo": "valibot",
+  "fix_sha": "d7da8f4e9684f77d7294cdf9b14b3f1c24051e91",
+  "base_sha": "d7da8f4e9684f77d7294cdf9b14b3f1c24051e91",
+  "language": "typescript",
+  "category": "security",
+  "severity": "high",
+  "post_cutoff": false,
+  "bug_summary": "assert/parse/parseAsync関数に誤って@__NO_SIDE_EFFECTS__アノテーションが付与されており、これらの関数はバリデーション失敗時に例外を投げるという副作用が本質にもかかわらず、バンドラーのツリーシェイキングによって呼び出し自体が除去されバリデーションが黙って無効化されうる問題を修正。",
+  "pr_diff": "diff --git a/library/src/methods/assert/assert.ts b/library/src/methods/assert/assert.ts\nindex b1f5f975..4dfbb61f 100644\n--- a/library/src/methods/assert/assert.ts\n+++ b/library/src/methods/assert/assert.ts\n@@ -8,6 +8,7 @@ import { ValiError } from '../../utils/index.ts';\n  * @param schema The schema to be used.\n  * @param input The input to be tested.\n  */\n+// @__NO_SIDE_EFFECTS__\n export function assert<\n   const TSchema extends BaseSchema<unknown, unknown, BaseIssue<unknown>>,\n >(schema: TSchema, input: unknown): asserts input is InferInput<TSchema> {\ndiff --git a/library/src/methods/parse/parse.ts b/library/src/methods/parse/parse.ts\nindex 17e48864..2c2ce1c5 100644\n--- a/library/src/methods/parse/parse.ts\n+++ b/library/src/methods/parse/parse.ts\n@@ -17,6 +17,7 @@ import { ValiError } from '../../utils/index.ts';\n  *\n  * @returns The parsed input.\n  */\n+// @__NO_SIDE_EFFECTS__\n export function parse<\n   const TSchema extends BaseSchema<unknown, unknown, BaseIssue<unknown>>,\n >(\ndiff --git a/library/src/methods/parse/parseAsync.ts b/library/src/methods/parse/parseAsync.ts\nindex 329fefad..09452865 100644\n--- a/library/src/methods/parse/parseAsync.ts\n+++ b/library/src/methods/parse/parseAsync.ts\n@@ -18,6 +18,7 @@ import { ValiError } from '../../utils/index.ts';\n  *\n  * @returns The parsed input.\n  */\n+// @__NO_SIDE_EFFECTS__\n export async function parseAsync<\n   const TSchema extends\n     | BaseSchema<unknown, unknown, BaseIssue<unknown>>\n",
+  "ground_truth": [
+    {
+      "file": "library/src/methods/assert/assert.ts",
+      "start": 8,
+      "end": 14
+    },
+    {
+      "file": "library/src/methods/parse/parse.ts",
+      "start": 17,
+      "end": 23
+    },
+    {
+      "file": "library/src/methods/parse/parseAsync.ts",
+      "start": 18,
+      "end": 24
+    }
+  ],
+  "pr_title": "Mark assert/parse/parseAsync as side-effect free",
+  "pr_description": "Adds @__NO_SIDE_EFFECTS__ annotations to assert, parse, and parseAsync so bundlers can tree-shake calls whose results go unused, matching the annotations already used elsewhere in the library's public API."
+}

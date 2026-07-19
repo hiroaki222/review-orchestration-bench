@@ -1,0 +1,21 @@
+{
+  "id": "fastapi-378ad688b7",
+  "repo": "fastapi",
+  "fix_sha": "378ad688b7e57efb190506b3b36be65eb8ad5e6f",
+  "base_sha": "378ad688b7e57efb190506b3b36be65eb8ad5e6f",
+  "language": "python",
+  "category": "security",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "Security依存関係のスコープ解決で `security_scopes or []` を新規リストとせず既存リストを直接extendして変更するため、兄弟依存関係間でスコープが意図せず伝播・リークする",
+  "pr_diff": "diff --git a/fastapi/dependencies/utils.py b/fastapi/dependencies/utils.py\nindex 45353835b..1e92c1ba2 100644\n--- a/fastapi/dependencies/utils.py\n+++ b/fastapi/dependencies/utils.py\n@@ -278,9 +278,7 @@ def get_dependant(\n             use_security_scopes = security_scopes or []\n             if isinstance(param_details.depends, params.Security):\n                 if param_details.depends.scopes:\n-                    use_security_scopes = use_security_scopes + list(\n-                        param_details.depends.scopes\n-                    )\n+                    use_security_scopes.extend(param_details.depends.scopes)\n             sub_dependant = get_dependant(\n                 path=path,\n                 call=param_details.depends.dependency,\n",
+  "ground_truth": [
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 278,
+      "end": 284
+    }
+  ],
+  "pr_title": "Avoid extra list allocation when merging dependency security scopes",
+  "pr_description": "Building `use_security_scopes` for a sub-dependency concatenated two lists with `+`, allocating a new list just to append the dependency's own scopes. This replaces it with `.extend(...)`, updating the list in place instead of constructing an intermediate one."
+}

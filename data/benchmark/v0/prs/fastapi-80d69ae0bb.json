@@ -1,0 +1,26 @@
+{
+  "id": "fastapi-80d69ae0bb",
+  "repo": "fastapi",
+  "fix_sha": "80d69ae0bb393c728c61c41086b770237b7b676c",
+  "base_sha": "80d69ae0bb393c728c61c41086b770237b7b676c",
+  "language": "python",
+  "category": "type-safety",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "Python3.10+の `X | None` union構文(UnionType)がOptionalシーケンス判定から漏れており、新構文使用時にassert失敗でクラッシュ",
+  "pr_diff": "diff --git a/fastapi/_compat/v2.py b/fastapi/_compat/v2.py\nindex 0faa7d5a8..543a42dda 100644\n--- a/fastapi/_compat/v2.py\n+++ b/fastapi/_compat/v2.py\n@@ -17,7 +17,7 @@ from typing import (\n \n from fastapi._compat import may_v1, shared\n from fastapi.openapi.constants import REF_TEMPLATE\n-from fastapi.types import IncEx, ModelNameMap, UnionType\n+from fastapi.types import IncEx, ModelNameMap\n from pydantic import BaseModel, TypeAdapter, create_model\n from pydantic import PydanticSchemaGenerationError as PydanticSchemaGenerationError\n from pydantic import PydanticUndefinedAnnotation as PydanticUndefinedAnnotation\n@@ -381,7 +381,7 @@ def copy_field_info(*, field_info: FieldInfo, annotation: Any) -> FieldInfo:\n \n def serialize_sequence_value(*, field: ModelField, value: Any) -> Sequence[Any]:\n     origin_type = get_origin(field.field_info.annotation) or field.field_info.annotation\n-    if origin_type is Union or origin_type is UnionType:  # Handle optional sequences\n+    if origin_type is Union:  # Handle optional sequences\n         union_args = get_args(field.field_info.annotation)\n         for union_arg in union_args:\n             if union_arg is type(None):\n",
+  "ground_truth": [
+    {
+      "file": "fastapi/_compat/v2.py",
+      "start": 17,
+      "end": 23
+    },
+    {
+      "file": "fastapi/_compat/v2.py",
+      "start": 381,
+      "end": 387
+    }
+  ],
+  "pr_title": "Simplify optional-sequence detection in serialize_sequence_value",
+  "pr_description": "`serialize_sequence_value` only needs to recognize `typing.Union` to detect optional sequences here, so this drops the extra `UnionType` origin check and its import. Keeps the helper focused on the case that's actually exercised by the surrounding serialization path."
+}

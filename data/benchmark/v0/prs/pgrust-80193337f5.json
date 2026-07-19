@@ -1,0 +1,26 @@
+{
+  "id": "pgrust-80193337f5",
+  "repo": "pgrust",
+  "fix_sha": "80193337f5ce4f70cd753c4b0c2c95cf11d37f27",
+  "base_sha": "80193337f5ce4f70cd753c4b0c2c95cf11d37f27",
+  "language": "rust",
+  "category": "error-handling",
+  "severity": "high",
+  "post_cutoff": true,
+  "bug_summary": "未移植パス(seam-missやpanic!)がbackend全体を巻き込むabortとなっていたのを、main_loopをcatch_unwindで包み込み構造化されたSQL ERRORへ変換するよう修正。",
+  "pr_diff": "diff --git a/crates/backend-main-main/src/lib.rs b/crates/backend-main-main/src/lib.rs\nindex f201638c6..ffe1fb27e 100644\n--- a/crates/backend-main-main/src/lib.rs\n+++ b/crates/backend-main-main/src/lib.rs\n@@ -274,14 +274,16 @@ const EREPORT_PANIC_PREFIX: &str = \"PGRUST-SQLSTATE:\";\n fn install_ereport_panic_hook() {\n     let prev = std::panic::take_hook();\n     std::panic::set_hook(Box::new(move |info| {\n-        // A string/&str payload is a recoverable hard error: either a structured\n-        // `PGRUST-SQLSTATE:` ereport, or a generic seam-miss/`panic!` message\n-        // that the main loop's catch_unwind now turns into a clean SQL ERROR.\n-        // Either way the backtrace is noise — stay quiet. Non-string payloads\n-        // are genuine programming errors and still print.\n-        let _ = EREPORT_PANIC_PREFIX;\n-        let is_handled_ereport = info.payload().downcast_ref::<String>().is_some()\n-            || info.payload().downcast_ref::<&str>().is_some();\n+        let is_handled_ereport = info\n+            .payload()\n+            .downcast_ref::<String>()\n+            .map(|s| s.starts_with(EREPORT_PANIC_PREFIX))\n+            .unwrap_or(false)\n+            || info\n+                .payload()\n+                .downcast_ref::<&str>()\n+                .map(|s| s.starts_with(EREPORT_PANIC_PREFIX))\n+                .unwrap_or(false);\n         if is_handled_ereport {\n             // Caught downstream and turned into a clean SQL ERROR: stay quiet.\n             return;\ndiff --git a/crates/backend-tcop-postgres/src/main_loop.rs b/crates/backend-tcop-postgres/src/main_loop.rs\nindex b6af1a560..a12392007 100644\n--- a/crates/backend-tcop-postgres/src/main_loop.rs\n+++ b/crates/backend-tcop-postgres/src/main_loop.rs\n@@ -922,39 +922,7 @@ fn postgres_main_inner(dbname: Option<&str>, username: Option<&str>) -> PgResult\n         // Run one full iteration; on Err, run the recovery block and continue.\n         // This is the `sigsetjmp` outer handler expressed over PgResult.\n         let message_context = backend_top.new_child(\"MessageContext\");\n-        // Wrap the iteration in catch_unwind so an unported-path panic (a\n-        // seam-miss or a `panic!`-shaped hard error) is converted into a\n-        // recoverable structured ERROR rather than aborting the backend — the\n-        // Rust expression of C's sigsetjmp outer handler. AssertUnwindSafe is\n-        // sound here because the recovery path (AbortCurrentTransaction etc.)\n-        // resets all backend state regardless of where the panic landed.\n-        let iter = match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {\n-            run_one_iteration(message_context.mcx(), &mut state)\n-        })) {\n-            Ok(r) => r,\n-            Err(payload) => {\n-                // Mirror invoke_pgfunction (backend-utils-fmgr-core:415-432):\n-                // honor a `PGRUST-SQLSTATE:` prefix, else default XX000.\n-                let msg = payload\n-                    .downcast_ref::<String>()\n-                    .cloned()\n-                    .or_else(|| payload.downcast_ref::<&str>().map(|s| s.to_string()));\n-                let pgerr = match msg {\n-                    Some(m) => match m.strip_prefix(\"PGRUST-SQLSTATE:\") {\n-                        Some(rest) if rest.len() > 6 && rest.as_bytes()[5] == b':' => {\n-                            let (code, msg) = rest.split_at(5);\n-                            let mut chars = [0u8; 5];\n-                            chars.copy_from_slice(code.as_bytes());\n-                            types_error::PgError::error(msg[1..].to_string())\n-                                .with_sqlstate(types_error::make_sqlstate(chars))\n-                        }\n-                        _ => types_error::PgError::error(m),\n-                    },\n-                    None => types_error::PgError::error(\"unported path panicked\"),\n-                };\n-                Err(pgerr)\n-            }\n-        };\n+        let iter = run_one_iteration(message_context.mcx(), &mut state);\n         if let Err(err) = iter {\n             // The C switches into MessageContext before FlushErrorState; we pass\n             // the (about-to-be-reset) per-iteration context.\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend-main-main/src/lib.rs",
+      "start": 274,
+      "end": 289
+    },
+    {
+      "file": "crates/backend-tcop-postgres/src/main_loop.rs",
+      "start": 922,
+      "end": 928
+    }
+  ],
+  "pr_title": "Simplify panic classification in the ereport hook",
+  "pr_description": "The panic hook now matches payloads against the PGRUST-SQLSTATE: prefix directly instead of treating any string/&str payload as a handled ereport. This also removes the catch_unwind wrapper around each main-loop iteration, since the prefix check gives the hook enough information on its own to stay quiet for handled cases."
+}

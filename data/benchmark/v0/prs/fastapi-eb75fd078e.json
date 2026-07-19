@@ -1,0 +1,21 @@
+{
+  "id": "fastapi-eb75fd078e",
+  "repo": "fastapi",
+  "fix_sha": "eb75fd078e83aed935016bcdf0705cd58bbf0d0e",
+  "base_sha": "eb75fd078e83aed935016bcdf0705cd58bbf0d0e",
+  "language": "python",
+  "category": "logic",
+  "severity": "low",
+  "post_cutoff": true,
+  "bug_summary": "フロントエンドfallbackの判定がパス末尾セグメントの拡張子有無で誤判定しており、ドット付きパス(/users/john.doe等)がHTML要求でも誤って404になる",
+  "pr_diff": "diff --git a/fastapi/routing.py b/fastapi/routing.py\nindex 28694b4e5..c442b122b 100644\n--- a/fastapi/routing.py\n+++ b/fastapi/routing.py\n@@ -1984,13 +1984,24 @@ def _iter_accept_media_types(accept: str) -> Iterator[tuple[str, float]]:\n \n \n def _is_frontend_navigation_request(scope: Scope) -> bool:\n+    route_path = get_route_path(scope)\n+    final_segment = route_path.rsplit(\"/\", 1)[-1]\n+    if os.path.splitext(final_segment)[1]:\n+        return False\n     request = Request(scope)\n+    wildcard_accepted = False\n+    html_rejected = False\n     for media_type, quality in _iter_accept_media_types(\n         request.headers.get(\"accept\", \"\")\n     ):\n-        if media_type in {\"text/html\", \"application/xhtml+xml\"} and quality != 0:\n-            return True\n-    return False\n+        if media_type in {\"text/html\", \"application/xhtml+xml\"}:\n+            if quality == 0:\n+                html_rejected = True\n+            else:\n+                return True\n+        elif media_type == \"*/*\" and quality != 0:\n+            wildcard_accepted = True\n+    return wildcard_accepted and not html_rejected\n \n \n class _FrontendRoute(BaseRoute):\n",
+  "ground_truth": [
+    {
+      "file": "fastapi/routing.py",
+      "start": 1984,
+      "end": 2007
+    }
+  ],
+  "pr_title": "Improve frontend navigation detection for asset paths and wildcard Accept headers",
+  "pr_description": "Extends _is_frontend_navigation_request to treat request paths whose final segment has a file extension as non-navigation, and to interpret `*/*` Accept headers alongside explicit `text/html` rejection (q=0) when deciding whether a request is a browser navigation."
+}

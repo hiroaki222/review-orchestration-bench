@@ -1,0 +1,21 @@
+{
+  "id": "fastapi-09f5941f0e",
+  "repo": "fastapi",
+  "fix_sha": "09f5941f0e18db2b28b40d35a5da7a94c23eb9ed",
+  "base_sha": "09f5941f0e18db2b28b40d35a5da7a94c23eb9ed",
+  "language": "python",
+  "category": "type-safety",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "Python 3.14(PEP649)でTYPE_CHECKING配下の型注釈をannotation_format指定なしで評価しようとしNameErrorが発生する",
+  "pr_diff": "diff --git a/fastapi/dependencies/utils.py b/fastapi/dependencies/utils.py\nindex fc5dfed85..b647818c4 100644\n--- a/fastapi/dependencies/utils.py\n+++ b/fastapi/dependencies/utils.py\n@@ -204,12 +204,7 @@ def _get_signature(call: Callable[..., Any]) -> inspect.Signature:\n         except NameError:\n             # Handle type annotations with if TYPE_CHECKING, not used by FastAPI\n             # e.g. dependency return types\n-            if sys.version_info >= (3, 14):\n-                from annotationlib import Format\n-\n-                signature = inspect.signature(call, annotation_format=Format.FORWARDREF)\n-            else:\n-                signature = inspect.signature(call)\n+            signature = inspect.signature(call)\n     else:\n         signature = inspect.signature(call)\n     return signature\n",
+  "ground_truth": [
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 204,
+      "end": 210
+    }
+  ],
+  "pr_title": "Simplify _get_signature fallback for TYPE_CHECKING-only annotations",
+  "pr_description": "The version-gated branch for building the signature with a forward-ref annotation format added extra complexity for a fairly narrow case. Falls back to the plain `inspect.signature(call)` call uniformly, matching how the rest of this function already handles annotation resolution."
+}

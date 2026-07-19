@@ -1,0 +1,31 @@
+{
+  "id": "valibot-27ecfefc2f",
+  "repo": "valibot",
+  "fix_sha": "27ecfefc2f8f1cfb625954c87a39d8a673772bdc",
+  "base_sha": "27ecfefc2f8f1cfb625954c87a39d8a673772bdc",
+  "language": "typescript",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "toJsonSchemaで定義キーに`/`や`~`が含まれる場合、JSON Pointerのエスケープ (~0, ~1) をせずに$refを生成していたため不正な$refになる",
+  "pr_diff": "diff --git a/packages/to-json-schema/src/converters/convertSchema/convertSchema.ts b/packages/to-json-schema/src/converters/convertSchema/convertSchema.ts\nindex ae5f3286..6eb08bb4 100644\n--- a/packages/to-json-schema/src/converters/convertSchema/convertSchema.ts\n+++ b/packages/to-json-schema/src/converters/convertSchema/convertSchema.ts\n@@ -123,17 +123,6 @@ function flattenPipe(pipe: Pipe): Pipe {\n   );\n }\n \n-/**\n- * Returns the JSON Pointer reference for a definition key.\n- *\n- * @param referenceId The unescaped definition key.\n- *\n- * @returns The encoded JSON Pointer fragment.\n- */\n-function getDefinitionRef(referenceId: string): string {\n-  return `#/$defs/${referenceId.replaceAll('~', '~0').replaceAll('/', '~1')}`;\n-}\n-\n // Create global reference count\n let refCount = 0;\n \n@@ -159,7 +148,7 @@ export function convertSchema(\n     // If schema is in reference map use reference and skip conversion\n     const referenceId = context.referenceMap.get(valibotSchema);\n     if (referenceId) {\n-      jsonSchema.$ref = getDefinitionRef(referenceId);\n+      jsonSchema.$ref = `#/$defs/${referenceId}`;\n       if (config?.overrideRef) {\n         const refOverride = config.overrideRef({\n           ...context,\n@@ -642,7 +631,7 @@ export function convertSchema(\n       }\n \n       // Add reference to JSON Schema object\n-      jsonSchema.$ref = getDefinitionRef(referenceId);\n+      jsonSchema.$ref = `#/$defs/${referenceId}`;\n \n       // Override reference, if necessary\n       if (config?.overrideRef) {\n",
+  "ground_truth": [
+    {
+      "file": "packages/to-json-schema/src/converters/convertSchema/convertSchema.ts",
+      "start": 123,
+      "end": 128
+    },
+    {
+      "file": "packages/to-json-schema/src/converters/convertSchema/convertSchema.ts",
+      "start": 148,
+      "end": 154
+    },
+    {
+      "file": "packages/to-json-schema/src/converters/convertSchema/convertSchema.ts",
+      "start": 631,
+      "end": 637
+    }
+  ],
+  "pr_title": "Inline $ref construction in convertSchema",
+  "pr_description": "`getDefinitionRef` wrapped a single string template in its own helper function, used at just two call sites in `convertSchema`. This inlines the `#/$defs/${referenceId}` template directly at both places and removes the helper, cutting down on indirection for such a small piece of logic."
+}

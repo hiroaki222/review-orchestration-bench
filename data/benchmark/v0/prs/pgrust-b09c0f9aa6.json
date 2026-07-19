@@ -1,0 +1,46 @@
+{
+  "id": "pgrust-b09c0f9aa6",
+  "repo": "pgrust",
+  "fix_sha": "b09c0f9aa6bdc7da8c6cc2aa161a903f9437149e",
+  "base_sha": "b09c0f9aa6bdc7da8c6cc2aa161a903f9437149e",
+  "language": "rust",
+  "category": "resource-leak",
+  "severity": "high",
+  "post_cutoff": true,
+  "bug_summary": "plpgsqlのEXCEPTIONブロックがサブトランザクション後にCurrentResourceOwnerを元(ポータルのオーナー)に戻しておらず、後続のリレーション参照解放が誤ったオーナーに対して行われクラッシュ+リカバリ突入していた",
+  "pr_diff": "diff --git a/crates/backend-pl-plpgsql-exec-seams/src/lib.rs b/crates/backend-pl-plpgsql-exec-seams/src/lib.rs\nindex 4bb588b30..da39168e9 100644\n--- a/crates/backend-pl-plpgsql-exec-seams/src/lib.rs\n+++ b/crates/backend-pl-plpgsql-exec-seams/src/lib.rs\n@@ -26,7 +26,6 @@\n use types_core::Oid;\n use types_error::PgResult;\n use types_plpgsql::int32;\n-use types_resowner::ResourceOwner;\n \n /// The `(typeId, typMod, collation)` triple filled by\n /// `plpgsql_exec_get_datum_type_info`.\n@@ -416,24 +415,6 @@ seam_core::seam!(\n     pub fn rollback_and_release_current_subtransaction() -> PgResult<()>\n );\n \n-seam_core::seam!(\n-    /// Read `CurrentResourceOwner` (resowner.c global). `exec_stmt_block`'s\n-    /// EXCEPTION leg snapshots this (`oldowner = CurrentResourceOwner`) before\n-    /// `BeginInternalSubTransaction` so it can restore it after the subxact\n-    /// release/rollback — the subxact engine leaves `CurrentResourceOwner` set\n-    /// to the parent (CurTransaction) owner, not the portal owner that was\n-    /// current when the block ran.\n-    pub fn current_resource_owner() -> ResourceOwner\n-);\n-\n-seam_core::seam!(\n-    /// `CurrentResourceOwner = owner` (resowner.c global). `exec_stmt_block`'s\n-    /// EXCEPTION leg restores the snapshot (`CurrentResourceOwner = oldowner`)\n-    /// after the internal subtransaction is released or rolled back, exactly as\n-    /// pl_exec.c does.\n-    pub fn set_current_resource_owner(owner: ResourceOwner)\n-);\n-\n seam_core::seam!(\n     /// `CStringGetTextDatum(s)` (`builtins.h` / `varlena.c cstring_to_text`):\n     /// build a `text` Datum from an owned Rust `String`. Used by the EXCEPTION\ndiff --git a/crates/backend-pl-plpgsql-exec/src/lib.rs b/crates/backend-pl-plpgsql-exec/src/lib.rs\nindex 7423a4a6a..4e0ff51b1 100644\n--- a/crates/backend-pl-plpgsql-exec/src/lib.rs\n+++ b/crates/backend-pl-plpgsql-exec/src/lib.rs\n@@ -313,20 +313,6 @@ fn exec_stmt_block_with_exceptions(\n     estate: &mut PLpgSQL_execstate,\n     block: &PLpgSQL_stmt_block,\n ) -> PLpgSQL_rc_result {\n-    // C (pl_exec.c exec_stmt_block): `oldowner = CurrentResourceOwner;` is\n-    // snapshotted BEFORE entering the internal subtransaction, then restored\n-    // (`CurrentResourceOwner = oldowner;`) after the subxact is released\n-    // (no-error path) or rolled back (PG_CATCH). This restore is NOT optional /\n-    // RAII: `CleanupSubTransaction` leaves `CurrentResourceOwner` pointing at the\n-    // parent (CurTransaction) resource owner, but the block ran with the PORTAL's\n-    // resource owner current (pquery sets `CurrentResourceOwner = portal->resowner`\n-    // around execution). Without restoring `oldowner`, relation refs / buffer pins\n-    // the OUTER statement opened under the portal owner are later forgotten under\n-    // the wrong (TopTransaction) owner — `ResourceOwnerForgetRelationRef` fails\n-    // \"not owned by resource owner TopTransaction\" and the rd_refcnt underflows,\n-    // killing the backend (the `revalidate_bug` ANALYZE-then-div-by-zero case).\n-    let oldowner = exec_seams::current_resource_owner::call();\n-\n     // BeginInternalSubTransaction(NULL) + remember the caller context / owner.\n     begin_internal_subtransaction(estate)?;\n \n@@ -352,12 +338,7 @@ fn exec_stmt_block_with_exceptions(\n         Ok(rc) => rc,\n         Err(payload) => {\n             // Best-effort rollback of the open subtransaction, then re-raise.\n-            // Restore the saved owner (C `CurrentResourceOwner = oldowner;`) so\n-            // the unwinding outer statement's resowner cleanup runs against the\n-            // owner it opened resources under, not the parent owner the subxact\n-            // cleanup left current.\n             let _ = rollback_and_release_current_subtransaction(estate);\n-            exec_seams::set_current_resource_owner::call(oldowner);\n             std::panic::resume_unwind(payload);\n         }\n     };\n@@ -365,21 +346,13 @@ fn exec_stmt_block_with_exceptions(\n     match caught {\n         Ok(rc) => {\n             // No error: ReleaseCurrentSubTransaction + restore context/owner.\n-            // C: `ReleaseCurrentSubTransaction(); ... CurrentResourceOwner = oldowner;`\n             release_current_subtransaction(estate)?;\n-            exec_seams::set_current_resource_owner::call(oldowner);\n             Ok(rc)\n         }\n         Err(edata) => {\n             // PG_CATCH: roll back the subtransaction, restore the SPI\n             // connection, then look for a matching exception handler.\n             rollback_and_release_current_subtransaction(estate)?;\n-            // C: `CurrentResourceOwner = oldowner;` immediately after the\n-            // rollback, so the EXCEPTION handler statements (and the eventual\n-            // outer-statement resowner cleanup) run under the owner that was\n-            // current when the block began (the portal owner), not the parent\n-            // owner the subxact cleanup left current.\n-            exec_seams::set_current_resource_owner::call(oldowner);\n \n             let exceptions = block\n                 .exceptions\ndiff --git a/crates/backend-pl-plpgsql-handler/src/lib.rs b/crates/backend-pl-plpgsql-handler/src/lib.rs\nindex fcb2ef177..f2a7a23d8 100644\n--- a/crates/backend-pl-plpgsql-handler/src/lib.rs\n+++ b/crates/backend-pl-plpgsql-handler/src/lib.rs\n@@ -1009,20 +1009,6 @@ pub fn init_seams() {\n         backend_access_transam_xact::RollbackAndReleaseCurrentSubTransaction()\n     });\n \n-    // `oldowner = CurrentResourceOwner` / `CurrentResourceOwner = oldowner` —\n-    // the snapshot+restore pl_exec.c's exec_stmt_block performs around the\n-    // internal subtransaction. The subxact engine's CleanupSubTransaction leaves\n-    // CurrentResourceOwner at the parent (CurTransaction) owner; without this\n-    // restore, the outer statement's relation refs / buffer pins (opened under\n-    // the portal's resource owner) are later forgotten under the wrong owner.\n-    // `ResourceOwner::NULL` (the C NULL owner) round-trips faithfully.\n-    backend_pl_plpgsql_exec_seams::current_resource_owner::set(|| {\n-        backend_utils_resowner_resowner_seams::CurrentResourceOwner::call()\n-    });\n-    backend_pl_plpgsql_exec_seams::set_current_resource_owner::set(|owner| {\n-        backend_utils_resowner_resowner_seams::set_CurrentResourceOwner::call(owner)\n-    });\n-\n     // Install `CStringGetTextDatum` for the EXCEPTION handler's SQLSTATE/SQLERRM\n     // special-var binding (assign_error_vars) and `exec_stmt_getdiag`. C does\n     // `CStringGetTextDatum(s)` = `cstring_to_text(s)` palloc'd in\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend-pl-plpgsql-exec-seams/src/lib.rs",
+      "start": 26,
+      "end": 31
+    },
+    {
+      "file": "crates/backend-pl-plpgsql-exec-seams/src/lib.rs",
+      "start": 415,
+      "end": 420
+    },
+    {
+      "file": "crates/backend-pl-plpgsql-exec/src/lib.rs",
+      "start": 313,
+      "end": 318
+    },
+    {
+      "file": "crates/backend-pl-plpgsql-exec/src/lib.rs",
+      "start": 338,
+      "end": 344
+    },
+    {
+      "file": "crates/backend-pl-plpgsql-exec/src/lib.rs",
+      "start": 346,
+      "end": 358
+    },
+    {
+      "file": "crates/backend-pl-plpgsql-handler/src/lib.rs",
+      "start": 1009,
+      "end": 1014
+    }
+  ],
+  "pr_title": "Remove manual resource-owner snapshot/restore around plpgsql subtransactions",
+  "pr_description": "Drop the `current_resource_owner`/`set_current_resource_owner` seams and the explicit `oldowner` save-and-restore dance in `exec_stmt_block_with_exceptions`, letting the subtransaction begin/release/rollback calls manage `CurrentResourceOwner` on their own. Removes the corresponding seam registrations in the handler crate's `init_seams`, shrinking the surface between the plpgsql executor and the resowner internals."
+}

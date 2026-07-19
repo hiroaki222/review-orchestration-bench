@@ -1,0 +1,26 @@
+{
+  "id": "fastapi-20f40b29c0",
+  "repo": "fastapi",
+  "fix_sha": "20f40b29c0241fc73d82857ab456ef6fda15659f",
+  "base_sha": "20f40b29c0241fc73d82857ab456ef6fda15659f",
+  "language": "python",
+  "category": "type-safety",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "Decimal(\"NaN\")/(\"Infinity\")のexponentが文字列('n'/'F')になるため `>= 0` 比較でTypeErrorが発生",
+  "pr_diff": "diff --git a/fastapi/encoders.py b/fastapi/encoders.py\nindex 793951089..6fc6228e1 100644\n--- a/fastapi/encoders.py\n+++ b/fastapi/encoders.py\n@@ -34,14 +34,14 @@ def isoformat(o: Union[datetime.date, datetime.time]) -> str:\n     return o.isoformat()\n \n \n-# Adapted from Pydantic v1\n+# Taken from Pydantic v1 as is\n # TODO: pv2 should this return strings instead?\n def decimal_encoder(dec_value: Decimal) -> Union[int, float]:\n     \"\"\"\n-    Encodes a Decimal as int if there's no exponent, otherwise float\n+    Encodes a Decimal as int of there's no exponent, otherwise float\n \n     This is useful when we use ConstrainedDecimal to represent Numeric(x,0)\n-    where an integer (but not int typed) is used. Encoding this as a float\n+    where a integer (but not int typed) is used. Encoding this as a float\n     results in failed round-tripping between encode and parse.\n     Our Id type is a prime example of this.\n \n@@ -50,12 +50,8 @@ def decimal_encoder(dec_value: Decimal) -> Union[int, float]:\n \n     >>> decimal_encoder(Decimal(\"1\"))\n     1\n-\n-    >>> decimal_encoder(Decimal(\"NaN\"))\n-    nan\n     \"\"\"\n-    exponent = dec_value.as_tuple().exponent\n-    if isinstance(exponent, int) and exponent >= 0:\n+    if dec_value.as_tuple().exponent >= 0:  # type: ignore[operator]\n         return int(dec_value)\n     else:\n         return float(dec_value)\n",
+  "ground_truth": [
+    {
+      "file": "fastapi/encoders.py",
+      "start": 34,
+      "end": 47
+    },
+    {
+      "file": "fastapi/encoders.py",
+      "start": 50,
+      "end": 57
+    }
+  ],
+  "pr_title": "Match decimal_encoder more closely with its Pydantic v1 source",
+  "pr_description": "Tidies up decimal_encoder's docstring wording and simplifies the exponent check to mirror the original Pydantic v1 implementation more directly, dropping the extra isinstance guard and the NaN doctest example."
+}

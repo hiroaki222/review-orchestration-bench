@@ -1,0 +1,41 @@
+{
+  "id": "pgrust-807f55432a",
+  "repo": "pgrust",
+  "fix_sha": "807f55432ae9a1008c2edbe99a441c910ffa45ca",
+  "base_sha": "807f55432ae9a1008c2edbe99a441c910ffa45ca",
+  "language": "rust",
+  "category": "concurrency",
+  "severity": "high",
+  "post_cutoff": true,
+  "bug_summary": "ExecGetRangeTableRelationがIsParallelWorker()を呼び出し元からのハードコードfalseに依存しており、パラレルワーカーでの実行時パーティションプルーニング時にロックアサーションに失敗しクラッシュしていた",
+  "pr_diff": "diff --git a/crates/backend-executor-execMain/src/lib.rs b/crates/backend-executor-execMain/src/lib.rs\nindex c522632a8..6cc3e0bab 100644\n--- a/crates/backend-executor-execMain/src/lib.rs\n+++ b/crates/backend-executor-execMain/src/lib.rs\n@@ -2263,7 +2263,7 @@ fn init_plan_rowmarks<'mcx>(estate: &mut types_nodes::EStateData<'mcx>) -> PgRes\n         let relation: Option<types_rel::Relation<'mcx>> = match rc.markType {\n             ROW_MARK_EXCLUSIVE | ROW_MARK_NOKEYEXCLUSIVE | ROW_MARK_SHARE | ROW_MARK_KEYSHARE\n             | ROW_MARK_REFERENCE => {\n-                let rel = execUtils::ExecGetRangeTableRelation(estate, rc.rti, false)?;\n+                let rel = execUtils::ExecGetRangeTableRelation(estate, rc.rti, false, false)?;\n                 CheckValidRowMarkRel(&rel, rc.markType)?;\n                 Some(rel)\n             }\ndiff --git a/crates/backend-executor-execPartition/src/pruning.rs b/crates/backend-executor-execPartition/src/pruning.rs\nindex d01d9e8d3..b1b3ca6ed 100644\n--- a/crates/backend-executor-execPartition/src/pruning.rs\n+++ b/crates/backend-executor-execPartition/src/pruning.rs\n@@ -302,7 +302,7 @@ pub(crate) fn CreatePartitionPruneState<'mcx>(\n             let rtindex = pruneinfo_ref(&estate.es_part_prune_infos[pruneinfo_index]).prune_infos\n                 [i][j]\n                 .rtindex;\n-            let partrel = ExecGetRangeTableRelation(estate, rtindex, false)?;\n+            let partrel = ExecGetRangeTableRelation(estate, rtindex, false, false)?;\n \n             // partkey = RelationGetPartitionKey(partrel);\n             let partkey = partcache_seams::relation_get_partition_key::call(mcx, partrel.alias())?;\ndiff --git a/crates/backend-executor-execUtils/src/lib.rs b/crates/backend-executor-execUtils/src/lib.rs\nindex a6506797c..487be74e4 100644\n--- a/crates/backend-executor-execUtils/src/lib.rs\n+++ b/crates/backend-executor-execUtils/src/lib.rs\n@@ -1049,11 +1049,8 @@ pub fn ExecOpenScanRelation<'mcx>(\n     eflags: i32,\n     is_parallel_worker: bool,\n ) -> PgResult<Relation<'mcx>> {\n-    // Open the relation. (The parallel-worker branch is resolved inside\n-    // ExecGetRangeTableRelation via IsParallelWorker(); the passed-in flag is\n-    // retained on the wrapper signature only for call-site compatibility.)\n-    let _ = is_parallel_worker;\n-    let rel = ExecGetRangeTableRelation(estate, scanrelid, false)?;\n+    // Open the relation.\n+    let rel = ExecGetRangeTableRelation(estate, scanrelid, false, is_parallel_worker)?;\n \n     // Complain if we're attempting a scan of an unscannable relation, except\n     // when the query won't actually be run. This is a slightly klugy place\n@@ -1130,26 +1127,17 @@ pub fn exec_rt_fetch<'a, 'mcx>(\n /// calling this function — attempting to open a pruned relation for scanning\n /// results in an error.\n ///\n-/// The parallel-worker branch (take our own lock vs. assert the leader already\n-/// holds one) is decided internally by the C `IsParallelWorker()` global\n-/// (parallel.c), resolved through the `is_parallel_worker` seam — NOT a\n-/// caller-supplied flag. C has no such parameter; threading it as one invited\n-/// callers (e.g. `CreatePartitionPruneState` / row-mark setup) to hardcode\n-/// `false`, which crashed parallel workers running run-time partition pruning:\n-/// they reached `relation_open` with `NoLock` while holding no `AccessShareLock`\n-/// (the leader's locks aren't imported on this path), tripping the\n-/// caller-must-hold-a-lock assertion.\n+/// `is_parallel_worker` is the C `IsParallelWorker()` global (parallel.c) —\n+/// an explicit parameter; the caller reads it off its own facet/state when\n+/// the parallel owner lands.\n pub fn ExecGetRangeTableRelation<'mcx>(\n     estate: &mut EStateData<'mcx>,\n     rti: Index,\n     is_result_rel: bool,\n+    is_parallel_worker: bool,\n ) -> PgResult<Relation<'mcx>> {\n     debug_assert!(rti > 0 && rti as usize <= estate.es_range_table_size);\n \n-    // C: `if (!IsParallelWorker()) { ... } else { ... }` — resolve the global\n-    // directly here rather than trusting a caller-passed flag.\n-    let is_parallel_worker = backend_executor_execUtils_seams::is_parallel_worker::call();\n-\n     if !is_result_rel\n         && !bms_seams::bms_is_member::call(rti as i32, estate.es_unpruned_relids.as_deref())\n     {\n@@ -1212,11 +1200,7 @@ pub fn ExecInitResultRelation(\n     rti: Index,\n     is_parallel_worker: bool,\n ) -> PgResult<()> {\n-    // The parallel-worker branch is resolved inside ExecGetRangeTableRelation\n-    // via IsParallelWorker(); the passed-in flag is retained on the wrapper\n-    // signature only for call-site compatibility.\n-    let _ = is_parallel_worker;\n-    let result_relation_desc = ExecGetRangeTableRelation(estate, rti, true)?;\n+    let result_relation_desc = ExecGetRangeTableRelation(estate, rti, true, is_parallel_worker)?;\n \n     // InitResultRelInfo(resultRelInfo, resultRelationDesc, rti, NULL,\n     //                   estate->es_instrument);\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend-executor-execMain/src/lib.rs",
+      "start": 2263,
+      "end": 2269
+    },
+    {
+      "file": "crates/backend-executor-execPartition/src/pruning.rs",
+      "start": 302,
+      "end": 308
+    },
+    {
+      "file": "crates/backend-executor-execUtils/src/lib.rs",
+      "start": 1049,
+      "end": 1056
+    },
+    {
+      "file": "crates/backend-executor-execUtils/src/lib.rs",
+      "start": 1127,
+      "end": 1143
+    },
+    {
+      "file": "crates/backend-executor-execUtils/src/lib.rs",
+      "start": 1200,
+      "end": 1206
+    }
+  ],
+  "pr_title": "Thread is_parallel_worker explicitly through relation lookup helpers",
+  "pr_description": "Adds an explicit is_parallel_worker parameter to ExecGetRangeTableRelation and threads it through from ExecOpenScanRelation, ExecInitResultRelation, and the row-mark and partition-pruning call sites. Replaces the internal seam-based resolution of parallel-worker state with a plain parameter, making the control flow easier to trace at each call site."
+}

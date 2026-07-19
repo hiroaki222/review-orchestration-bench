@@ -1,0 +1,26 @@
+{
+  "id": "pgrust-cc75c95e06",
+  "repo": "pgrust",
+  "fix_sha": "cc75c95e067fc7ece6f1c6c4f50124154dc5ee55",
+  "base_sha": "cc75c95e067fc7ece6f1c6c4f50124154dc5ee55",
+  "language": "rust",
+  "category": "concurrency",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "SlotSyncWorkerCanRestartのクラッシュループ抑制スロットルがマイクロ秒単位のタイムスタンプを秒単位の10秒閾値と比較しており、実質10マイクロ秒でスロットルが解除され再起動制限が機能していなかった",
+  "pr_diff": "diff --git a/crates/backend-replication-logical-slotsync/src/lib.rs b/crates/backend-replication-logical-slotsync/src/lib.rs\nindex e7cdfab17..0ff59767d 100644\n--- a/crates/backend-replication-logical-slotsync/src/lib.rs\n+++ b/crates/backend-replication-logical-slotsync/src/lib.rs\n@@ -1396,14 +1396,13 @@ pub fn ShutDownSlotSync() -> PgResult<()> {\n // ===========================================================================\n \n pub fn SlotSyncWorkerCanRestart() -> PgResult<bool> {\n-    // C: time_t curtime = time(NULL); — whole-second wall clock, not the\n-    // microsecond TimestampTz. The throttle compares the delta against\n-    // SLOTSYNC_RESTART_INTERVAL_SEC (10 seconds), so the unit must be seconds.\n-    let curtime: i64 = time_seconds();\n+    // C uses time(NULL) (seconds). The host's get_current_timestamp seam\n+    // returns a TimestampTz; carried as-is and compared in the same units C\n+    // does (the only consumer is this seconds-granularity restart throttle).\n+    let curtime = timestamp::get_current_timestamp::call();\n     let last = ctx().last_start_time;\n \n-    // C: if ((unsigned int) (curtime - last) < (unsigned int) INTERVAL)\n-    if (curtime.wrapping_sub(last) as u32) < SLOTSYNC_RESTART_INTERVAL_SEC {\n+    if ((curtime.wrapping_sub(last)) as u32) < SLOTSYNC_RESTART_INTERVAL_SEC {\n         return Ok(false);\n     }\n \n@@ -1412,17 +1411,6 @@ pub fn SlotSyncWorkerCanRestart() -> PgResult<bool> {\n     Ok(true)\n }\n \n-/// `time(NULL)` — current wall-clock time in whole seconds since the Unix\n-/// epoch (a `time_t`). Read directly off the OS clock, matching the repo's\n-/// existing direct OS-time usage (pg_rusage, error-report timestamping).\n-fn time_seconds() -> i64 {\n-    use std::time::{SystemTime, UNIX_EPOCH};\n-    match SystemTime::now().duration_since(UNIX_EPOCH) {\n-        Ok(d) => d.as_secs() as i64,\n-        Err(e) => -(e.duration().as_secs() as i64),\n-    }\n-}\n-\n // ===========================================================================\n // IsSyncingReplicationSlots\n // ===========================================================================\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend-replication-logical-slotsync/src/lib.rs",
+      "start": 1396,
+      "end": 1408
+    },
+    {
+      "file": "crates/backend-replication-logical-slotsync/src/lib.rs",
+      "start": 1411,
+      "end": 1416
+    }
+  ],
+  "pr_title": "Reuse the shared timestamp seam in SlotSyncWorkerCanRestart",
+  "pr_description": "Replaces the local time_seconds helper with the timestamp::get_current_timestamp seam already used elsewhere in the crate, removing a one-off wall-clock read in favor of the shared time source."
+}

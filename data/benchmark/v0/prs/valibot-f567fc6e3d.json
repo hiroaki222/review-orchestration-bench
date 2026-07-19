@@ -1,0 +1,61 @@
+{
+  "id": "valibot-f567fc6e3d",
+  "repo": "valibot",
+  "fix_sha": "f567fc6e3de4a99b8d6f4d6daac2c3209a0c3b41",
+  "base_sha": "f567fc6e3de4a99b8d6f4d6daac2c3209a0c3b41",
+  "language": "typescript",
+  "category": "type-safety",
+  "severity": "low",
+  "post_cutoff": true,
+  "bug_summary": "default/fallback の型が MaybeReadonly (浅い readonly) になっており、ネストしたオブジェクト/配列を deeply readonly として正しく型付けできていなかった",
+  "pr_diff": "diff --git a/library/src/methods/fallback/fallback.ts b/library/src/methods/fallback/fallback.ts\nindex 4da344f4..a57689fb 100644\n--- a/library/src/methods/fallback/fallback.ts\n+++ b/library/src/methods/fallback/fallback.ts\n@@ -4,7 +4,7 @@ import type {\n   Config,\n   InferIssue,\n   InferOutput,\n-  MaybeDeepReadonly,\n+  MaybeReadonly,\n   OutputDataset,\n } from '../../types/index.ts';\n import { _getStandardProps } from '../../utils/index.ts';\n@@ -16,11 +16,11 @@ import { getFallback } from '../getFallback/index.ts';\n export type Fallback<\n   TSchema extends BaseSchema<unknown, unknown, BaseIssue<unknown>>,\n > =\n-  | MaybeDeepReadonly<InferOutput<TSchema>>\n+  | MaybeReadonly<InferOutput<TSchema>>\n   | ((\n       dataset?: OutputDataset<InferOutput<TSchema>, InferIssue<TSchema>>,\n       config?: Config<InferIssue<TSchema>>\n-    ) => MaybeDeepReadonly<InferOutput<TSchema>>);\n+    ) => MaybeReadonly<InferOutput<TSchema>>);\n \n /**\n  * Schema with fallback type.\ndiff --git a/library/src/methods/fallback/fallbackAsync.ts b/library/src/methods/fallback/fallbackAsync.ts\nindex c579f5f7..b8f4cc68 100644\n--- a/library/src/methods/fallback/fallbackAsync.ts\n+++ b/library/src/methods/fallback/fallbackAsync.ts\n@@ -6,8 +6,8 @@ import type {\n   InferInput,\n   InferIssue,\n   InferOutput,\n-  MaybeDeepReadonly,\n   MaybePromise,\n+  MaybeReadonly,\n   OutputDataset,\n   StandardProps,\n   UnknownDataset,\n@@ -23,11 +23,11 @@ export type FallbackAsync<\n     | BaseSchema<unknown, unknown, BaseIssue<unknown>>\n     | BaseSchemaAsync<unknown, unknown, BaseIssue<unknown>>,\n > =\n-  | MaybeDeepReadonly<InferOutput<TSchema>>\n+  | MaybeReadonly<InferOutput<TSchema>>\n   | ((\n       dataset?: OutputDataset<InferOutput<TSchema>, InferIssue<TSchema>>,\n       config?: Config<InferIssue<TSchema>>\n-    ) => MaybePromise<MaybeDeepReadonly<InferOutput<TSchema>>>);\n+    ) => MaybePromise<MaybeReadonly<InferOutput<TSchema>>>);\n \n /**\n  * Schema with fallback async type.\ndiff --git a/library/src/types/other.ts b/library/src/types/other.ts\nindex 7dd4a30b..44591508 100644\n--- a/library/src/types/other.ts\n+++ b/library/src/types/other.ts\n@@ -3,7 +3,7 @@ import type { UnknownDataset } from './dataset.ts';\n import type { InferInput, InferIssue } from './infer.ts';\n import type { BaseIssue } from './issue.ts';\n import type { BaseSchema, BaseSchemaAsync } from './schema.ts';\n-import type { MaybeDeepReadonly, MaybePromise } from './utils.ts';\n+import type { MaybePromise, MaybeReadonly } from './utils.ts';\n \n /**\n  * Error message type.\n@@ -19,11 +19,11 @@ export type Default<\n   TWrapped extends BaseSchema<unknown, unknown, BaseIssue<unknown>>,\n   TInput extends null | undefined,\n > =\n-  | MaybeDeepReadonly<InferInput<TWrapped> | TInput>\n+  | MaybeReadonly<InferInput<TWrapped> | TInput>\n   | ((\n       dataset?: UnknownDataset,\n       config?: Config<InferIssue<TWrapped>>\n-    ) => MaybeDeepReadonly<InferInput<TWrapped> | TInput>)\n+    ) => MaybeReadonly<InferInput<TWrapped> | TInput>)\n   | undefined;\n \n /**\n@@ -35,11 +35,11 @@ export type DefaultAsync<\n     | BaseSchemaAsync<unknown, unknown, BaseIssue<unknown>>,\n   TInput extends null | undefined,\n > =\n-  | MaybeDeepReadonly<InferInput<TWrapped> | TInput>\n+  | MaybeReadonly<InferInput<TWrapped> | TInput>\n   | ((\n       dataset?: UnknownDataset,\n       config?: Config<InferIssue<TWrapped>>\n-    ) => MaybePromise<MaybeDeepReadonly<InferInput<TWrapped> | TInput>>)\n+    ) => MaybePromise<MaybeReadonly<InferInput<TWrapped> | TInput>>)\n   | undefined;\n \n /**\n@@ -66,7 +66,7 @@ export type DefaultValue<\n     ? TDefault extends (\n         dataset?: UnknownDataset,\n         config?: Config<InferIssue<TWrapped>>\n-      ) => MaybePromise<MaybeDeepReadonly<InferInput<TWrapped> | TInput>>\n+      ) => MaybePromise<InferInput<TWrapped> | TInput>\n       ? Awaited<ReturnType<TDefault>>\n       : TDefault\n     : never;\ndiff --git a/library/src/types/utils.ts b/library/src/types/utils.ts\nindex bd2a9fa3..b14fd596 100644\n--- a/library/src/types/utils.ts\n+++ b/library/src/types/utils.ts\n@@ -30,20 +30,6 @@ export type NonOptional<TValue> = TValue extends undefined ? never : TValue;\n  */\n export type MaybeReadonly<TValue> = TValue | Readonly<TValue>;\n \n-/**\n- * Constructs a type that is deeply readonly.\n- */\n-export type DeepReadonly<TValue> = TValue extends\n-  | Record<string, unknown>\n-  | readonly unknown[]\n-  ? { readonly [TKey in keyof TValue]: DeepReadonly<TValue[TKey]> }\n-  : TValue;\n-\n-/**\n- * Constructs a type that is maybe deeply readonly.\n- */\n-export type MaybeDeepReadonly<TValue> = TValue | DeepReadonly<TValue>;\n-\n /**\n  * Constructs a type that is maybe a promise.\n  */\n",
+  "ground_truth": [
+    {
+      "file": "library/src/methods/fallback/fallback.ts",
+      "start": 4,
+      "end": 10
+    },
+    {
+      "file": "library/src/methods/fallback/fallback.ts",
+      "start": 16,
+      "end": 26
+    },
+    {
+      "file": "library/src/methods/fallback/fallbackAsync.ts",
+      "start": 6,
+      "end": 13
+    },
+    {
+      "file": "library/src/methods/fallback/fallbackAsync.ts",
+      "start": 23,
+      "end": 33
+    },
+    {
+      "file": "library/src/types/other.ts",
+      "start": 3,
+      "end": 9
+    },
+    {
+      "file": "library/src/types/other.ts",
+      "start": 19,
+      "end": 29
+    },
+    {
+      "file": "library/src/types/other.ts",
+      "start": 35,
+      "end": 45
+    },
+    {
+      "file": "library/src/types/other.ts",
+      "start": 66,
+      "end": 72
+    },
+    {
+      "file": "library/src/types/utils.ts",
+      "start": 30,
+      "end": 35
+    }
+  ],
+  "pr_title": "Consolidate readonly type helpers used by Default/Fallback",
+  "pr_description": "Replace `MaybeDeepReadonly` with the existing `MaybeReadonly` utility type across `Default`, `DefaultAsync`, `Fallback`, and `FallbackAsync`, and remove the now-unused `DeepReadonly`/`MaybeDeepReadonly` type definitions from `types/utils.ts`. One less pair of readonly helpers to keep in sync with the rest of the type utilities."
+}

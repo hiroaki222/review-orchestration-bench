@@ -1,0 +1,26 @@
+{
+  "id": "chi-d80b8f3f3c",
+  "repo": "chi",
+  "fix_sha": "d80b8f3f3c7fdb449622bdee65d8fff5155acf30",
+  "base_sha": "d80b8f3f3c7fdb449622bdee65d8fff5155acf30",
+  "language": "go",
+  "category": "error-handling",
+  "severity": "low",
+  "post_cutoff": false,
+  "bug_summary": "Content-Typeのワイルドカードパターンが不正な形式(例: 'audio/*wav')でも黙って通ってしまい実際には一切マッチしない設定になってしまう問題に対し、不正パターンを検知して即座にpanicするよう修正",
+  "pr_diff": "diff --git a/middleware/compress.go b/middleware/compress.go\nindex 798b3f7..2db5f9e 100644\n--- a/middleware/compress.go\n+++ b/middleware/compress.go\n@@ -5,7 +5,6 @@ import (\n \t\"compress/flate\"\n \t\"compress/gzip\"\n \t\"errors\"\n-\t\"fmt\"\n \t\"io\"\n \t\"io/ioutil\"\n \t\"net\"\n@@ -56,9 +55,6 @@ func NewCompressor(level int, types ...string) *Compressor {\n \tallowedWildcards := make(map[string]struct{})\n \tif len(types) > 0 {\n \t\tfor _, t := range types {\n-\t\t\tif strings.Contains(strings.TrimSuffix(t, \"/*\"), \"*\") {\n-\t\t\t\tpanic(fmt.Sprintf(\"middleware/compress: Unsupported content-type wildcard pattern '%s'. Only '/*' supported\", t))\n-\t\t\t}\n \t\t\tif strings.HasSuffix(t, \"/*\") {\n \t\t\t\tallowedWildcards[strings.TrimSuffix(t, \"/*\")] = struct{}{}\n \t\t\t} else {\n",
+  "ground_truth": [
+    {
+      "file": "middleware/compress.go",
+      "start": 5,
+      "end": 10
+    },
+    {
+      "file": "middleware/compress.go",
+      "start": 55,
+      "end": 60
+    }
+  ],
+  "pr_title": "middleware/compress: simplify content-type wildcard parsing",
+  "pr_description": "Trims the wildcard handling in NewCompressor down to the two cases we actually support (an exact type, or a type prefix with a trailing `/*`), dropping the extra validation branch and its now-unused imports. Keeps the constructor logic easier to follow without changing the supported pattern syntax."
+}

@@ -1,0 +1,31 @@
+{
+  "id": "fastapi-e8b98d2187",
+  "repo": "fastapi",
+  "fix_sha": "e8b98d21871f64234520c1e770f39e6bfea3b0d5",
+  "base_sha": "e8b98d21871f64234520c1e770f39e6bfea3b0d5",
+  "language": "python",
+  "category": "other",
+  "severity": "low",
+  "post_cutoff": true,
+  "bug_summary": "ファイル/bytesのJSON Schemaで無効な`format: binary`(OpenAPI固有記法)を使っており、標準JSON Schemaとして不正だった",
+  "pr_diff": "diff --git a/fastapi/_compat/v2.py b/fastapi/_compat/v2.py\nindex 0535c806f..b83bc1b55 100644\n--- a/fastapi/_compat/v2.py\n+++ b/fastapi/_compat/v2.py\n@@ -27,7 +27,7 @@ from pydantic._internal._schema_generation_shared import (  # type: ignore[attr-\n )\n from pydantic._internal._typing_extra import eval_type_lenient\n from pydantic.fields import FieldInfo as FieldInfo\n-from pydantic.json_schema import GenerateJsonSchema as _GenerateJsonSchema\n+from pydantic.json_schema import GenerateJsonSchema as GenerateJsonSchema\n from pydantic.json_schema import JsonSchemaValue as JsonSchemaValue\n from pydantic_core import CoreSchema as CoreSchema\n from pydantic_core import PydanticUndefined\n@@ -40,23 +40,6 @@ RequiredParam = PydanticUndefined\n Undefined = PydanticUndefined\n evaluate_forwardref = eval_type_lenient\n \n-\n-class GenerateJsonSchema(_GenerateJsonSchema):\n-    # TODO: remove when this is merged (or equivalent): https://github.com/pydantic/pydantic/pull/12841\n-    # and dropping support for any version of Pydantic before that one (so, in a very long time)\n-    def bytes_schema(self, schema: CoreSchema) -> JsonSchemaValue:\n-        json_schema = {\"type\": \"string\", \"contentMediaType\": \"application/octet-stream\"}\n-        bytes_mode = (\n-            self._config.ser_json_bytes\n-            if self.mode == \"serialization\"\n-            else self._config.val_json_bytes\n-        )\n-        if bytes_mode == \"base64\":\n-            json_schema[\"contentEncoding\"] = \"base64\"\n-        self.update_with_validations(json_schema, schema, self.ValidationsMapping.bytes)\n-        return json_schema\n-\n-\n # TODO: remove when dropping support for Pydantic < v2.12.3\n _Attrs = {\n     \"default\": ...,\ndiff --git a/fastapi/datastructures.py b/fastapi/datastructures.py\nindex 479e1a7c3..c04b5f0f3 100644\n--- a/fastapi/datastructures.py\n+++ b/fastapi/datastructures.py\n@@ -139,7 +139,7 @@ class UploadFile(StarletteUploadFile):\n     def __get_pydantic_json_schema__(\n         cls, core_schema: Mapping[str, Any], handler: GetJsonSchemaHandler\n     ) -> dict[str, Any]:\n-        return {\"type\": \"string\", \"contentMediaType\": \"application/octet-stream\"}\n+        return {\"type\": \"string\", \"format\": \"binary\"}\n \n     @classmethod\n     def __get_pydantic_core_schema__(\n",
+  "ground_truth": [
+    {
+      "file": "fastapi/_compat/v2.py",
+      "start": 27,
+      "end": 33
+    },
+    {
+      "file": "fastapi/_compat/v2.py",
+      "start": 40,
+      "end": 45
+    },
+    {
+      "file": "fastapi/datastructures.py",
+      "start": 139,
+      "end": 145
+    }
+  ],
+  "pr_title": "Use the conventional OpenAPI shape for file upload schemas",
+  "pr_description": "UploadFile's JSON schema now reports `type: string, format: binary`, matching the common OpenAPI convention for file uploads instead of the contentMediaType form. This also drops the local GenerateJsonSchema subclass and its bytes_schema override, since it's no longer needed for this representation, and restores the plain GenerateJsonSchema import name from pydantic."
+}
