@@ -15,3 +15,9 @@ repos/*
 *.synctex.gz
 *.fls
 *.fdb_latexmk
+*.dvi
+*.bbl
+*.blg
+
+# JSAI style files (redistribution not permitted by JSAI)
+docs/paper/jsai_5_0_1_template/
