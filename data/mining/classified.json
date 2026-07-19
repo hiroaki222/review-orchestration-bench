@@ -1037,13 +1037,14 @@
       "has_test": true,
       "post_cutoff": false,
       "genuine": true,
-      "category": "type-safety",
+      "category": "api-misuse",
       "injectable": true,
       "severity": "medium",
       "summary": "Python3.10以降でPEP563文字列化アノテーションをeval_str=Trueで評価していなかったため、__call__を持つインスタンス依存等で型解決に失敗する",
       "confidence": "high",
       "notes": "",
-      "batch": "fastapi_1"
+      "batch": "fastapi_1",
+      "verification_note": "codex独立検証: category type-safety → api-misuse"
     },
     {
       "repo": "fastapi",
@@ -1488,13 +1489,14 @@
       "has_test": false,
       "post_cutoff": true,
       "genuine": true,
-      "category": "other",
+      "category": "api-misuse",
       "injectable": true,
       "severity": "medium",
       "summary": "timeofday() が std::SystemTime::now() を無条件使用しており、wasm64ターゲットではpanicする",
       "confidence": "high",
       "notes": "Rust固有(標準ライブラリがwasm64でpanicするプラットフォーム差異)。wasm64限定の問題で影響範囲が狭いためseverityはmediumとした。",
-      "batch": "pgrust_1"
+      "batch": "pgrust_1",
+      "verification_note": "codex独立検証: category other → api-misuse"
     },
     {
       "repo": "pgrust",
@@ -2643,13 +2645,14 @@
       "has_test": false,
       "post_cutoff": true,
       "genuine": true,
-      "category": "other",
+      "category": "api-misuse",
       "injectable": true,
       "severity": "low",
       "summary": "_isValidObjectKeyがES2022のObject.hasOwnを直接使っており、ビルドターゲット/ランタイムによっては未サポートで例外になりうる互換性バグをObject.prototype.hasOwnProperty.callに置き換えて修正",
       "confidence": "medium",
       "notes": "現在Object.hasOwnは広くサポートされておりコードレビューで検出しにくい互換性issueだが、revert自体は1行で自然な差分",
-      "batch": "valibot_1"
+      "batch": "valibot_1",
+      "verification_note": "codex独立検証: category other → api-misuse"
     },
     {
       "repo": "valibot",
@@ -2768,14 +2771,15 @@
       "source_files": 2,
       "has_test": true,
       "post_cutoff": true,
-      "genuine": true,
+      "genuine": false,
       "category": "security",
-      "injectable": true,
+      "injectable": false,
       "severity": "medium",
       "summary": "domain()のASCII限定という仕様に反し、Punycodeエンコードされたラベル(xn--...)を誤って有効なドメインとして許容していた。IDNホモグラフ等のなりすまし対策として意図通りxn--を拒否するよう正規表現に否定先読みを追加",
       "confidence": "medium",
       "notes": "revertはDOMAIN_REGEXから否定先読み`(?![Xx][Nn]--)`を外すだけの1行差分で自然",
-      "batch": "valibot_1"
+      "batch": "valibot_1",
+      "verification_note": "codex独立検証: 旧テストがPunycodeをvalid明示+docsも当時の仕様通り → バグ修正でなく仕様厳格化. 除外"
     },
     {
       "repo": "valibot",
@@ -3525,13 +3529,14 @@
       "has_test": false,
       "post_cutoff": false,
       "genuine": true,
-      "category": "security",
+      "category": "api-misuse",
       "injectable": true,
       "severity": "high",
       "summary": "内部ユーティリティ_addIssueに誤って@__NO_SIDE_EFFECTS__アノテーションが付与されており、issueをデータセットに追加するという副作用のある関数がツリーシェイキングで除去されうる問題を修正。",
       "confidence": "low",
       "notes": "1行のみの変更でビルドツール知識が必要なニッチな不具合、注入してもレビューで気づかれにくい可能性が高い",
-      "batch": "valibot_3"
+      "batch": "valibot_3",
+      "verification_note": "codex独立検証: category security → api-misuse"
     },
     {
       "repo": "valibot",
@@ -3623,5 +3628,6 @@
       "notes": "",
       "batch": "valibot_3"
     }
-  ]
+  ],
+  "verification": "17-item spot check by codex (GPT family, independent from classifier): 12/17 full agree, 1 dropped (spec change), 4 relabeled to api-misuse"
 }
