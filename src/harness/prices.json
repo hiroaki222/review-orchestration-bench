@@ -1,0 +1,10 @@
+{
+  "_comment": "USD per 1M tokens. retrieved_at must be set from the provider pricing page before any run; the harness refuses to start while it is null.",
+  "retrieved_at": null,
+  "models": {
+    "claude-sonnet-4-5": {"provider": "anthropic", "tier": "frontier", "input": null, "output": null, "cache_read": null, "cache_write": null},
+    "claude-haiku-4-5": {"provider": "anthropic", "tier": "budget", "input": null, "output": null, "cache_read": null, "cache_write": null},
+    "gpt-frontier-TBD": {"provider": "openai", "tier": "frontier", "input": null, "output": null, "cache_read": null, "cache_write": null},
+    "gpt-budget-TBD": {"provider": "openai", "tier": "budget", "input": null, "output": null, "cache_read": null, "cache_write": null}
+  }
+}
