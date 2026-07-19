@@ -1,0 +1,31 @@
+{
+  "id": "fastapi-cb3792d39e",
+  "repo": "fastapi",
+  "fix_sha": "cb3792d39e1004947419a2a06b5764894730892d",
+  "base_sha": "cb3792d39e1004947419a2a06b5764894730892d",
+  "language": "python",
+  "category": "error-handling",
+  "severity": "low",
+  "post_cutoff": false,
+  "bug_summary": "FastAPIError生成時に `.format(type_=type_)` を呼んでおらず、エラーメッセージにプレースホルダー \"{type_}\" がそのまま出力される",
+  "pr_diff": "diff --git a/fastapi/utils.py b/fastapi/utils.py\nindex b3b89ed2b..2e79ee6b1 100644\n--- a/fastapi/utils.py\n+++ b/fastapi/utils.py\n@@ -110,9 +110,7 @@ def create_model_field(\n         try:\n             return v1.ModelField(**v1_kwargs)  # type: ignore[no-any-return]\n         except RuntimeError:\n-            raise fastapi.exceptions.FastAPIError(\n-                _invalid_args_message.format(type_=type_)\n-            ) from None\n+            raise fastapi.exceptions.FastAPIError(_invalid_args_message) from None\n     elif PYDANTIC_V2:\n         from ._compat import v2\n \n@@ -123,9 +121,7 @@ def create_model_field(\n         try:\n             return v2.ModelField(**kwargs)  # type: ignore[return-value,arg-type]\n         except PydanticSchemaGenerationError:\n-            raise fastapi.exceptions.FastAPIError(\n-                _invalid_args_message.format(type_=type_)\n-            ) from None\n+            raise fastapi.exceptions.FastAPIError(_invalid_args_message) from None\n     # Pydantic v2 is not installed, but it's not a Pydantic v1 ModelField, it could be\n     # a Pydantic v1 type, like a constrained int\n     from fastapi._compat import v1\n@@ -133,9 +129,7 @@ def create_model_field(\n     try:\n         return v1.ModelField(**v1_kwargs)  # type: ignore[no-any-return]\n     except RuntimeError:\n-        raise fastapi.exceptions.FastAPIError(\n-            _invalid_args_message.format(type_=type_)\n-        ) from None\n+        raise fastapi.exceptions.FastAPIError(_invalid_args_message) from None\n \n \n def create_cloned_field(\n",
+  "ground_truth": [
+    {
+      "file": "fastapi/utils.py",
+      "start": 110,
+      "end": 116
+    },
+    {
+      "file": "fastapi/utils.py",
+      "start": 121,
+      "end": 127
+    },
+    {
+      "file": "fastapi/utils.py",
+      "start": 129,
+      "end": 135
+    }
+  ],
+  "pr_title": "Simplify FastAPIError construction in create_model_field",
+  "pr_description": "Passes _invalid_args_message directly to FastAPIError at all three call sites instead of calling .format(type_=type_) beforehand, trimming a repeated formatting step from each branch."
+}

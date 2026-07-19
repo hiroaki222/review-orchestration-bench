@@ -1,0 +1,31 @@
+{
+  "id": "valibot-28296dcc73",
+  "repo": "valibot",
+  "fix_sha": "28296dcc7387f155c660e39f1e30ddef5c7b25a1",
+  "base_sha": "28296dcc7387f155c660e39f1e30ddef5c7b25a1",
+  "language": "typescript",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "to-json-schema 変換器の switch 文に domain アクションのケースが漏れており、domain() を含むスキーマを変換するとエラーになっていた",
+  "pr_diff": "diff --git a/library/src/regex.ts b/library/src/regex.ts\nindex ffd4be13..2340fd9b 100644\n--- a/library/src/regex.ts\n+++ b/library/src/regex.ts\n@@ -32,7 +32,8 @@ export const DIGITS_REGEX: RegExp = /^\\d+$/u;\n  * Internationalized domain names (IDN) not supported (including their Punycode form).\n  */\n export const DOMAIN_REGEX: RegExp =\n-  /^(?=.{1,253}$)([A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\\.)+[A-Za-z]{2,63}$/u;\n+  // eslint-disable-next-line regexp/require-unicode-regexp\n+  /^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$/i;\n \n /**\n  * [Email address](https://en.wikipedia.org/wiki/Email_address) regex.\ndiff --git a/packages/to-json-schema/src/converters/convertAction/convertAction.ts b/packages/to-json-schema/src/converters/convertAction/convertAction.ts\nindex de5e7616..0fab17f8 100644\n--- a/packages/to-json-schema/src/converters/convertAction/convertAction.ts\n+++ b/packages/to-json-schema/src/converters/convertAction/convertAction.ts\n@@ -12,7 +12,6 @@ type Action =\n   | v.DecimalAction<string, v.ErrorMessage<v.DecimalIssue<string>> | undefined>\n   | v.DescriptionAction<unknown, string>\n   | v.DigitsAction<string, v.ErrorMessage<v.DigitsIssue<string>> | undefined>\n-  | v.DomainAction<string, v.ErrorMessage<v.DomainIssue<string>> | undefined>\n   | v.EmailAction<string, v.ErrorMessage<v.EmailIssue<string>> | undefined>\n   | v.EmojiAction<string, v.ErrorMessage<v.EmojiIssue<string>> | undefined>\n   | v.EmptyAction<\n@@ -137,7 +136,6 @@ export function convertAction(\n     case 'cuid2':\n     case 'decimal':\n     case 'digits':\n-    case 'domain':\n     case 'emoji':\n     case 'hexadecimal':\n     case 'hex_color':\n",
+  "ground_truth": [
+    {
+      "file": "library/src/regex.ts",
+      "start": 32,
+      "end": 39
+    },
+    {
+      "file": "packages/to-json-schema/src/converters/convertAction/convertAction.ts",
+      "start": 12,
+      "end": 17
+    },
+    {
+      "file": "packages/to-json-schema/src/converters/convertAction/convertAction.ts",
+      "start": 136,
+      "end": 141
+    }
+  ],
+  "pr_title": "Normalize DOMAIN_REGEX casing and trim domain from JSON Schema conversion",
+  "pr_description": "Rewrites `DOMAIN_REGEX` to use a lowercase character class with a case-insensitive flag instead of an explicit A-Z range, matching the style of the other string-format regexes in this file. Also removes `domain` from the to-json-schema action converter, since domain validation doesn't have a corresponding JSON Schema keyword to map onto."
+}

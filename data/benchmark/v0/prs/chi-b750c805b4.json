@@ -1,0 +1,21 @@
+{
+  "id": "chi-b750c805b4",
+  "repo": "chi",
+  "fix_sha": "b750c805b4ee0952be12031a9b64014a8ae99c6f",
+  "base_sha": "b750c805b4ee0952be12031a9b64014a8ae99c6f",
+  "language": "go",
+  "category": "api-misuse",
+  "severity": "low",
+  "post_cutoff": false,
+  "bug_summary": "圧縮ミドルウェアでVaryヘッダーをHeader().Setしており、他ミドルウェアが設定した既存のVary値を上書きしてしまっていた(Add()にすべき)",
+  "pr_diff": "diff --git a/middleware/compress.go b/middleware/compress.go\nindex 52f4e0b..6cafddc 100644\n--- a/middleware/compress.go\n+++ b/middleware/compress.go\n@@ -318,7 +318,7 @@ func (cw *compressResponseWriter) WriteHeader(code int) {\n \tif cw.encoding != \"\" {\n \t\tcw.compressable = true\n \t\tcw.Header().Set(\"Content-Encoding\", cw.encoding)\n-\t\tcw.Header().Add(\"Vary\", \"Accept-Encoding\")\n+\t\tcw.Header().Set(\"Vary\", \"Accept-Encoding\")\n \n \t\t// The content-length after compression is unknown\n \t\tcw.Header().Del(\"Content-Length\")\n",
+  "ground_truth": [
+    {
+      "file": "middleware/compress.go",
+      "start": 318,
+      "end": 324
+    }
+  ],
+  "pr_title": "Avoid duplicate Vary values in compress middleware",
+  "pr_description": "The compress response writer appended to the `Vary` header with `Add`, which could pile up repeated `Accept-Encoding` entries when `WriteHeader` runs more than once for the same response. Switching to `Set` keeps a single canonical value for the header the middleware controls."
+}

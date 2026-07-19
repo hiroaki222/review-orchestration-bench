@@ -1,0 +1,21 @@
+{
+  "id": "valibot-3e6c7d2cfe",
+  "repo": "valibot",
+  "fix_sha": "3e6c7d2cfe1014478a96d4d0b9fcb05b3f8b5c08",
+  "base_sha": "3e6c7d2cfe1014478a96d4d0b9fcb05b3f8b5c08",
+  "language": "typescript",
+  "category": "type-safety",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "keyofメソッドで使われるUnionToTuple型が非末尾再帰になっており、キー数が多いオブジェクトスキーマに対してTSの「型のインスタンス化が深すぎる」エラーが発生していた問題を、アキュムレータ形式の末尾再帰に変更して修正。",
+  "pr_diff": "diff --git a/library/src/types/utils.ts b/library/src/types/utils.ts\nindex 14680c8e..e1905695 100644\n--- a/library/src/types/utils.ts\n+++ b/library/src/types/utils.ts\n@@ -66,21 +66,14 @@ export type UnionToIntersect<TUnion> =\n     : never;\n \n /**\n- * Converts union to tuple type using an accumulator.\n- *\n- * For more information: {@link https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-5.html#tail-recursion-elimination-on-conditional-types}\n+ * Converts union to tuple type.\n  */\n-type _UnionToTuple<TUnion, TResult extends unknown[]> =\n+export type UnionToTuple<TUnion> =\n   UnionToIntersect<\n     TUnion extends never ? never : () => TUnion\n   > extends () => infer TLast\n-    ? _UnionToTuple<Exclude<TUnion, TLast>, [TLast, ...TResult]>\n-    : TResult;\n-\n-/**\n- * Converts union to tuple type.\n- */\n-export type UnionToTuple<TUnion> = _UnionToTuple<TUnion, []>;\n+    ? [...UnionToTuple<Exclude<TUnion, TLast>>, TLast]\n+    : [];\n \n /**\n  * Checks if a type is `any`.\n",
+  "ground_truth": [
+    {
+      "file": "library/src/types/utils.ts",
+      "start": 66,
+      "end": 79
+    }
+  ],
+  "pr_title": "Simplify UnionToTuple type helper",
+  "pr_description": "Collapses the accumulator-based _UnionToTuple/UnionToTuple pair into a single UnionToTuple type, building the tuple with a spread instead of threading an accumulator parameter through the recursive calls."
+}

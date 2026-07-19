@@ -1,0 +1,56 @@
+{
+  "id": "fastapi-7fbd30460f",
+  "repo": "fastapi",
+  "fix_sha": "7fbd30460f480e90faf321b9158bffb5116000d5",
+  "base_sha": "7fbd30460f480e90faf321b9158bffb5116000d5",
+  "language": "python",
+  "category": "resource-leak",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "scopeを使わない依存関係のキャッシュキー計算が不適切で、キャッシュされるべき依存関係が重複して呼び出される(DBセッション等の副作用が複数回発生)",
+  "pr_diff": "diff --git a/fastapi/dependencies/models.py b/fastapi/dependencies/models.py\nindex fbb666a7d..d6359c0f5 100644\n--- a/fastapi/dependencies/models.py\n+++ b/fastapi/dependencies/models.py\n@@ -38,43 +38,19 @@ class Dependant:\n     response_param_name: Optional[str] = None\n     background_tasks_param_name: Optional[str] = None\n     security_scopes_param_name: Optional[str] = None\n-    own_oauth_scopes: Optional[List[str]] = None\n-    parent_oauth_scopes: Optional[List[str]] = None\n+    security_scopes: Optional[List[str]] = None\n     use_cache: bool = True\n     path: Optional[str] = None\n     scope: Union[Literal[\"function\", \"request\"], None] = None\n \n-    @cached_property\n-    def oauth_scopes(self) -> List[str]:\n-        scopes = self.parent_oauth_scopes.copy() if self.parent_oauth_scopes else []\n-        # This doesn't use a set to preserve order, just in case\n-        for scope in self.own_oauth_scopes or []:\n-            if scope not in scopes:\n-                scopes.append(scope)\n-        return scopes\n-\n     @cached_property\n     def cache_key(self) -> DependencyCacheKey:\n-        scopes_for_cache = (\n-            tuple(sorted(set(self.oauth_scopes or []))) if self._uses_scopes else ()\n-        )\n         return (\n             self.call,\n-            scopes_for_cache,\n+            tuple(sorted(set(self.security_scopes or []))),\n             self.computed_scope or \"\",\n         )\n \n-    @cached_property\n-    def _uses_scopes(self) -> bool:\n-        if self.own_oauth_scopes:\n-            return True\n-        if self.security_scopes_param_name is not None:\n-            return True\n-        for sub_dep in self.dependencies:\n-            if sub_dep._uses_scopes:\n-                return True\n-        return False\n-\n     @cached_property\n     def is_gen_callable(self) -> bool:\n         if inspect.isgeneratorfunction(self.call):\ndiff --git a/fastapi/dependencies/utils.py b/fastapi/dependencies/utils.py\nindex d43fa8a51..45353835b 100644\n--- a/fastapi/dependencies/utils.py\n+++ b/fastapi/dependencies/utils.py\n@@ -58,7 +58,8 @@ from fastapi.dependencies.models import Dependant, SecurityRequirement\n from fastapi.exceptions import DependencyScopeError\n from fastapi.logger import logger\n from fastapi.security.base import SecurityBase\n-from fastapi.security.oauth2 import SecurityScopes\n+from fastapi.security.oauth2 import OAuth2, SecurityScopes\n+from fastapi.security.open_id_connect_url import OpenIdConnect\n from fastapi.types import DependencyCacheKey\n from fastapi.utils import create_model_field, get_path_param_names\n from pydantic import BaseModel\n@@ -125,14 +126,14 @@ def get_parameterless_sub_dependant(*, depends: params.Depends, path: str) -> De\n     assert callable(depends.dependency), (\n         \"A parameter-less dependency must have a callable dependency\"\n     )\n-    own_oauth_scopes: List[str] = []\n+    use_security_scopes: List[str] = []\n     if isinstance(depends, params.Security) and depends.scopes:\n-        own_oauth_scopes.extend(depends.scopes)\n+        use_security_scopes.extend(depends.scopes)\n     return get_dependant(\n         path=path,\n         call=depends.dependency,\n         scope=depends.scope,\n-        own_oauth_scopes=own_oauth_scopes,\n+        security_scopes=use_security_scopes,\n     )\n \n \n@@ -231,8 +232,7 @@ def get_dependant(\n     path: str,\n     call: Callable[..., Any],\n     name: Optional[str] = None,\n-    own_oauth_scopes: Optional[List[str]] = None,\n-    parent_oauth_scopes: Optional[List[str]] = None,\n+    security_scopes: Optional[List[str]] = None,\n     use_cache: bool = True,\n     scope: Union[Literal[\"function\", \"request\"], None] = None,\n ) -> Dependant:\n@@ -240,18 +240,19 @@ def get_dependant(\n         call=call,\n         name=name,\n         path=path,\n+        security_scopes=security_scopes,\n         use_cache=use_cache,\n         scope=scope,\n-        own_oauth_scopes=own_oauth_scopes,\n-        parent_oauth_scopes=parent_oauth_scopes,\n     )\n-    current_scopes = (parent_oauth_scopes or []) + (own_oauth_scopes or [])\n     path_param_names = get_path_param_names(path)\n     endpoint_signature = get_typed_signature(call)\n     signature_params = endpoint_signature.parameters\n     if isinstance(call, SecurityBase):\n+        use_scopes: List[str] = []\n+        if isinstance(call, (OAuth2, OpenIdConnect)):\n+            use_scopes = security_scopes or use_scopes\n         security_requirement = SecurityRequirement(\n-            security_scheme=call, scopes=current_scopes\n+            security_scheme=call, scopes=use_scopes\n         )\n         dependant.security_requirements.append(security_requirement)\n     for param_name, param in signature_params.items():\n@@ -274,16 +275,17 @@ def get_dependant(\n                     f'The dependency \"{dependant.call.__name__}\" has a scope of '\n                     '\"request\", it cannot depend on dependencies with scope \"function\".'\n                 )\n-            sub_own_oauth_scopes: List[str] = []\n+            use_security_scopes = security_scopes or []\n             if isinstance(param_details.depends, params.Security):\n                 if param_details.depends.scopes:\n-                    sub_own_oauth_scopes = list(param_details.depends.scopes)\n+                    use_security_scopes = use_security_scopes + list(\n+                        param_details.depends.scopes\n+                    )\n             sub_dependant = get_dependant(\n                 path=path,\n                 call=param_details.depends.dependency,\n                 name=param_name,\n-                own_oauth_scopes=sub_own_oauth_scopes,\n-                parent_oauth_scopes=current_scopes,\n+                security_scopes=use_security_scopes,\n                 use_cache=param_details.depends.use_cache,\n                 scope=param_details.depends.scope,\n             )\n@@ -609,7 +611,7 @@ async def solve_dependencies(\n                 path=use_path,\n                 call=call,\n                 name=sub_dependant.name,\n-                parent_oauth_scopes=sub_dependant.oauth_scopes,\n+                security_scopes=sub_dependant.security_scopes,\n                 scope=sub_dependant.scope,\n             )\n \n@@ -691,7 +693,7 @@ async def solve_dependencies(\n         values[dependant.response_param_name] = response\n     if dependant.security_scopes_param_name:\n         values[dependant.security_scopes_param_name] = SecurityScopes(\n-            scopes=dependant.oauth_scopes\n+            scopes=dependant.security_scopes\n         )\n     return SolvedDependency(\n         values=values,\n",
+  "ground_truth": [
+    {
+      "file": "fastapi/dependencies/models.py",
+      "start": 38,
+      "end": 56
+    },
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 58,
+      "end": 65
+    },
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 126,
+      "end": 139
+    },
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 232,
+      "end": 238
+    },
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 240,
+      "end": 258
+    },
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 275,
+      "end": 291
+    },
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 611,
+      "end": 617
+    },
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 693,
+      "end": 699
+    }
+  ],
+  "pr_title": "Simplify dependency security scope propagation",
+  "pr_description": "Collapse `own_oauth_scopes`/`parent_oauth_scopes` into a single `security_scopes` field on `Dependant`, removing the `oauth_scopes` cached property and the `_uses_scopes` recursive check it relied on. `cache_key` now derives its scope tuple directly from `security_scopes`. Scope lists are only threaded through for `OAuth2`/`OpenIdConnect` security schemes, which narrows where `SecurityRequirement.scopes` gets populated. Updates the handful of call sites in `utils.py` and `routing.py`'s dependant construction accordingly."
+}

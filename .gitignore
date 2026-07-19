@@ -1,6 +1,10 @@
 # 個人的な下書き (メール文面等) — 公開 repo に含めない
 drafts/
 
+# ベンチマーク対象リポの clone 置き場 (repos/fetch.sh で再取得可能)
+repos/*
+!repos/fetch.sh
+
 # LaTeX build artifacts
 *.aux
 *.log
@@ -11,3 +15,9 @@ drafts/
 *.synctex.gz
 *.fls
 *.fdb_latexmk
+*.dvi
+*.bbl
+*.blg
+
+# JSAI style files (redistribution not permitted by JSAI)
+docs/paper/jsai_5_0_1_template/

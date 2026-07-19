@@ -1,0 +1,21 @@
+{
+  "id": "valibot-17cd7ed5b8",
+  "repo": "valibot",
+  "fix_sha": "17cd7ed5b8851ff5006dcf85bf9fa6c53da3cb72",
+  "base_sha": "17cd7ed5b8851ff5006dcf85bf9fa6c53da3cb72",
+  "language": "typescript",
+  "category": "api-misuse",
+  "severity": "low",
+  "post_cutoff": true,
+  "bug_summary": "_isValidObjectKeyがES2022のObject.hasOwnを直接使っており、ビルドターゲット/ランタイムによっては未サポートで例外になりうる互換性バグをObject.prototype.hasOwnProperty.callに置き換えて修正",
+  "pr_diff": "diff --git a/library/src/utils/_isValidObjectKey/_isValidObjectKey.ts b/library/src/utils/_isValidObjectKey/_isValidObjectKey.ts\nindex eed44e3c..f4e0f213 100644\n--- a/library/src/utils/_isValidObjectKey/_isValidObjectKey.ts\n+++ b/library/src/utils/_isValidObjectKey/_isValidObjectKey.ts\n@@ -12,7 +12,7 @@\n // @__NO_SIDE_EFFECTS__\n export function _isValidObjectKey(object: object, key: string): boolean {\n   return (\n-    Object.prototype.hasOwnProperty.call(object, key) &&\n+    Object.hasOwn(object, key) &&\n     key !== '__proto__' &&\n     key !== 'prototype' &&\n     key !== 'constructor'\n",
+  "ground_truth": [
+    {
+      "file": "library/src/utils/_isValidObjectKey/_isValidObjectKey.ts",
+      "start": 12,
+      "end": 18
+    }
+  ],
+  "pr_title": "Use Object.hasOwn in _isValidObjectKey",
+  "pr_description": "Swaps the Object.prototype.hasOwnProperty.call indirection for the more concise Object.hasOwn, matching the style used elsewhere in the utils."
+}

@@ -1,0 +1,26 @@
+{
+  "id": "valibot-1bd01c3046",
+  "repo": "valibot",
+  "fix_sha": "1bd01c304657cd0809cc92694360b6cc60f700bf",
+  "base_sha": "1bd01c304657cd0809cc92694360b6cc60f700bf",
+  "language": "typescript",
+  "category": "logic",
+  "severity": "high",
+  "post_cutoff": true,
+  "bug_summary": "flattenとintersectの内部_mergeが真偽値/in演算子でキー存在チェックしていたため、toStringなどObject.prototypeのメンバーと衝突するキーで継承メンバーを誤って参照し、flattenがTypeErrorをスロー、intersectがマージに失敗する",
+  "pr_diff": "diff --git a/library/src/methods/flatten/flatten.ts b/library/src/methods/flatten/flatten.ts\nindex a13c844e..25db5b28 100644\n--- a/library/src/methods/flatten/flatten.ts\n+++ b/library/src/methods/flatten/flatten.ts\n@@ -101,7 +101,7 @@ export function flatten(\n           // @ts-expect-error\n           flatErrors.nested = {};\n         }\n-        if (Object.prototype.hasOwnProperty.call(flatErrors.nested, dotPath)) {\n+        if (flatErrors.nested![dotPath]) {\n           flatErrors.nested![dotPath]!.push(issue.message);\n         } else {\n           // @ts-expect-error\ndiff --git a/library/src/schemas/intersect/utils/_merge/_merge.ts b/library/src/schemas/intersect/utils/_merge/_merge.ts\nindex 49b327dc..73b6563a 100644\n--- a/library/src/schemas/intersect/utils/_merge/_merge.ts\n+++ b/library/src/schemas/intersect/utils/_merge/_merge.ts\n@@ -38,7 +38,8 @@ export function _merge(value1: unknown, value2: unknown): MergeDataset {\n \n       // Deeply merge entries of `value2` into `nextValue`\n       for (const key in value2) {\n-        if (Object.prototype.hasOwnProperty.call(value1, key)) {\n+        // @ts-expect-error\n+        if (key in value1) {\n           // @ts-expect-error\n           const dataset = _merge(value1[key], value2[key]);\n \n",
+  "ground_truth": [
+    {
+      "file": "library/src/methods/flatten/flatten.ts",
+      "start": 101,
+      "end": 107
+    },
+    {
+      "file": "library/src/schemas/intersect/utils/_merge/_merge.ts",
+      "start": 38,
+      "end": 45
+    }
+  ],
+  "pr_title": "Simplify key checks in flatten and intersect merge",
+  "pr_description": "Replace the `Object.prototype.hasOwnProperty.call` checks in `flatten.ts` and `_merge.ts` with more direct key checks (property access and the `in` operator respectively), cutting an unnecessary layer of indirection out of these hot paths."
+}

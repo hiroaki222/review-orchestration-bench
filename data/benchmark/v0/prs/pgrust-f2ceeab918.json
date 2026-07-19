@@ -1,0 +1,46 @@
+{
+  "id": "pgrust-f2ceeab918",
+  "repo": "pgrust",
+  "fix_sha": "f2ceeab918a76476aa9d35c7d1c2d7f75fefdc17",
+  "base_sha": "f2ceeab918a76476aa9d35c7d1c2d7f75fefdc17",
+  "language": "rust",
+  "category": "concurrency",
+  "severity": "high",
+  "post_cutoff": true,
+  "bug_summary": "catcacheのwith_cache_tupdescがRefCellの借用を保持したままコールバックを呼び、TOAST化されたカタログタプルの再入(double-borrow)でpanicしていた。加えてruleutilsのキャスト表示でtypmodが常に-1にハードコードされていた",
+  "pr_diff": "diff --git a/crates/backend-nodes-core/src/nodefuncs.rs b/crates/backend-nodes-core/src/nodefuncs.rs\nindex a72dd2e98..ab7d3fec0 100644\n--- a/crates/backend-nodes-core/src/nodefuncs.rs\n+++ b/crates/backend-nodes-core/src/nodefuncs.rs\n@@ -1802,7 +1802,6 @@ pub fn init_seams() {\n     use backend_nodes_nodeFuncs_seams as seams;\n \n     seams::expr_type_info::set(seam_expr_type_info);\n-    seams::expr_is_length_coercion::set(seam_expr_is_length_coercion);\n     seams::expr_type::set(seam_expr_type);\n     seams::call_expr_argtype::set(seam_call_expr_argtype);\n     seams::get_call_expr_argtype_expr::set(seam_get_call_expr_argtype_expr);\n@@ -2028,11 +2027,6 @@ fn seam_expr_type_info(\n     })\n }\n \n-/// `exprIsLengthCoercion(expr, &coercedTypmod)` seam adapter.\n-fn seam_expr_is_length_coercion(expr: &Expr) -> PgResult<(bool, i32)> {\n-    expr_is_length_coercion(Some(expr))\n-}\n-\n /// `exprType(ExternalFnExpr)` seam (fmgr `get_fn_expr_rettype` path).\n ///\n /// When the carrier holds the field-bearing call node (`node == Some`, the\ndiff --git a/crates/backend-nodes-nodeFuncs-seams/src/lib.rs b/crates/backend-nodes-nodeFuncs-seams/src/lib.rs\nindex cc422142d..841bd6c52 100644\n--- a/crates/backend-nodes-nodeFuncs-seams/src/lib.rs\n+++ b/crates/backend-nodes-nodeFuncs-seams/src/lib.rs\n@@ -42,16 +42,6 @@ seam_core::seam!(\n     pub fn expr_type(expr: ExternalFnExpr) -> Oid\n );\n \n-seam_core::seam!(\n-    /// `exprIsLengthCoercion(expr, &coercedTypmod)` (nodeFuncs.c) — detect\n-    /// whether `expr` is a length-coercion cast (a FuncExpr/ArrayCoerceExpr that\n-    /// applies a typmod, e.g. `numeric(16,4)` / `varchar(8)`). Returns\n-    /// `(true, coercedTypmod)` with the coerced type modifier, or `(false, -1)`.\n-    /// Pure node inspection. Used by ruleutils' cast deparse to print the typmod\n-    /// on the target type name. `Err` carries an unexpected-node `elog(ERROR)`.\n-    pub fn expr_is_length_coercion(expr: &Expr) -> PgResult<(bool, i32)>\n-);\n-\n seam_core::seam!(\n     /// `get_call_expr_argtype(expr, argnum)` (fmgr.c) — the declared type of the\n     /// `argnum`'th argument of a call expression (the `IsA` dispatch over\ndiff --git a/crates/backend-utils-adt-ruleutils/src/expr_deparse.rs b/crates/backend-utils-adt-ruleutils/src/expr_deparse.rs\nindex ebeacb023..443ad898e 100644\n--- a/crates/backend-utils-adt-ruleutils/src/expr_deparse.rs\n+++ b/crates/backend-utils-adt-ruleutils/src/expr_deparse.rs\n@@ -1262,21 +1262,9 @@ fn get_func_expr_inner(\n     {\n         let arg = expr_arg(args, 0)?;\n         let rettype = f.funcresulttype;\n-        // exprIsLengthCoercion((Node *) expr, &coercedTypmod): a length-coercion\n-        // cast (e.g. numeric(16,4) / varchar(8)) carries its typmod in the\n-        // function's int4 second argument, which we must print on the target\n-        // type name. Non-length coercions yield -1.\n-        let coerced_typmod = match enclosing {\n-            Some(e) => {\n-                backend_nodes_nodeFuncs_seams::expr_is_length_coercion::call(e)?.1\n-            }\n-            None => {\n-                // The enclosing FuncExpr node is what C passes; reconstruct it\n-                // when the caller didn't thread it through.\n-                let f_expr = Expr::FuncExpr(f.clone());\n-                backend_nodes_nodeFuncs_seams::expr_is_length_coercion::call(&f_expr)?.1\n-            }\n-        };\n+        // exprIsLengthCoercion would yield the coerced typmod; that helper is\n+        // unported, so we use -1 (the common non-length-coercion case).\n+        let coerced_typmod = -1;\n         get_coercion_expr_e(arg, context, rettype, coerced_typmod, enclosing)?;\n         return Ok(());\n     }\ndiff --git a/crates/backend-utils-cache-catcache/src/init_meta.rs b/crates/backend-utils-cache-catcache/src/init_meta.rs\nindex 5f2800f2d..4c7827046 100644\n--- a/crates/backend-utils-cache-catcache/src/init_meta.rs\n+++ b/crates/backend-utils-cache-catcache/src/init_meta.rs\n@@ -357,23 +357,8 @@ pub fn cache_tupdesc_is_valid(cache_id: i32) -> bool {\n /// Read access to `cache->cc_tupdesc`: runs `f` with a borrow of the\n /// descriptor. Panics if not loaded (callers check `cache_tupdesc_is_valid` /\n /// run phase 2 first, as `SysCacheGetAttr` does).\n-///\n-/// IMPORTANT: `f` is *not* run while the `TUPDESC_STORE` `RefCell` borrow is\n-/// held. `f` is typically `heap_deform_tuple` over a catalog tuple; deforming a\n-/// TOASTed catalog tuple re-enters the catcache (TOAST fetch → index scan →\n-/// relcache build → `SearchSysCache`), which calls `with_cache_tupdesc` again.\n-/// Holding the store borrow across that re-entrant call trips\n-/// \"RefCell already borrowed\" (the C `cc_tupdesc` is a bare pointer with no such\n-/// guard). So we resolve the descriptor pointer under a short borrow, release\n-/// the borrow, then call `f`. The descriptor lives in the CacheMemoryContext\n-/// analog (`TUPDESC_STORE`'s `McxOwned`), which persists for the whole backend\n-/// life and is never freed or relocated once a cache is initialized, so the\n-/// pointer stays valid across `f`.\n pub fn with_cache_tupdesc(cache_id: i32, f: &mut dyn FnMut(&TupleDescData<'_>)) {\n-    // Resolve a stable pointer to the stored TupleDescData under a short borrow.\n-    // The store's `'mcx` is an HRTB that can't escape the closure, so we erase it\n-    // to `'static` for the carrier pointer and reattach a fresh lifetime below.\n-    let td_ptr: *const TupleDescData<'static> = with_tupdesc_store(|store| {\n+    with_tupdesc_store(|store| {\n         let (_, td) = store\n             .descs\n             .iter()\n@@ -381,15 +366,6 @@ pub fn with_cache_tupdesc(cache_id: i32, f: &mut dyn FnMut(&TupleDescData<'_>))\n             .unwrap_or_else(|| {\n                 panic!(\"with_cache_tupdesc: cc_tupdesc for cache id {cache_id} not loaded\")\n             });\n-        // The PgBox's target is pinned in the store's MemoryContext for the\n-        // backend's life; a raw pointer outlives this borrow safely.\n-        (&**td as *const TupleDescData<'_>) as *const TupleDescData<'static>\n+        f(td);\n     });\n-    // SAFETY: `td_ptr` points into the CacheMemoryContext-analog store, which is\n-    // never freed or moved for an initialized cache (see the doc comment). The\n-    // borrow that produced it has been released, so `f` may freely re-enter the\n-    // catcache (and `with_cache_tupdesc`) without a double-borrow panic. The\n-    // `'static` is a carrier only; `f` accepts any lifetime (`&TupleDescData<'_>`).\n-    let td: &TupleDescData<'static> = unsafe { &*td_ptr };\n-    f(td);\n }\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend-nodes-core/src/nodefuncs.rs",
+      "start": 1802,
+      "end": 1807
+    },
+    {
+      "file": "crates/backend-nodes-core/src/nodefuncs.rs",
+      "start": 2027,
+      "end": 2032
+    },
+    {
+      "file": "crates/backend-nodes-nodeFuncs-seams/src/lib.rs",
+      "start": 42,
+      "end": 47
+    },
+    {
+      "file": "crates/backend-utils-adt-ruleutils/src/expr_deparse.rs",
+      "start": 1262,
+      "end": 1270
+    },
+    {
+      "file": "crates/backend-utils-cache-catcache/src/init_meta.rs",
+      "start": 357,
+      "end": 364
+    },
+    {
+      "file": "crates/backend-utils-cache-catcache/src/init_meta.rs",
+      "start": 366,
+      "end": 371
+    }
+  ],
+  "pr_title": "Remove unported exprIsLengthCoercion seam and streamline tupdesc cache access",
+  "pr_description": "Drops the not-yet-ported exprIsLengthCoercion seam and its registration; the cast deparse path in ruleutils now uses -1 for the coerced typmod, matching the common non-length-coercion case. Also simplifies with_cache_tupdesc to invoke the callback directly against the stored descriptor rather than resolving a raw pointer outside the borrow first."
+}

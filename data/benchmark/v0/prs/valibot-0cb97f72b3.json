@@ -1,0 +1,21 @@
+{
+  "id": "valibot-0cb97f72b3",
+  "repo": "valibot",
+  "fix_sha": "0cb97f72b3163829758eb33e5cbfa6e33568ee39",
+  "base_sha": "0cb97f72b3163829758eb33e5cbfa6e33568ee39",
+  "language": "typescript",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "creditCardのMastercard用正規表現が非キャプチャグループで囲われておらず、`|`の優先順位により`5[1-5]\\d{2}`の分岐に末尾アンカーが効かず不正な長さのMastercard番号を許容してしまうバグ",
+  "pr_diff": "diff --git a/library/src/actions/creditCard/creditCard.ts b/library/src/actions/creditCard/creditCard.ts\nindex 09803523..1193ebd2 100644\n--- a/library/src/actions/creditCard/creditCard.ts\n+++ b/library/src/actions/creditCard/creditCard.ts\n@@ -85,7 +85,8 @@ const PROVIDER_REGEX_LIST = [\n   // JCB\n   /^(?:2131|1800|35\\d{3})\\d{11}$/u,\n   // Mastercard\n-  /^(?:5[1-5]\\d{2}|222\\d|22[3-9]\\d|2[3-6]\\d{2}|27[01]\\d|2720)\\d{12}$/u,\n+  // eslint-disable-next-line redos-detector/no-unsafe-regex\n+  /^5[1-5]\\d{2}|(?:222\\d|22[3-9]\\d|2[3-6]\\d{2}|27[01]\\d|2720)\\d{12}$/u,\n   // UnionPay\n   /^(?:6[27]\\d{14,17}|81\\d{14,17})$/u,\n   // Visa\n",
+  "ground_truth": [
+    {
+      "file": "library/src/actions/creditCard/creditCard.ts",
+      "start": 85,
+      "end": 92
+    }
+  ],
+  "pr_title": "Restructure the Mastercard regex alternation",
+  "pr_description": "Reworks the Mastercard branch of PROVIDER_REGEX_LIST, dropping the outer non-capturing group around the alternation and keeping the digit-count suffix attached to the second half of the pattern. Also adds a redos-detector lint suppression matching the other provider patterns in the list."
+}

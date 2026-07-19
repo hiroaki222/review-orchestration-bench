@@ -1,0 +1,21 @@
+{
+  "id": "valibot-0569e5e5e4",
+  "repo": "valibot",
+  "fix_sha": "0569e5e5e42b5e64bd9fbbab8e282b24cb305406",
+  "base_sha": "0569e5e5e42b5e64bd9fbbab8e282b24cb305406",
+  "language": "typescript",
+  "category": "api-misuse",
+  "severity": "high",
+  "post_cutoff": false,
+  "bug_summary": "内部ユーティリティ_addIssueに誤って@__NO_SIDE_EFFECTS__アノテーションが付与されており、issueをデータセットに追加するという副作用のある関数がツリーシェイキングで除去されうる問題を修正。",
+  "pr_diff": "diff --git a/library/src/utils/_addIssue/_addIssue.ts b/library/src/utils/_addIssue/_addIssue.ts\nindex ada16565..263b8b1f 100644\n--- a/library/src/utils/_addIssue/_addIssue.ts\n+++ b/library/src/utils/_addIssue/_addIssue.ts\n@@ -61,6 +61,7 @@ interface Other<TContext extends Context> {\n  *\n  * @internal\n  */\n+// @__NO_SIDE_EFFECTS__\n export function _addIssue<const TContext extends Context>(\n   context: TContext & {\n     expects?: string | null;\n",
+  "ground_truth": [
+    {
+      "file": "library/src/utils/_addIssue/_addIssue.ts",
+      "start": 61,
+      "end": 67
+    }
+  ],
+  "pr_title": "Mark _addIssue with @__NO_SIDE_EFFECTS__",
+  "pr_description": "Several internal utilities already carry the `@__NO_SIDE_EFFECTS__` annotation to help bundlers tree-shake unused call sites. This adds the same annotation to `_addIssue` for consistency with the rest of the internal utils."
+}

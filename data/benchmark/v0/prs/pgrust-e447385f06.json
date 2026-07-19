@@ -1,0 +1,21 @@
+{
+  "id": "pgrust-e447385f06",
+  "repo": "pgrust",
+  "fix_sha": "e447385f06f6f156abdef71a4444550a7ca38752",
+  "base_sha": "e447385f06f6f156abdef71a4444550a7ca38752",
+  "language": "rust",
+  "category": "logic",
+  "severity": "high",
+  "post_cutoff": true,
+  "bug_summary": "SRFの直近式(p_last_srf)を派生Cloneでコピーしていたため、引数にSubLink(サブセレクト)を含むSRF呼び出しでpanicしていた",
+  "pr_diff": "diff --git a/crates/backend/parser/parse_expr/src/lib.rs b/crates/backend/parser/parse_expr/src/lib.rs\nindex 6e63ec181..98969cb85 100644\n--- a/crates/backend/parser/parse_expr/src/lib.rs\n+++ b/crates/backend/parser/parse_expr/src/lib.rs\n@@ -2462,19 +2462,10 @@ pub fn ParseExprKindName(expr_kind: ParseExprKind) -> &'static str {\n /// set-returning function/operator). Public so `analyze.c`'s `transformCallStmt`\n /// can pass it to `ParseFuncOrColumn` (C reads `pstate->p_last_srf` directly).\n pub fn last_srf_expr<'mcx>(pstate: &ParseState<'mcx>) -> Option<Expr<'mcx>> {\n-    // C reads `pstate->p_last_srf` (a `Node *`) by pointer; here we hand back an\n-    // owned `Expr`. Deep-copy through the sanctioned `clone_in` path (copyObject\n-    // shape) rather than the derived `.clone()` — the SRF's argument list may\n-    // embed a `SubLink` (e.g. a scalar subselect argument like\n-    // `ts_parse((SELECT cfgparser ...), $2)` in ts_debug's body), whose owned\n-    // `Query` subselect panics under a plain `.clone()`.\n     pstate\n         .p_last_srf\n         .as_ref()\n-        .and_then(|b| b.as_expr())\n-        .map(|e| e.clone_in(aexpr_clone_ctx(pstate)))\n-        .transpose()\n-        .expect(\"last_srf_expr: SRF node clone_in failed\")\n+        .and_then(|b| b.as_expr().map(|e| e.clone()))\n }\n \n // NB: the `pstate->p_last_srf` *write* for a set-returning operator is performed\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend/parser/parse_expr/src/lib.rs",
+      "start": 2462,
+      "end": 2471
+    }
+  ],
+  "pr_title": "Use the standard Clone impl for last_srf_expr",
+  "pr_description": "last_srf_expr copied the stored SRF expression through a custom clone_in/aexpr_clone_ctx path. This switches to the plain .clone() on the Expr, removing the extra context plumbing that the custom copy required."
+}

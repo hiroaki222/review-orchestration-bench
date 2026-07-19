@@ -1,0 +1,21 @@
+{
+  "id": "pgrust-d5333e4935",
+  "repo": "pgrust",
+  "fix_sha": "d5333e49356b9bee76e3eb997dfbc5f408e9b9da",
+  "base_sha": "d5333e49356b9bee76e3eb997dfbc5f408e9b9da",
+  "language": "rust",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "PVC_INCLUDE_PLACEHOLDERS定数が0x0020(実際は0x0010=PVC_RECURSE_PLACEHOLDERSと衝突)になっており、PlaceHolderVarの事前登録が漏れてパーティション結合クエリが実行時エラーになっていた",
+  "pr_diff": "diff --git a/crates/backend-optimizer-util-joininfo/src/placeholder.rs b/crates/backend-optimizer-util-joininfo/src/placeholder.rs\nindex 3ba68e3e0..8b2707c6b 100644\n--- a/crates/backend-optimizer-util-joininfo/src/placeholder.rs\n+++ b/crates/backend-optimizer-util-joininfo/src/placeholder.rs\n@@ -15,7 +15,7 @@ use crate::ext_seam;\n // pull_var_clause flags (optimizer.h).\n const PVC_RECURSE_AGGREGATES: i32 = 0x0002;\n const PVC_RECURSE_WINDOWFUNCS: i32 = 0x0008;\n-const PVC_INCLUDE_PLACEHOLDERS: i32 = 0x0010;\n+const PVC_INCLUDE_PLACEHOLDERS: i32 = 0x0020;\n \n /// Convert an [`ExprRelids`] (carried on a `PlaceHolderVar`) into a [`Relids`].\n fn expr_relids_to_relids(er: &ExprRelids) -> Relids {\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend-optimizer-util-joininfo/src/placeholder.rs",
+      "start": 15,
+      "end": 21
+    }
+  ],
+  "pr_title": "Update PVC_INCLUDE_PLACEHOLDERS flag value",
+  "pr_description": "Renumber the local `PVC_INCLUDE_PLACEHOLDERS` constant in `placeholder.rs` to `0x0020` to keep the `pull_var_clause` flag bits in this crate aligned with the numbering convention used elsewhere in the optimizer flag set."
+}

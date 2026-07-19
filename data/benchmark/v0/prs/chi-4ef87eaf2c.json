@@ -1,0 +1,21 @@
+{
+  "id": "chi-4ef87eaf2c",
+  "repo": "chi",
+  "fix_sha": "4ef87eaf2cfb27d3126d48194e1a84806acc1aed",
+  "base_sha": "4ef87eaf2cfb27d3126d48194e1a84806acc1aed",
+  "language": "go",
+  "category": "logic",
+  "severity": "low",
+  "post_cutoff": true,
+  "bug_summary": "Tee設定時、httpFancyWriter.ReadFromがio.Copy経由でWriteが既にカウント済みのbytesにさらに加算し、書き込みバイト数を二重カウントしていた",
+  "pr_diff": "diff --git a/middleware/wrap_writer.go b/middleware/wrap_writer.go\nindex b2de875..367e0fc 100644\n--- a/middleware/wrap_writer.go\n+++ b/middleware/wrap_writer.go\n@@ -208,10 +208,8 @@ func (f *http2FancyWriter) Push(target string, opts *http.PushOptions) error {\n \n func (f *httpFancyWriter) ReadFrom(r io.Reader) (int64, error) {\n \tif f.basicWriter.tee != nil {\n-\t\t// Route through basicWriter.Write so that data is also written to the\n-\t\t// tee writer. basicWriter.Write already increments basicWriter.bytes,\n-\t\t// so we must NOT add n again here (that would double-count).\n \t\tn, err := io.Copy(&f.basicWriter, r)\n+\t\tf.basicWriter.bytes += int(n)\n \t\treturn n, err\n \t}\n \trf := f.basicWriter.ResponseWriter.(io.ReaderFrom)\n",
+  "ground_truth": [
+    {
+      "file": "middleware/wrap_writer.go",
+      "start": 208,
+      "end": 215
+    }
+  ],
+  "pr_title": "Explicitly track bytes copied in httpFancyWriter.ReadFrom",
+  "pr_description": "Adds explicit byte tracking to the tee'd ReadFrom path so the accounting doesn't rely on an implicit side effect of the underlying Write call. Keeps the intent of the byte counter visible directly in ReadFrom, matching the style of the other counting paths in this file."
+}

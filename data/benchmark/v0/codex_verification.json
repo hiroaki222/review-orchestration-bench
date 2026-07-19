@@ -1,0 +1,279 @@
+[
+  {
+    "repo": "fastapi",
+    "sha": "861598b4e30a7a7297aee803097f77431f799ea5",
+    "subject": "🐛 Fix evaluating stringified annotations in Python 3.10 (#11355)",
+    "category": "type-safety",
+    "severity": "medium",
+    "summary": "Python3.10以降でPEP563文字列化アノテーションをeval_str=Trueで評価していなかったため、__call__を持つインスタンス依存等で型解決に失敗する",
+    "verdict": {
+      "sha": "861598b4e30a7a7297aee803097f77431f799ea5",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "disagree",
+      "suggested_category": "api-misuse",
+      "confidence": "medium",
+      "notes": "実装済みの依存解決でinspect.signatureのeval_strを使わず文字列化アノテーションを正しく評価できない実バグだが、型安全性よりPython標準APIの使い方不足に近い"
+    }
+  },
+  {
+    "repo": "fastapi",
+    "sha": "8a9258b169dce3e321f614c14b1877c18750d6c7",
+    "subject": "🐛 Fix, avoid yield from a TaskGroup, only as an async context manager, closed in the request async exit stack (#15038)",
+    "category": "concurrency",
+    "severity": "medium",
+    "summary": "SSEストリーミングでTaskGroupを非同期ジェネレータのyieldから直接使っており、GeneratorExitによる不適切な終了処理でエラーが起きうる(PEP789関連)",
+    "verdict": {
+      "sha": "8a9258b169dce3e321f614c14b1877c18750d6c7",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "agree",
+      "confidence": "high",
+      "notes": "SSEの完成済み実装でTaskGroup内のasync generator yieldがキャンセル/GeneratorExit時の構造化並行性を壊す実バグで、逆適用も自然な実装ミスに見えるためconcurrency分類で妥当。"
+    }
+  },
+  {
+    "repo": "fastapi",
+    "sha": "7fe315c21afb8a57a2b559772e0f7ced7e5d071a",
+    "subject": "🐛 Refactor router route building to make it thread-safe, mainly relevant for tests running in parallel threads (uncommon) (#16013)",
+    "category": "concurrency",
+    "severity": "low",
+    "summary": "ルーティングの effective routes キャッシュ構築に競合状態(TOCTOU)があり、テスト等で並列スレッドから同時アクセスすると不整合が起きうる",
+    "verdict": {
+      "sha": "7fe315c21afb8a57a2b559772e0f7ced7e5d071a",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "agree",
+      "confidence": "high",
+      "notes": "共有キャッシュをロックなしで空リストに差し替えて逐次appendしていたため並列アクセスで部分結果や重複が返り得る実バグで、逆適用も自然な競合再導入に見える"
+    }
+  },
+  {
+    "repo": "fastapi",
+    "sha": "812a1926f06391b22b081fdb11fe7528e3b91293",
+    "subject": "🐛 Fix `separate_input_output_schemas=False` with `computed_field` (#14453)",
+    "category": "logic",
+    "severity": "low",
+    "summary": "computed_fieldの有無判定がフィールド集合全体へのグローバル判定になっており、無関係なモデルのスキーマ結合抑制に影響してしまう",
+    "verdict": {
+      "sha": "812a1926f06391b22b081fdb11fe7528e3b91293",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "agree",
+      "confidence": "high",
+      "notes": "computed_field検出を全フィールド共通にしていたため、separate_input_output_schemas=Falseでも無関係なモデルまで入出力分離される実際のOpenAPI生成バグで、逆適用も自然な条件ロジック退行に見える"
+    }
+  },
+  {
+    "repo": "fastapi",
+    "sha": "1d96b3e3f14fa5a226ae817d1095b868796beb60",
+    "subject": "🐛 Strip whitespaces from `Authorization` header credentials (#14786)",
+    "category": "logic",
+    "severity": "low",
+    "summary": "Authorizationヘッダーのcredentials部分の前後空白を除去しておらず、トークン比較等に不整合が起きうる",
+    "verdict": {
+      "sha": "1d96b3e3f14fa5a226ae817d1095b868796beb60",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "agree",
+      "confidence": "high",
+      "notes": "Authorizationヘッダーの認証情報部分の空白処理に関する完成済みコードの実際の解析ロジック不具合で、逆適用も自然な小さな回帰として成立する"
+    }
+  },
+  {
+    "repo": "valibot",
+    "sha": "f051378d61f019c3096519545912a736c7e646d6",
+    "subject": "fix: clarify `domain()` IDN limitation and reject Punycode labels",
+    "category": "security",
+    "severity": "medium",
+    "summary": "domain()のASCII限定という仕様に反し、Punycodeエンコードされたラベル(xn--...)を誤って有効なドメインとして許容していた。IDNホモグラフ等のなりすまし対策として意図通りxn--を拒否するよう正規表現に否定先読みを追加",
+    "verdict": {
+      "sha": "f051378d61f019c3096519545912a736c7e646d6",
+      "genuine": "disagree",
+      "injectable": "agree",
+      "category": "disagree",
+      "suggested_category": "logic",
+      "confidence": "high",
+      "notes": "既存テストがPunycodeを有効例として明示しており、旧ドキュメントも「Unicode formのIDN非対応」とだけ述べていたため、完成済みコードのバグ修正というより仕様変更・制限強化に見える。"
+    }
+  },
+  {
+    "repo": "valibot",
+    "sha": "0569e5e5e42b5e64bd9fbbab8e282b24cb305406",
+    "subject": "Fix bug my removing invalid no side effects marker #1007",
+    "category": "security",
+    "severity": "high",
+    "summary": "内部ユーティリティ_addIssueに誤って@__NO_SIDE_EFFECTS__アノテーションが付与されており、issueをデータセットに追加するという副作用のある関数がツリーシェイキングで除去されうる問題を修正。",
+    "verdict": {
+      "sha": "0569e5e5e42b5e64bd9fbbab8e282b24cb305406",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "disagree",
+      "suggested_category": "api-misuse",
+      "confidence": "high",
+      "notes": "副作用のある_addIssueに純粋性アノテーションを付けた実害あるバンドラ/圧縮器向け指示の誤用であり、一般的なsecurity分類は根拠が弱い。"
+    }
+  },
+  {
+    "repo": "valibot",
+    "sha": "0634c1b7042717c114edf3864eae7b5bcc063624",
+    "subject": "fix(to-json-schema): inline getDefault to remove runtime valibot peer dep import (#1461)",
+    "category": "api-misuse",
+    "severity": "medium",
+    "summary": "to-json-schemaパッケージがvalibotを値としてimportしv.getDefault()をランタイム呼び出ししていたため、valibotがpeer依存として実行時に存在しない環境で壊れる可能性があった。import typeにしてgetDefaultロジックをインライン化して修正",
+    "verdict": {
+      "sha": "0634c1b7042717c114edf3864eae7b5bcc063624",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "agree",
+      "confidence": "medium",
+      "notes": "実行時に不要なvalibot値importへ依存していたため、型用途だけのpeer依存解決で壊れる実害があり、逆適用も自然なヘルパー利用として見える。"
+    }
+  },
+  {
+    "repo": "valibot",
+    "sha": "17cd7ed5b8851ff5006dcf85bf9fa6c53da3cb72",
+    "subject": "fix: prefer hasOwnProperty over hasOwn (#1421)",
+    "category": "other",
+    "severity": "low",
+    "summary": "_isValidObjectKeyがES2022のObject.hasOwnを直接使っており、ビルドターゲット/ランタイムによっては未サポートで例外になりうる互換性バグをObject.prototype.hasOwnProperty.callに置き換えて修正",
+    "verdict": {
+      "sha": "17cd7ed5b8851ff5006dcf85bf9fa6c53da3cb72",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "disagree",
+      "suggested_category": "api-misuse",
+      "confidence": "high",
+      "notes": "ES2020互換をうたう配布コードでES2022のObject.hasOwnに依存していた実害ある互換性バグで、逆適用も自然な近代化変更に見えるが、分類はotherより未対応API利用のapi-misuseが適切。"
+    }
+  },
+  {
+    "repo": "chi",
+    "sha": "6ceb498b221efa11f559602beb2463b8b52c2161",
+    "subject": "Fix `Mux.Find` not correctly handling nested routes (#954)",
+    "category": "logic",
+    "severity": "medium",
+    "summary": "Mux.Findがネストしたルート(サブルーター)の場合にパターン文字列を正しく合成できず、誤った/空のパターンを返していた",
+    "verdict": {
+      "sha": "6ceb498b221efa11f559602beb2463b8b52c2161",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "agree",
+      "confidence": "high",
+      "notes": "Mux.Findのサブルーター再帰で親パターンを合成せず子のパターンだけ返す実害のある経路解決ロジック不備で、逆適用も自然な見落としに見える"
+    }
+  },
+  {
+    "repo": "chi",
+    "sha": "1c2d011f59c4b2fc2127f308f2b4171db2567f19",
+    "subject": "Avoid potential nil dereference (#1008)",
+    "category": "type-safety",
+    "severity": "medium",
+    "summary": "URLFormatミドルウェアでrctxがnilの場合にnilポインタ参照(RoutePath代入)する可能性があった",
+    "verdict": {
+      "sha": "1c2d011f59c4b2fc2127f308f2b4171db2567f19",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "agree",
+      "confidence": "high",
+      "notes": "URLFormatをchiルータ外またはRouteContext未設定の文脈で使うと拡張子付きパスでrctx.RoutePath代入がpanicし、nilガード削除は自然な回帰でカテゴリもnil derefのtype-safetyとして妥当"
+    }
+  },
+  {
+    "repo": "chi",
+    "sha": "6fedde2a70dc2adce0a3dc41b8aebc0b2bec8185",
+    "subject": "Make Context.RoutePattern() nil-safe (#927)",
+    "category": "type-safety",
+    "severity": "medium",
+    "summary": "Context.RoutePattern()がnilレシーバで呼ばれるとnilポインタ参照でパニックする可能性があった",
+    "verdict": {
+      "sha": "6fedde2a70dc2adce0a3dc41b8aebc0b2bec8185",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "agree",
+      "confidence": "high",
+      "notes": "RouteContextがnilを返し得るAPI形状でRoutePatternのnilレシーバpanicを防ぐ実際の挙動修正で、逆適用も自然なnilガード欠落に見える。"
+    }
+  },
+  {
+    "repo": "pgrust",
+    "sha": "b09c0f9aa6bdc7da8c6cc2aa161a903f9437149e",
+    "subject": "plpgsql: restore CurrentResourceOwner after EXCEPTION-block subxact (revalidate_bug crash)",
+    "category": "resource-leak",
+    "severity": "high",
+    "summary": "plpgsqlのEXCEPTIONブロックがサブトランザクション後にCurrentResourceOwnerを元(ポータルのオーナー)に戻しておらず、後続のリレーション参照解放が誤ったオーナーに対して行われクラッシュ+リカバリ突入していた",
+    "verdict": {
+      "sha": "b09c0f9aa6bdc7da8c6cc2aa161a903f9437149e",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "agree",
+      "confidence": "high",
+      "notes": "PostgreSQL本家のCurrentResourceOwner復元漏れに相当する完了済みPL/pgSQL実行系の実害ある資源所有者管理バグで、逆適用もRust移植時の自然な抜けに見える。"
+    }
+  },
+  {
+    "repo": "pgrust",
+    "sha": "fdb2bbb893fdd298191f760c4dc8aaca16ef4465",
+    "subject": "FIX: autovacuum perform_work_item PG_TRY/PG_CATCH errcontext + recovery",
+    "category": "error-handling",
+    "severity": "medium",
+    "summary": "autovacuum の perform_work_item がエラーを ? で素通しし、C の PG_TRY/PG_CATCH による errcontext付与・トランザクション中断再開・次work-item継続・query-cancelフラグクリアを欠いていた",
+    "verdict": {
+      "sha": "fdb2bbb893fdd298191f760c4dc8aaca16ef4465",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "agree",
+      "confidence": "medium",
+      "notes": "提示差分上、C版のPG_CATCH相当の回復・errcontext・QueryCancelPending解除を欠く実害あるエラー処理バグの修正で、逆適用もRust移植時の自然な?伝播に見える"
+    }
+  },
+  {
+    "repo": "pgrust",
+    "sha": "42e2ad0b5cbfdd4c1fbd268792f1c6a8b006a0a9",
+    "subject": "common-ip: fix misaligned sockaddr_storage/sockaddr_un derefs (WALL 1k)",
+    "category": "type-safety",
+    "severity": "high",
+    "summary": "アライメント保証のないバイトバッファをsockaddr_storage/sockaddr_unへ直接キャストして参照を作っていたため、Rustの未整列参照に対する未定義動作検出でSIGABRTしバックエンドが落ちていた(psqlの単純な接続でも再現)。",
+    "verdict": {
+      "sha": "42e2ad0b5cbfdd4c1fbd268792f1c6a8b006a0a9",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "agree",
+      "confidence": "high",
+      "notes": "未整列のバイト配列をsockaddr_*参照にするのはRustの参照不変条件違反で実クラッシュし得る修正で、逆差分もunsafe Rustでありがちな自然なバグに見える。"
+    }
+  },
+  {
+    "repo": "pgrust",
+    "sha": "cb60ac482aebd36c104dc88805656ac767b57796",
+    "subject": "wasm64: host-clock in timeofday() (SystemTime::now panics on wasm64)",
+    "category": "other",
+    "severity": "medium",
+    "summary": "timeofday() が std::SystemTime::now() を無条件使用しており、wasm64ターゲットではpanicする",
+    "verdict": {
+      "sha": "cb60ac482aebd36c104dc88805656ac767b57796",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "disagree",
+      "suggested_category": "api-misuse",
+      "confidence": "medium",
+      "notes": "完成済みのtimeofday()がwasm64非対応のSystemTime::nowを無条件に呼んでpanicする実バグで、逆適用も自然だが分類はunsupported API使用なのでotherよりapi-misuseが適切"
+    }
+  },
+  {
+    "repo": "pgrust",
+    "sha": "4e4126c1b147876c6c2ef19cfbe815a883c6825b",
+    "subject": "Audit backend-libpq-pqformat: fix enlargeStringInfo errmsg and len-cursor underflow; PASS",
+    "category": "security",
+    "severity": "high",
+    "summary": "pq_getmsgbytes/pq_copymsgbytes/pq_getmsgtextが len - cursor を符号なし演算で計算しており、cursor > len (不正なメッセージ)のとき本来ereportすべき所でunderflowしてpanicしていた",
+    "verdict": {
+      "sha": "4e4126c1b147876c6c2ef19cfbe815a883c6825b",
+      "genuine": "agree",
+      "injectable": "agree",
+      "category": "agree",
+      "confidence": "medium",
+      "notes": "len-cursorのusize減算はcursor>lenでpanic/範囲外アクセスになり得るため実バグで、差し戻しも自然な移植ミスだが、security評価はDoS前提の解釈に依存する"
+    }
+  }
+]

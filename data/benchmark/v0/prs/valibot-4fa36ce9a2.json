@@ -1,0 +1,26 @@
+{
+  "id": "valibot-4fa36ce9a2",
+  "repo": "valibot",
+  "fix_sha": "4fa36ce9a2b4480042c0f981027afd719f674252",
+  "base_sha": "4fa36ce9a2b4480042c0f981027afd719f674252",
+  "language": "typescript",
+  "category": "type-safety",
+  "severity": "low",
+  "post_cutoff": false,
+  "bug_summary": "entriesFromObjectsユーティリティの型がreadonlyなタプル引数を受け付けず、as constで作った有効なreadonly配列を渡すとコンパイルエラーになっていたのを修正。",
+  "pr_diff": "diff --git a/library/src/utils/entriesFromObjects/entriesFromObjects.ts b/library/src/utils/entriesFromObjects/entriesFromObjects.ts\nindex 32adfca2..5f930dc6 100644\n--- a/library/src/utils/entriesFromObjects/entriesFromObjects.ts\n+++ b/library/src/utils/entriesFromObjects/entriesFromObjects.ts\n@@ -73,20 +73,21 @@ type MergeEntries<\n /**\n  * Recursive merge type.\n  */\n-type RecursiveMerge<TSchemas extends readonly [Schema, ...Schema[]]> =\n-  TSchemas extends readonly [infer TFirstSchema extends Schema]\n-    ? TFirstSchema['entries']\n-    : TSchemas extends readonly [\n-          infer TFirstSchema extends Schema,\n-          ...infer TRestSchemas extends readonly [Schema, ...Schema[]],\n-        ]\n-      ? MergeEntries<TFirstSchema['entries'], RecursiveMerge<TRestSchemas>>\n-      : never;\n+type RecursiveMerge<TSchemas extends [Schema, ...Schema[]]> = TSchemas extends [\n+  infer TFirstSchema extends Schema,\n+]\n+  ? TFirstSchema['entries']\n+  : TSchemas extends [\n+        infer TFirstSchema extends Schema,\n+        ...infer TRestSchemas extends [Schema, ...Schema[]],\n+      ]\n+    ? MergeEntries<TFirstSchema['entries'], RecursiveMerge<TRestSchemas>>\n+    : never;\n \n /**\n  * Merged entries types.\n  */\n-type MergedEntries<TSchemas extends readonly [Schema, ...Schema[]]> = Prettify<\n+type MergedEntries<TSchemas extends [Schema, ...Schema[]]> = Prettify<\n   RecursiveMerge<TSchemas>\n >;\n \n@@ -100,7 +101,7 @@ type MergedEntries<TSchemas extends readonly [Schema, ...Schema[]]> = Prettify<\n  * @beta\n  */\n export function entriesFromObjects<\n-  const TSchemas extends readonly [Schema, ...Schema[]],\n+  const TSchemas extends [Schema, ...Schema[]],\n >(schemas: TSchemas): MergedEntries<TSchemas>;\n \n // @__NO_SIDE_EFFECTS__\n",
+  "ground_truth": [
+    {
+      "file": "library/src/utils/entriesFromObjects/entriesFromObjects.ts",
+      "start": 73,
+      "end": 93
+    },
+    {
+      "file": "library/src/utils/entriesFromObjects/entriesFromObjects.ts",
+      "start": 101,
+      "end": 107
+    }
+  ],
+  "pr_title": "Align entriesFromObjects tuple types with other schema helpers",
+  "pr_description": "`RecursiveMerge`, `MergedEntries`, and `entriesFromObjects` constrained their tuple type parameter with `readonly [Schema, ...Schema[]]`, while comparable helpers elsewhere in the library use the non-readonly tuple form. This drops the `readonly` modifier from all three so the type parameter matches the convention used across the rest of the utils."
+}

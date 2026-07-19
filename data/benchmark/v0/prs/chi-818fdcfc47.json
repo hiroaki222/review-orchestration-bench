@@ -1,0 +1,21 @@
+{
+  "id": "chi-818fdcfc47",
+  "repo": "chi",
+  "fix_sha": "818fdcfc4786168651768377ba647cf9dd5b3953",
+  "base_sha": "818fdcfc4786168651768377ba647cf9dd5b3953",
+  "language": "go",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "ネストしたルートでhttp.Request.Patternに(合成前の)routePatternフィールドを直接使っており、サブルーター経由のパターンが正しく反映されていなかった",
+  "pr_diff": "diff --git a/mux.go b/mux.go\nindex 3da7f3f..71620c0 100644\n--- a/mux.go\n+++ b/mux.go\n@@ -472,7 +472,7 @@ func (mx *Mux) routeHTTP(w http.ResponseWriter, r *http.Request) {\n \t\t\tvalue := rctx.URLParams.Values[i]\n \t\t\tr.SetPathValue(key, value)\n \t\t}\n-\t\tr.Pattern = rctx.RoutePattern()\n+\t\tr.Pattern = rctx.routePattern\n \n \t\th.ServeHTTP(w, r)\n \t\treturn\n",
+  "ground_truth": [
+    {
+      "file": "mux.go",
+      "start": 472,
+      "end": 478
+    }
+  ],
+  "pr_title": "mux: use routePattern field directly when setting r.Pattern",
+  "pr_description": "RoutePattern() rebuilds the pattern string from the route stack on every call, which is unnecessary here since routeHTTP already has the composed pattern cached on the context. Read routePattern directly to avoid the extra recomputation on the hot request path."
+}

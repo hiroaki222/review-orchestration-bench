@@ -1,0 +1,26 @@
+{
+  "id": "fastapi-7ba042e069",
+  "repo": "fastapi",
+  "fix_sha": "7ba042e069ad424a584a37f1db03887798d9af80",
+  "base_sha": "7ba042e069ad424a584a37f1db03887798d9af80",
+  "language": "python",
+  "category": "type-safety",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "if TYPE_CHECKING配下でのみ定義された型(依存関数の戻り値型等)をeval_str=Trueで評価しようとしNameErrorが発生する",
+  "pr_diff": "diff --git a/fastapi/dependencies/utils.py b/fastapi/dependencies/utils.py\nindex 262dba6fd..23bca6f2a 100644\n--- a/fastapi/dependencies/utils.py\n+++ b/fastapi/dependencies/utils.py\n@@ -209,21 +209,11 @@ def get_flat_params(dependant: Dependant) -> List[ModelField]:\n     return path_params + query_params + header_params + cookie_params\n \n \n-def _get_signature(call: Callable[..., Any]) -> inspect.Signature:\n+def get_typed_signature(call: Callable[..., Any]) -> inspect.Signature:\n     if sys.version_info >= (3, 10):\n-        try:\n-            signature = inspect.signature(call, eval_str=True)\n-        except NameError:\n-            # Handle type annotations with if TYPE_CHECKING, not used by FastAPI\n-            # e.g. dependency return types\n-            signature = inspect.signature(call)\n+        signature = inspect.signature(call, eval_str=True)\n     else:\n         signature = inspect.signature(call)\n-    return signature\n-\n-\n-def get_typed_signature(call: Callable[..., Any]) -> inspect.Signature:\n-    signature = _get_signature(call)\n     unwrapped = inspect.unwrap(call)\n     globalns = getattr(unwrapped, \"__globals__\", {})\n     typed_params = [\n@@ -249,7 +239,10 @@ def get_typed_annotation(annotation: Any, globalns: Dict[str, Any]) -> Any:\n \n \n def get_typed_return_annotation(call: Callable[..., Any]) -> Any:\n-    signature = _get_signature(call)\n+    if sys.version_info >= (3, 10):\n+        signature = inspect.signature(call, eval_str=True)\n+    else:\n+        signature = inspect.signature(call)\n     unwrapped = inspect.unwrap(call)\n     annotation = signature.return_annotation\n \n",
+  "ground_truth": [
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 209,
+      "end": 219
+    },
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 239,
+      "end": 248
+    }
+  ],
+  "pr_title": "Inline signature evaluation branches in dependencies/utils.py",
+  "pr_description": "Removes the shared _get_signature helper and inlines the Python-version check directly into get_typed_signature and get_typed_return_annotation. Keeps the eval_str=True call sites next to the function that uses them instead of routing through an extra layer of indirection."
+}

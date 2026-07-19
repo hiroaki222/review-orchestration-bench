@@ -1,0 +1,21 @@
+{
+  "id": "chi-05f1ef7bb5",
+  "repo": "chi",
+  "fix_sha": "05f1ef7bb50b8a8cb33a9dd3ba1c5b94bff0f723",
+  "base_sha": "05f1ef7bb50b8a8cb33a9dd3ba1c5b94bff0f723",
+  "language": "go",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "RouteHeadersミドルウェアで空ルーター時にreturn文が抜けており、next.ServeHTTPが二重に呼ばれていた",
+  "pr_diff": "diff --git a/middleware/route_headers.go b/middleware/route_headers.go\nindex 1c3334d..8874376 100644\n--- a/middleware/route_headers.go\n+++ b/middleware/route_headers.go\n@@ -79,7 +79,6 @@ func (hr HeaderRouter) Handler(next http.Handler) http.Handler {\n \t\tif len(hr) == 0 {\n \t\t\t// skip if no routes set\n \t\t\tnext.ServeHTTP(w, r)\n-\t\t\treturn\n \t\t}\n \n \t\t// find first matching header route, and continue\n",
+  "ground_truth": [
+    {
+      "file": "middleware/route_headers.go",
+      "start": 79,
+      "end": 84
+    }
+  ],
+  "pr_title": "Simplify empty-route branch in HeaderRouter middleware",
+  "pr_description": "The empty-router branch of `HeaderRouter.Handler` returned right after calling `next.ServeHTTP`, even though that was the last statement executed for this case anyway. Dropping the explicit return lets the function fall through the same code path uniformly instead of special-casing the empty-router case, which keeps the branch shorter and easier to follow."
+}

@@ -1,0 +1,21 @@
+{
+  "id": "chi-f4ab9b1f05",
+  "repo": "chi",
+  "fix_sha": "f4ab9b1f050bdcf14bd096399e8bd57363406514",
+  "base_sha": "f4ab9b1f050bdcf14bd096399e8bd57363406514",
+  "language": "go",
+  "category": "logic",
+  "severity": "low",
+  "post_cutoff": false,
+  "bug_summary": "ルートパターンが\"/\"のときTrimSuffixの連続適用で空文字列になってしまうエッジケースバグ",
+  "pr_diff": "diff --git a/context.go b/context.go\nindex 6aaee8b..0eda1a2 100644\n--- a/context.go\n+++ b/context.go\n@@ -123,10 +123,8 @@ func (x *Context) URLParam(key string) string {\n func (x *Context) RoutePattern() string {\n \troutePattern := strings.Join(x.RoutePatterns, \"\")\n \troutePattern = replaceWildcards(routePattern)\n-\tif routePattern != \"/\" {\n-\t\troutePattern = strings.TrimSuffix(routePattern, \"//\")\n-\t\troutePattern = strings.TrimSuffix(routePattern, \"/\")\n-\t}\n+\troutePattern = strings.TrimSuffix(routePattern, \"//\")\n+\troutePattern = strings.TrimSuffix(routePattern, \"/\")\n \treturn routePattern\n }\n \n",
+  "ground_truth": [
+    {
+      "file": "context.go",
+      "start": 123,
+      "end": 130
+    }
+  ],
+  "pr_title": "Simplify RoutePattern trailing-slash trimming",
+  "pr_description": "Remove the special-cased `if routePattern != \"/\"` guard around the trailing-slash trims in `Context.RoutePattern`. `strings.TrimSuffix` is already a no-op when the suffix isn't present, so the guard was just extra branching around code that behaves correctly without it."
+}

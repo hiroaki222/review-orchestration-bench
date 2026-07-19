@@ -1,0 +1,31 @@
+{
+  "id": "valibot-0634c1b704",
+  "repo": "valibot",
+  "fix_sha": "0634c1b7042717c114edf3864eae7b5bcc063624",
+  "base_sha": "0634c1b7042717c114edf3864eae7b5bcc063624",
+  "language": "typescript",
+  "category": "api-misuse",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "to-json-schemaパッケージがvalibotを値としてimportしv.getDefault()をランタイム呼び出ししていたため、valibotがpeer依存として実行時に存在しない環境で壊れる可能性があった。import typeにしてgetDefaultロジックをインライン化して修正",
+  "pr_diff": "diff --git a/packages/to-json-schema/src/converters/convertSchema/convertSchema.ts b/packages/to-json-schema/src/converters/convertSchema/convertSchema.ts\nindex 6eb08bb4..8ee65eb6 100644\n--- a/packages/to-json-schema/src/converters/convertSchema/convertSchema.ts\n+++ b/packages/to-json-schema/src/converters/convertSchema/convertSchema.ts\n@@ -1,4 +1,4 @@\n-import type * as v from 'valibot';\n+import * as v from 'valibot';\n import type {\n   ConversionConfig,\n   ConversionContext,\n@@ -490,10 +490,8 @@ export function convertSchema(\n \n       // Add default value to JSON Schema, if available\n       if (valibotSchema.default !== undefined) {\n-        jsonSchema.default =\n-          typeof valibotSchema.default === 'function'\n-            ? valibotSchema.default()\n-            : valibotSchema.default;\n+        // @ts-expect-error\n+        jsonSchema.default = v.getDefault(valibotSchema);\n       }\n \n       break;\n@@ -512,10 +510,8 @@ export function convertSchema(\n \n       // Add default value to JSON Schema, if available\n       if (valibotSchema.default !== undefined) {\n-        jsonSchema.default =\n-          typeof valibotSchema.default === 'function'\n-            ? valibotSchema.default()\n-            : valibotSchema.default;\n+        // @ts-expect-error\n+        jsonSchema.default = v.getDefault(valibotSchema);\n       }\n \n       break;\n",
+  "ground_truth": [
+    {
+      "file": "packages/to-json-schema/src/converters/convertSchema/convertSchema.ts",
+      "start": 1,
+      "end": 4
+    },
+    {
+      "file": "packages/to-json-schema/src/converters/convertSchema/convertSchema.ts",
+      "start": 490,
+      "end": 497
+    },
+    {
+      "file": "packages/to-json-schema/src/converters/convertSchema/convertSchema.ts",
+      "start": 510,
+      "end": 517
+    }
+  ],
+  "pr_title": "Use valibot's getDefault() in to-json-schema converters",
+  "pr_description": "Switches convertSchema to a regular `valibot` import and calls the library's own `v.getDefault()` helper to resolve default values, instead of re-implementing the function-vs-value check inline in two places. Keeps the default-value resolution logic in one place."
+}

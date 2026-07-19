@@ -1,0 +1,56 @@
+{
+  "id": "valibot-ef4166c04e",
+  "repo": "valibot",
+  "fix_sha": "ef4166c04ebf85dfb6c61d1329246bba6ac7e4dc",
+  "base_sha": "ef4166c04ebf85dfb6c61d1329246bba6ac7e4dc",
+  "language": "typescript",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "cache/cacheAsyncメソッドがキャッシュした出力datasetをそのまま返していたため、後続のpipeアイテム(transform等)がdatasetを変更するとキャッシュ自体が汚染され、以降の呼び出しで誤った結果を返すエイリアシングバグ",
+  "pr_diff": "diff --git a/library/src/methods/cache/cache.ts b/library/src/methods/cache/cache.ts\nindex 7e5f606d..e6119e01 100644\n--- a/library/src/methods/cache/cache.ts\n+++ b/library/src/methods/cache/cache.ts\n@@ -5,7 +5,7 @@ import type {\n   InferIssue,\n   InferOutput,\n } from '../../types/index.ts';\n-import { _cloneDataset, _getStandardProps } from '../../utils/index.ts';\n+import { _getStandardProps } from '../../utils/index.ts';\n import { _LruCache } from './_LruCache.ts';\n import type { Cache, CacheConfig } from './types.ts';\n \n@@ -93,9 +93,7 @@ export function cache(\n           (outputDataset = schema['~run'](dataset, runConfig))\n         );\n       }\n-      // Hint: We clone the dataset before returning it so downstream pipe items\n-      // do not mutate the cached dataset.\n-      return _cloneDataset(outputDataset);\n+      return outputDataset;\n     },\n   };\n }\ndiff --git a/library/src/methods/cache/cacheAsync.ts b/library/src/methods/cache/cacheAsync.ts\nindex 6b5b6128..dba8a8c3 100644\n--- a/library/src/methods/cache/cacheAsync.ts\n+++ b/library/src/methods/cache/cacheAsync.ts\n@@ -10,7 +10,7 @@ import type {\n   StandardProps,\n   UnknownDataset,\n } from '../../types/index.ts';\n-import { _cloneDataset, _getStandardProps } from '../../utils/index.ts';\n+import { _getStandardProps } from '../../utils/index.ts';\n import { _LruCache } from './_LruCache.ts';\n import type { Cache, CacheConfig } from './types.ts';\n \n@@ -140,11 +140,7 @@ export function cacheAsync(\n \n       // Check and return cached output if exists\n       const cached = this.cache.get(key);\n-      if (cached) {\n-        // Hint: We clone the dataset before returning it so downstream pipe\n-        // items do not mutate the cached dataset.\n-        return _cloneDataset(cached);\n-      }\n+      if (cached) return cached;\n \n       // If not cached, check if a matching run is already in progress\n       let promise = activeRuns?.get(key);\n@@ -158,9 +154,7 @@ export function cacheAsync(\n       try {\n         const outputDataset = await promise;\n         this.cache.set(key, outputDataset);\n-        // Hint: We clone the dataset before returning it so downstream pipe\n-        // items do not mutate the cached dataset.\n-        return _cloneDataset(outputDataset);\n+        return outputDataset;\n \n         // Cleanup active runs map\n       } finally {\ndiff --git a/library/src/utils/_cloneDataset/_cloneDataset.ts b/library/src/utils/_cloneDataset/_cloneDataset.ts\ndeleted file mode 100644\nindex 5a6cec1d..00000000\n--- a/library/src/utils/_cloneDataset/_cloneDataset.ts\n+++ /dev/null\n@@ -1,25 +0,0 @@\n-import type { BaseIssue, OutputDataset } from '../../types/index.ts';\n-\n-/**\n- * Creates a shallow copy of a dataset.\n- *\n- * Hint: The `value` is copied by reference, but the `issues` array is cloned\n- * to avoid reusing mutable dataset state across multiple runs.\n- *\n- * @param dataset The output dataset.\n- *\n- * @returns The copied output dataset.\n- */\n-// @__NO_SIDE_EFFECTS__\n-export function _cloneDataset<TValue, TIssue extends BaseIssue<unknown>>(\n-  dataset: OutputDataset<TValue, TIssue>\n-): OutputDataset<TValue, TIssue> {\n-  // Hint: We assign the known dataset properties directly instead of using the\n-  // spread operator for better runtime performance.\n-  // @ts-expect-error\n-  return {\n-    typed: dataset.typed,\n-    value: dataset.value,\n-    issues: dataset.issues && [...dataset.issues],\n-  };\n-}\ndiff --git a/library/src/utils/_cloneDataset/index.ts b/library/src/utils/_cloneDataset/index.ts\ndeleted file mode 100644\nindex 219dc755..00000000\n--- a/library/src/utils/_cloneDataset/index.ts\n+++ /dev/null\n@@ -1 +0,0 @@\n-export * from './_cloneDataset.ts';\ndiff --git a/library/src/utils/index.ts b/library/src/utils/index.ts\nindex d88c1ecc..8f569b67 100644\n--- a/library/src/utils/index.ts\n+++ b/library/src/utils/index.ts\n@@ -1,5 +1,4 @@\n export * from './_addIssue/index.ts';\n-export * from './_cloneDataset/index.ts';\n export * from './_getByteCount/index.ts';\n export * from './_getGraphemeCount/index.ts';\n export * from './_getLastMetadata/index.ts';\n",
+  "ground_truth": [
+    {
+      "file": "library/src/methods/cache/cache.ts",
+      "start": 5,
+      "end": 11
+    },
+    {
+      "file": "library/src/methods/cache/cache.ts",
+      "start": 93,
+      "end": 99
+    },
+    {
+      "file": "library/src/methods/cache/cacheAsync.ts",
+      "start": 10,
+      "end": 16
+    },
+    {
+      "file": "library/src/methods/cache/cacheAsync.ts",
+      "start": 140,
+      "end": 146
+    },
+    {
+      "file": "library/src/methods/cache/cacheAsync.ts",
+      "start": 154,
+      "end": 160
+    },
+    {
+      "file": "library/src/methods/cache/cacheAsync.ts",
+      "start": 0,
+      "end": 0
+    },
+    {
+      "file": "library/src/methods/cache/cacheAsync.ts",
+      "start": 0,
+      "end": 0
+    },
+    {
+      "file": "library/src/utils/index.ts",
+      "start": 1,
+      "end": 4
+    }
+  ],
+  "pr_title": "Return cached datasets directly from cache and cacheAsync",
+  "pr_description": "Removes the _cloneDataset utility and stops shallow-cloning the dataset before returning cache hits in both cache and cacheAsync. Cached results are now returned as-is, cutting an allocation on every cache hit."
+}

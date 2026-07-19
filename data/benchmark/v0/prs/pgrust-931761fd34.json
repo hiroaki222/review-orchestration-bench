@@ -1,0 +1,26 @@
+{
+  "id": "pgrust-931761fd34",
+  "repo": "pgrust",
+  "fix_sha": "931761fd34dd1a4badc56d54fca434807b4ad9a5",
+  "base_sha": "931761fd34dd1a4badc56d54fca434807b4ad9a5",
+  "language": "rust",
+  "category": "concurrency",
+  "severity": "high",
+  "post_cutoff": true,
+  "bug_summary": "SIGALRMハンドラがRefCellをborrow_mutする間に、通常経路のget_timeout_*がbareでborrowしており、シグナル再入でdouble-borrow panic→バックエンドSIGABRT",
+  "pr_diff": "diff --git a/crates/backend/utils/misc/misc_timeout/src/lib.rs b/crates/backend/utils/misc/misc_timeout/src/lib.rs\nindex 7f08ce25b..60eb88180 100644\n--- a/crates/backend/utils/misc/misc_timeout/src/lib.rs\n+++ b/crates/backend/utils/misc/misc_timeout/src/lib.rs\n@@ -721,28 +721,14 @@ pub fn disable_all_timeouts(keep_indicators: bool) -> PgResult<()> {\n \n /// `get_timeout_active(id)` — true if the timeout is enabled and not yet\n /// fired. Subject to race conditions (it could fire right after we look).\n-///\n-/// C reads `all_timeouts[id]->active` (a single `bool`) directly, relying on\n-/// the read being atomic w.r.t. the SIGALRM handler. In this port the timeout\n-/// arrays live behind a `RefCell`; an interrupting `handle_sig_alarm` does\n-/// `borrow_mut()`, so reading under a bare `borrow()` here risks a `RefCell\n-/// already borrowed` panic — and because that panic surfaces inside the C\n-/// `wrapper_handler` signal frame it is non-unwinding and aborts the backend.\n-/// Block SIGALRM across the borrow (the same guard the mutating accessors use)\n-/// so any pending interrupt runs after the borrow is released.\n pub fn get_timeout_active(id: TimeoutId) -> bool {\n-    let _block = BlockSigAlarm::new();\n     TIMEOUT_DATA.with(|d| d.borrow().all_timeouts[id.as_index()].active)\n }\n \n /// `get_timeout_indicator(id, reset_indicator)` — the I've-been-fired\n /// indicator. Resets it when returning true if `reset_indicator`; never resets\n /// when returning false (avoids missing a timeout due to races).\n-///\n-/// SIGALRM is blocked across the `borrow_mut()` for the same reentrancy reason\n-/// documented on [`get_timeout_active`].\n pub fn get_timeout_indicator(id: TimeoutId, reset_indicator: bool) -> bool {\n-    let _block = BlockSigAlarm::new();\n     TIMEOUT_DATA.with(|d| {\n         let mut data = d.borrow_mut();\n         let idx = id.as_index();\n@@ -758,21 +744,13 @@ pub fn get_timeout_indicator(id: TimeoutId, reset_indicator: bool) -> bool {\n \n /// `get_timeout_start_time(id)` — when the timeout was most recently\n /// activated; 0 if never activated in this process.\n-///\n-/// SIGALRM is blocked across the borrow for the same reentrancy reason\n-/// documented on [`get_timeout_active`].\n pub fn get_timeout_start_time(id: TimeoutId) -> TimestampTz {\n-    let _block = BlockSigAlarm::new();\n     TIMEOUT_DATA.with(|d| d.borrow().all_timeouts[id.as_index()].start_time)\n }\n \n /// `get_timeout_finish_time(id)` — when the timeout is, or most recently was,\n /// due to fire; 0 if never activated in this process.\n-///\n-/// SIGALRM is blocked across the borrow for the same reentrancy reason\n-/// documented on [`get_timeout_active`].\n pub fn get_timeout_finish_time(id: TimeoutId) -> TimestampTz {\n-    let _block = BlockSigAlarm::new();\n     TIMEOUT_DATA.with(|d| d.borrow().all_timeouts[id.as_index()].fin_time)\n }\n \n",
+  "ground_truth": [
+    {
+      "file": "crates/backend/utils/misc/misc_timeout/src/lib.rs",
+      "start": 721,
+      "end": 734
+    },
+    {
+      "file": "crates/backend/utils/misc/misc_timeout/src/lib.rs",
+      "start": 744,
+      "end": 756
+    }
+  ],
+  "pr_title": "Streamline the timeout query accessors",
+  "pr_description": "`get_timeout_active`, `get_timeout_indicator`, `get_timeout_start_time`, and `get_timeout_finish_time` each wrapped their borrow in a `BlockSigAlarm` guard, on top of already being documented as best-effort reads that tolerate races. This drops the guard from these four accessors, leaving the borrow itself as the only synchronization on these read paths."
+}

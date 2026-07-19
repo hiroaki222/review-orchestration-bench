@@ -1,0 +1,31 @@
+{
+  "id": "chi-906b567eba",
+  "repo": "chi",
+  "fix_sha": "906b567ebae89be14ccf532cdf29dd57645adc4a",
+  "base_sha": "906b567ebae89be14ccf532cdf29dd57645adc4a",
+  "language": "go",
+  "category": "concurrency",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "throttlerミドルウェアが共有structのフィールド(t.h)にハンドラを保持する設計だったため、同じミドルウェアインスタンスを複数のハンドラ/ルートに適用すると最後に設定したハンドラで上書きされ他のルートが壊れるバグを、クロージャベースの実装に書き換えて修正",
+  "pr_diff": "diff --git a/middleware/throttle.go b/middleware/throttle.go\nindex 4a6e977..2ad03bc 100644\n--- a/middleware/throttle.go\n+++ b/middleware/throttle.go\n@@ -16,9 +16,7 @@ var (\n )\n \n // Throttle is a middleware that limits number of currently processed requests\n-// at a time across all users. Note: Throttle is not a rate-limiter per user,\n-// instead it just puts a ceiling on the number of currentl in-flight requests\n-// being processed from the point from where the Throttle middleware is mounted.\n+// at a time.\n func Throttle(limit int) func(http.Handler) http.Handler {\n \treturn ThrottleBacklog(limit, 0, defaultBacklogTimeout)\n }\n@@ -49,48 +47,12 @@ func ThrottleBacklog(limit int, backlogLimit int, backlogTimeout time.Duration)\n \t\tt.backlogTokens <- token{}\n \t}\n \n-\treturn func(next http.Handler) http.Handler {\n-\t\tfn := func(w http.ResponseWriter, r *http.Request) {\n-\t\t\tctx := r.Context()\n-\n-\t\t\tselect {\n-\n-\t\t\tcase <-ctx.Done():\n-\t\t\t\thttp.Error(w, errContextCanceled, http.StatusServiceUnavailable)\n-\t\t\t\treturn\n-\n-\t\t\tcase btok := <-t.backlogTokens:\n-\t\t\t\ttimer := time.NewTimer(t.backlogTimeout)\n-\n-\t\t\t\tdefer func() {\n-\t\t\t\t\tt.backlogTokens <- btok\n-\t\t\t\t}()\n-\n-\t\t\t\tselect {\n-\t\t\t\tcase <-timer.C:\n-\t\t\t\t\thttp.Error(w, errTimedOut, http.StatusServiceUnavailable)\n-\t\t\t\t\treturn\n-\t\t\t\tcase <-ctx.Done():\n-\t\t\t\t\ttimer.Stop()\n-\t\t\t\t\thttp.Error(w, errContextCanceled, http.StatusServiceUnavailable)\n-\t\t\t\t\treturn\n-\t\t\t\tcase tok := <-t.tokens:\n-\t\t\t\t\tdefer func() {\n-\t\t\t\t\t\ttimer.Stop()\n-\t\t\t\t\t\tt.tokens <- tok\n-\t\t\t\t\t}()\n-\t\t\t\t\tnext.ServeHTTP(w, r)\n-\t\t\t\t}\n-\t\t\t\treturn\n-\n-\t\t\tdefault:\n-\t\t\t\thttp.Error(w, errCapacityExceeded, http.StatusServiceUnavailable)\n-\t\t\t\treturn\n-\t\t\t}\n-\t\t}\n-\n-\t\treturn http.HandlerFunc(fn)\n+\tfn := func(h http.Handler) http.Handler {\n+\t\tt.h = h\n+\t\treturn &t\n \t}\n+\n+\treturn fn\n }\n \n // token represents a request that is being processed.\n@@ -98,7 +60,44 @@ type token struct{}\n \n // throttler limits number of currently processed requests at a time.\n type throttler struct {\n+\th              http.Handler\n \ttokens         chan token\n \tbacklogTokens  chan token\n \tbacklogTimeout time.Duration\n }\n+\n+// ServeHTTP is the primary throttler request handler\n+func (t *throttler) ServeHTTP(w http.ResponseWriter, r *http.Request) {\n+\tctx := r.Context()\n+\tselect {\n+\tcase <-ctx.Done():\n+\t\thttp.Error(w, errContextCanceled, http.StatusServiceUnavailable)\n+\t\treturn\n+\tcase btok := <-t.backlogTokens:\n+\t\ttimer := time.NewTimer(t.backlogTimeout)\n+\n+\t\tdefer func() {\n+\t\t\tt.backlogTokens <- btok\n+\t\t}()\n+\n+\t\tselect {\n+\t\tcase <-timer.C:\n+\t\t\thttp.Error(w, errTimedOut, http.StatusServiceUnavailable)\n+\t\t\treturn\n+\t\tcase <-ctx.Done():\n+\t\t\ttimer.Stop()\n+\t\t\thttp.Error(w, errContextCanceled, http.StatusServiceUnavailable)\n+\t\t\treturn\n+\t\tcase tok := <-t.tokens:\n+\t\t\tdefer func() {\n+\t\t\t\ttimer.Stop()\n+\t\t\t\tt.tokens <- tok\n+\t\t\t}()\n+\t\t\tt.h.ServeHTTP(w, r)\n+\t\t}\n+\t\treturn\n+\tdefault:\n+\t\thttp.Error(w, errCapacityExceeded, http.StatusServiceUnavailable)\n+\t\treturn\n+\t}\n+}\n",
+  "ground_truth": [
+    {
+      "file": "middleware/throttle.go",
+      "start": 16,
+      "end": 22
+    },
+    {
+      "file": "middleware/throttle.go",
+      "start": 47,
+      "end": 58
+    },
+    {
+      "file": "middleware/throttle.go",
+      "start": 60,
+      "end": 103
+    }
+  ],
+  "pr_title": "Implement throttler as an http.Handler via ServeHTTP",
+  "pr_description": "Give `throttler` its own `ServeHTTP` method instead of building the request handling logic inside a closure returned from `ThrottleBacklog`. The wrapped handler is now stored on the struct and dispatched from `ServeHTTP`, which consolidates the token/backlog select logic into a single named method rather than an inline `http.HandlerFunc`. Also trims the doc comment on `Throttle` down to the essentials."
+}

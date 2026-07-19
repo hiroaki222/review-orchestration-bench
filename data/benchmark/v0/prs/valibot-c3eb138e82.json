@@ -1,0 +1,26 @@
+{
+  "id": "valibot-c3eb138e82",
+  "repo": "valibot",
+  "fix_sha": "c3eb138e828be365c4caa10c4e7966100e1762d4",
+  "base_sha": "c3eb138e828be365c4caa10c4e7966100e1762d4",
+  "language": "typescript",
+  "category": "type-safety",
+  "severity": "low",
+  "post_cutoff": false,
+  "bug_summary": "examplesアクションのTExamples型がArrayInput（任意の配列）を許容しており、パイプの入力型と一致しない値を例として渡してもコンパイルエラーにならなかった問題をreadonly TInput[]制約で修正。",
+  "pr_diff": "diff --git a/library/src/actions/examples/examples.ts b/library/src/actions/examples/examples.ts\nindex 2772a61b..027ed069 100644\n--- a/library/src/actions/examples/examples.ts\n+++ b/library/src/actions/examples/examples.ts\n@@ -1,9 +1,10 @@\n import type { BaseMetadata } from '../../types';\n+import type { ArrayInput } from '../types';\n \n /**\n  * Examples action interface.\n  */\n-export interface ExamplesAction<TInput, TExamples extends readonly TInput[]>\n+export interface ExamplesAction<TInput, TExamples extends ArrayInput>\n   extends BaseMetadata<TInput> {\n   /**\n    * The action type.\n@@ -27,7 +28,7 @@ export interface ExamplesAction<TInput, TExamples extends readonly TInput[]>\n  * @returns An examples action.\n  */\n // @__NO_SIDE_EFFECTS__\n-export function examples<TInput, const TExamples extends readonly TInput[]>(\n+export function examples<TInput, const TExamples extends ArrayInput>(\n   examples_: TExamples\n ): ExamplesAction<TInput, TExamples> {\n   return {\n",
+  "ground_truth": [
+    {
+      "file": "library/src/actions/examples/examples.ts",
+      "start": 1,
+      "end": 10
+    },
+    {
+      "file": "library/src/actions/examples/examples.ts",
+      "start": 28,
+      "end": 34
+    }
+  ],
+  "pr_title": "Reuse the shared ArrayInput type in the examples action",
+  "pr_description": "`ExamplesAction` and `examples` constrained `TExamples` with a locally written `readonly TInput[]`, while the actions module already exports an `ArrayInput` type for this exact shape. This swaps in the shared `ArrayInput` type for both the interface and the function signature, keeping the examples action consistent with how other actions declare array-typed generics."
+}

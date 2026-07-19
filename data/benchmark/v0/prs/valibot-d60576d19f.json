@@ -1,0 +1,46 @@
+{
+  "id": "valibot-d60576d19f",
+  "repo": "valibot",
+  "fix_sha": "d60576d19f8d2e5d5069d05a5d52bb84a22474f3",
+  "base_sha": "d60576d19f8d2e5d5069d05a5d52bb84a22474f3",
+  "language": "typescript",
+  "category": "type-safety",
+  "severity": "low",
+  "post_cutoff": false,
+  "bug_summary": "guardアクションの型がTOutput extends TInputという厳密な制約を要求しており、より狭い入力やより広い出力を返すガード関数を渡すと型推論が不正確になる問題をBaseGuard/InferGuardedへの型再設計で修正。",
+  "pr_diff": "diff --git a/library/src/actions/guard/guard.ts b/library/src/actions/guard/guard.ts\nindex 0029c569..721fc483 100644\n--- a/library/src/actions/guard/guard.ts\n+++ b/library/src/actions/guard/guard.ts\n@@ -5,23 +5,14 @@ import type {\n } from '../../types/index.ts';\n import { _addIssue } from '../../utils/index.ts';\n \n-type BaseGuard<TInput> = (\n+export type Guard<TInput, TOutput extends TInput> = (\n   input: TInput\n-  // eslint-disable-next-line @typescript-eslint/no-explicit-any\n-) => input is any;\n-\n-// eslint-disable-next-line @typescript-eslint/no-explicit-any\n-type InferGuarded<TGuard extends BaseGuard<any>> = TGuard extends (\n-  // eslint-disable-next-line @typescript-eslint/no-explicit-any\n-  input: any\n-) => input is infer TOutput\n-  ? TOutput\n-  : unknown;\n+) => input is TOutput;\n \n /**\n  * Guard issue interface.\n  */\n-export interface GuardIssue<TInput, TGuard extends BaseGuard<TInput>>\n+export interface GuardIssue<TInput, TOutput extends TInput>\n   extends BaseIssue<TInput> {\n   /**\n    * The issue kind.\n@@ -34,7 +25,7 @@ export interface GuardIssue<TInput, TGuard extends BaseGuard<TInput>>\n   /**\n    * The validation requirement.\n    */\n-  readonly requirement: TGuard;\n+  readonly requirement: Guard<TInput, TOutput>;\n }\n \n /**\n@@ -42,14 +33,9 @@ export interface GuardIssue<TInput, TGuard extends BaseGuard<TInput>>\n  */\n export interface GuardAction<\n   TInput,\n-  TGuard extends BaseGuard<TInput>,\n-  TMessage extends ErrorMessage<GuardIssue<TInput, TGuard>> | undefined,\n-> extends BaseTransformation<\n-    TInput,\n-    // intersect in case guard is actually wider\n-    TInput & InferGuarded<TGuard>,\n-    GuardIssue<TInput, TGuard>\n-  > {\n+  TOutput extends TInput,\n+  TMessage extends ErrorMessage<GuardIssue<TInput, TOutput>> | undefined,\n+> extends BaseTransformation<TInput, TOutput, GuardIssue<TInput, TOutput>> {\n   /**\n    * The action type.\n    */\n@@ -61,7 +47,7 @@ export interface GuardAction<\n   /**\n    * The guard function.\n    */\n-  readonly requirement: TGuard;\n+  readonly requirement: Guard<TInput, TOutput>;\n   /**\n    * The error message.\n    */\n@@ -74,23 +60,9 @@ export interface GuardAction<\n  *\n  * @returns A guard action.\n  */\n-// known input from pipe\n-export function guard<TInput, const TGuard extends BaseGuard<TInput>>(\n-  requirement: TGuard\n-): GuardAction<TInput, TGuard, undefined>;\n-\n-/**\n- * Creates a guard validation action.\n- *\n- * @param requirement The guard function.\n- *\n- * @returns A guard action.\n- */\n-// unknown input, e.g. standalone\n-// eslint-disable-next-line @typescript-eslint/no-explicit-any\n-export function guard<const TGuard extends BaseGuard<any>>(\n-  requirement: TGuard\n-): GuardAction<Parameters<TGuard>[0], TGuard, undefined>;\n+export function guard<TInput, TOutput extends TInput>(\n+  requirement: Guard<TInput, TOutput>\n+): GuardAction<TInput, TOutput, undefined>;\n \n /**\n  * Creates a guard validation action.\n@@ -100,44 +72,23 @@ export function guard<const TGuard extends BaseGuard<any>>(\n  *\n  * @returns A guard action.\n  */\n-// known input from pipe\n export function guard<\n   TInput,\n-  const TGuard extends BaseGuard<TInput>,\n-  const TMessage extends ErrorMessage<GuardIssue<TInput, TGuard>> | undefined,\n->(\n-  requirement: TGuard,\n-  message: TMessage\n-): GuardAction<TInput, TGuard, TMessage>;\n-\n-/**\n- * Creates a guard validation action.\n- *\n- * @param requirement The guard function.\n- * @param message The error message.\n- *\n- * @returns A guard action.\n- */\n-// unknown input, e.g. standalone\n-export function guard<\n-  // eslint-disable-next-line @typescript-eslint/no-explicit-any\n-  const TGuard extends BaseGuard<any>,\n-  const TMessage extends\n-    | ErrorMessage<GuardIssue<Parameters<TGuard>[0], TGuard>>\n-    | undefined,\n+  TOutput extends TInput,\n+  const TMessage extends ErrorMessage<GuardIssue<TInput, TOutput>> | undefined,\n >(\n-  requirement: TGuard,\n+  requirement: Guard<TInput, TOutput>,\n   message: TMessage\n-): GuardAction<Parameters<TGuard>[0], TGuard, TMessage>;\n+): GuardAction<TInput, TOutput, TMessage>;\n \n // @__NO_SIDE_EFFECTS__\n export function guard(\n-  requirement: BaseGuard<unknown>,\n-  message?: ErrorMessage<GuardIssue<unknown, BaseGuard<unknown>>>\n+  requirement: Guard<unknown, unknown>,\n+  message?: ErrorMessage<GuardIssue<unknown, unknown>>\n ): GuardAction<\n   unknown,\n-  BaseGuard<unknown>,\n-  ErrorMessage<GuardIssue<unknown, BaseGuard<unknown>>> | undefined\n+  unknown,\n+  ErrorMessage<GuardIssue<unknown, unknown>> | undefined\n > {\n   return {\n     kind: 'transformation',\n",
+  "ground_truth": [
+    {
+      "file": "library/src/actions/guard/guard.ts",
+      "start": 5,
+      "end": 18
+    },
+    {
+      "file": "library/src/actions/guard/guard.ts",
+      "start": 25,
+      "end": 31
+    },
+    {
+      "file": "library/src/actions/guard/guard.ts",
+      "start": 33,
+      "end": 41
+    },
+    {
+      "file": "library/src/actions/guard/guard.ts",
+      "start": 47,
+      "end": 53
+    },
+    {
+      "file": "library/src/actions/guard/guard.ts",
+      "start": 60,
+      "end": 68
+    },
+    {
+      "file": "library/src/actions/guard/guard.ts",
+      "start": 72,
+      "end": 94
+    }
+  ],
+  "pr_title": "Simplify guard() action's public typing",
+  "pr_description": "Replaces the internal `BaseGuard`/`InferGuarded` utility types with a single exported `Guard<TInput, TOutput>` type, and collapses the guard() overload set down to the two forms (with and without a custom message) that most consumers use. Makes the guard action's type signature easier to reference from outside the library."
+}

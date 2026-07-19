@@ -1,0 +1,21 @@
+{
+  "id": "valibot-48e97e6f9a",
+  "repo": "valibot",
+  "fix_sha": "48e97e6f9a003258d3eab0dedad3a9ad3cfe9292",
+  "base_sha": "48e97e6f9a003258d3eab0dedad3a9ad3cfe9292",
+  "language": "typescript",
+  "category": "logic",
+  "severity": "low",
+  "post_cutoff": false,
+  "bug_summary": "to-json-schema変換で、exactOptionalなオブジェクトプロパティを誤ってrequired配列に含めてしまうバグを修正（optional/nullishのみ除外していた条件にexact_optionalを追加）。",
+  "pr_diff": "diff --git a/packages/to-json-schema/src/converters/convertSchema/convertSchema.ts b/packages/to-json-schema/src/converters/convertSchema/convertSchema.ts\nindex 2f6e61c1..ef8dc3f5 100644\n--- a/packages/to-json-schema/src/converters/convertSchema/convertSchema.ts\n+++ b/packages/to-json-schema/src/converters/convertSchema/convertSchema.ts\n@@ -318,11 +318,7 @@ export function convertSchema(\n       for (const key in valibotSchema.entries) {\n         const entry = valibotSchema.entries[key] as SchemaOrPipe;\n         jsonSchema.properties[key] = convertSchema({}, entry, config, context);\n-        if (\n-          entry.type !== 'exact_optional' &&\n-          entry.type !== 'nullish' &&\n-          entry.type !== 'optional'\n-        ) {\n+        if (entry.type !== 'nullish' && entry.type !== 'optional') {\n           jsonSchema.required.push(key);\n         }\n       }\n",
+  "ground_truth": [
+    {
+      "file": "packages/to-json-schema/src/converters/convertSchema/convertSchema.ts",
+      "start": 318,
+      "end": 324
+    }
+  ],
+  "pr_title": "Simplify required-field condition in convertSchema",
+  "pr_description": "Drop the `entry.type !== 'exact_optional'` clause from the condition that pushes an object property key onto the JSON Schema `required` array, leaving just the `nullish`/`optional` exclusions. Trims one branch from a condition that's evaluated for every entry in the schema."
+}

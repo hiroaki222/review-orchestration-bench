@@ -1,0 +1,21 @@
+{
+  "id": "chi-1c2d011f59",
+  "repo": "chi",
+  "fix_sha": "1c2d011f59c4b2fc2127f308f2b4171db2567f19",
+  "base_sha": "1c2d011f59c4b2fc2127f308f2b4171db2567f19",
+  "language": "go",
+  "category": "type-safety",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "URLFormatミドルウェアでrctxがnilの場合にnilポインタ参照(RoutePath代入)する可能性があった",
+  "pr_diff": "diff --git a/middleware/url_format.go b/middleware/url_format.go\nindex 2ec6657..d8a651e 100644\n--- a/middleware/url_format.go\n+++ b/middleware/url_format.go\n@@ -63,9 +63,7 @@ func URLFormat(next http.Handler) http.Handler {\n \t\t\t\tidx += base\n \t\t\t\tformat = path[idx+1:]\n \n-\t\t\t\tif rctx != nil {\n-\t\t\t\t\trctx.RoutePath = path[:idx]\n-\t\t\t\t}\n+\t\t\t\trctx.RoutePath = path[:idx]\n \t\t\t}\n \t\t}\n \n",
+  "ground_truth": [
+    {
+      "file": "middleware/url_format.go",
+      "start": 63,
+      "end": 69
+    }
+  ],
+  "pr_title": "middleware/url_format: drop redundant nil check on rctx",
+  "pr_description": "The URLFormat middleware always has a populated routing context by the time RoutePath is assigned, since chi.RouteContext is already threaded through earlier in the request lifecycle. This removes the leftover nil guard around the RoutePath assignment to keep the branch focused on the actual format-stripping logic."
+}

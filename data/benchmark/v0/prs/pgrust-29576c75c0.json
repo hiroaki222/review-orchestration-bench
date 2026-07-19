@@ -1,0 +1,26 @@
+{
+  "id": "pgrust-29576c75c0",
+  "repo": "pgrust",
+  "fix_sha": "29576c75c0470fd5eb5b1aa6a7daab041ae95e65",
+  "base_sha": "29576c75c0470fd5eb5b1aa6a7daab041ae95e65",
+  "language": "rust",
+  "category": "resource-leak",
+  "severity": "high",
+  "post_cutoff": true,
+  "bug_summary": "cluster_relが呼び出し元で既にOID経由でclose済みのOldHeapのRelationハンドルを保持し続け、Dropで二重にrelation_closeしてrefcountがアンダーフローしクラッシュしていた",
+  "pr_diff": "diff --git a/crates/backend-commands-cluster/src/lib.rs b/crates/backend-commands-cluster/src/lib.rs\nindex 63b0034d6..32a7af9a4 100644\n--- a/crates/backend-commands-cluster/src/lib.rs\n+++ b/crates/backend-commands-cluster/src/lib.rs\n@@ -435,23 +435,9 @@ pub fn cluster_rel(\n \n     // The C body uses `goto out`; the inner closure replicates it, then the\n     // `out:` cleanup runs unconditionally afterward.\n-    let mut OldHeap = OldHeap;\n     let body_result: PgResult<()> = cluster_rel_body(mcx, &OldHeap, tableOid, indexOid, &params,\n         recheck, verbose, save_userid);\n \n-    // The C body owns the single `relation_close(OldHeap, ...)`: every success\n-    // path of `cluster_rel_body` (its `goto out` bailouts and the main\n-    // `rebuild_relation` leg) already released `OldHeap`'s relcache reference\n-    // by OID. So on `Ok`, disarm this owned handle's `Drop` to avoid a second\n-    // refcount release (which would trip the `rd_refcnt > 0` guard and crash\n-    // the backend — the VACUUM FULL / CLUSTER double-close). On `Err`, the body\n-    // bailed out *before* closing (the `ereport(ERROR)` legs), so leave `Drop`\n-    // armed to release the reference on the error path, mirroring C's resowner\n-    // cleanup at transaction abort.\n-    if body_result.is_ok() {\n-        OldHeap.disarm_closer();\n-    }\n-\n     // out:\n     match body_result {\n         Ok(()) => {\ndiff --git a/crates/types-rel/src/lib.rs b/crates/types-rel/src/lib.rs\nindex 67cf6bdd4..5bc6ee195 100644\n--- a/crates/types-rel/src/lib.rs\n+++ b/crates/types-rel/src/lib.rs\n@@ -490,20 +490,6 @@ impl<'mcx> Relation<'mcx> {\n             None => Ok(()),\n         }\n     }\n-\n-    /// Surrender this handle's release authority *without* closing the\n-    /// relation, so its `Drop` will not release the relcache reference.\n-    ///\n-    /// This is for the case where the single C-level `relation_close`/\n-    /// `table_close` has already been performed by another (by-OID) path on the\n-    /// same relation — e.g. `cluster_rel`, where the body releases `OldHeap`'s\n-    /// refcount via `relation_close(rd_id, NoLock)` itself. The owned handle is\n-    /// still in scope and would otherwise double-release the refcount from its\n-    /// `Drop` (tripping the `rd_refcnt > 0` guard). After this call the handle\n-    /// is an inert view; the relation has already been closed exactly once.\n-    pub fn disarm_closer(&mut self) {\n-        let _ = self.closer.take();\n-    }\n }\n \n impl<'mcx> core::ops::Deref for Relation<'mcx> {\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend-commands-cluster/src/lib.rs",
+      "start": 435,
+      "end": 443
+    },
+    {
+      "file": "crates/types-rel/src/lib.rs",
+      "start": 490,
+      "end": 495
+    }
+  ],
+  "pr_title": "Remove the unused disarm_closer escape hatch",
+  "pr_description": "disarm_closer was added for a single call site in cluster_rel to hand off a Relation handle's close ownership manually, but that path doesn't need the extra bookkeeping. This drops the method from Relation along with its use in cluster_rel, leaving OldHeap's Drop as the sole owner of the close."
+}

@@ -1,0 +1,21 @@
+{
+  "id": "pgrust-c76dce36c8",
+  "repo": "pgrust",
+  "fix_sha": "c76dce36c86fa2eda30cc6bac21de2c7b6632c4a",
+  "base_sha": "c76dce36c86fa2eda30cc6bac21de2c7b6632c4a",
+  "language": "rust",
+  "category": "type-safety",
+  "severity": "high",
+  "post_cutoff": true,
+  "bug_summary": "flushblocksの差分計算がu64のchecked減算になっており、C側のint(符号あり)への暗黙ラップを再現できず、アンダーフローでpanicしてトランザクションがアボートしていた",
+  "pr_diff": "diff --git a/crates/backend-access-transam-xlog/src/driver.rs b/crates/backend-access-transam-xlog/src/driver.rs\nindex c04e825e9..becd1bc6d 100644\n--- a/crates/backend-access-transam-xlog/src/driver.rs\n+++ b/crates/backend-access-transam-xlog/src/driver.rs\n@@ -90,19 +90,10 @@ pub fn XLogSetAsyncXactLSN(async_xact_lsn: XLogRecPtr) {\n     } else {\n         // SAFETY: live shmem region.\n         unsafe { refresh_xlog_write_result(ctl) };\n-        // C: `int flushblocks = WriteRqstPtr / XLOG_BLCKSZ - LogwrtResult.Flush\n-        // / XLOG_BLCKSZ;` — the two block counts are `XLogRecPtr` (uint64) but\n-        // their difference is assigned to a *signed* `int`. When the flush\n-        // position is already past the requested async LSN the uint64 subtraction\n-        // wraps and narrows to a negative `int`, which then correctly fails the\n-        // `>= WalWriterFlushAfter` test (no wakeup). Mirror that with wrapping\n-        // u64 math narrowed to i32 rather than a checked subtraction (which would\n-        // panic on underflow in debug builds).\n-        let flushblocks = (write_rqst_ptr / XLOG_BLCKSZ as u64)\n-            .wrapping_sub(logwrt_result().Flush / XLOG_BLCKSZ as u64)\n-            as i32;\n+        let flushblocks =\n+            write_rqst_ptr / XLOG_BLCKSZ as u64 - logwrt_result().Flush / XLOG_BLCKSZ as u64;\n         let wal_writer_flush_after = vars::WalWriterFlushAfter.read();\n-        if wal_writer_flush_after == 0 || flushblocks >= wal_writer_flush_after {\n+        if wal_writer_flush_after == 0 || flushblocks >= wal_writer_flush_after as u64 {\n             wakeup = true;\n         }\n     }\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend-access-transam-xlog/src/driver.rs",
+      "start": 90,
+      "end": 99
+    }
+  ],
+  "pr_title": "Simplify flushblocks calculation in XLogSetAsyncXactLSN",
+  "pr_description": "Replaces the wrapping-subtract-then-narrow-to-i32 arithmetic for `flushblocks` with a straightforward `u64` subtraction, comparing directly against `WalWriterFlushAfter` cast to `u64`. Drops the accompanying comment about mirroring C's signed-int truncation, since the block counts here are simpler to reason about as unsigned deltas."
+}

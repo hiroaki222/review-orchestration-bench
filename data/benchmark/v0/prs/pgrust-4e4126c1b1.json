@@ -1,0 +1,41 @@
+{
+  "id": "pgrust-4e4126c1b1",
+  "repo": "pgrust",
+  "fix_sha": "4e4126c1b147876c6c2ef19cfbe815a883c6825b",
+  "base_sha": "4e4126c1b147876c6c2ef19cfbe815a883c6825b",
+  "language": "rust",
+  "category": "security",
+  "severity": "high",
+  "post_cutoff": true,
+  "bug_summary": "pq_getmsgbytes/pq_copymsgbytes/pq_getmsgtextが len - cursor を符号なし演算で計算しており、cursor > len (不正なメッセージ)のとき本来ereportすべき所でunderflowしてpanicしていた",
+  "pr_diff": "diff --git a/crates/backend-libpq-pqformat/src/lib.rs b/crates/backend-libpq-pqformat/src/lib.rs\nindex 11c3a8a60..6681e34b2 100644\n--- a/crates/backend-libpq-pqformat/src/lib.rs\n+++ b/crates/backend-libpq-pqformat/src/lib.rs\n@@ -58,10 +58,8 @@ pub fn init_seams() {\n fn enlarge_string_info(buf: &mut StringInfo<'_>, needed: usize) -> PgResult<()> {\n     let len = buf.data.len();\n     if needed >= MAX_ALLOC_SIZE.saturating_sub(len) {\n-        return Err(PgError::error(format!(\n-            \"string buffer exceeds maximum allowed length ({MAX_ALLOC_SIZE} bytes)\"\n-        ))\n-        .with_sqlstate(ERRCODE_PROGRAM_LIMIT_EXCEEDED)\n+        return Err(PgError::error(\"out of memory\")\n+            .with_sqlstate(ERRCODE_PROGRAM_LIMIT_EXCEEDED)\n             .with_detail(format!(\n                 \"Cannot enlarge string buffer containing {len} bytes by {needed} more bytes.\"\n             )));\n@@ -419,7 +417,7 @@ pub fn pq_getmsgfloat8(msg: &mut StringInfo<'_>) -> PgResult<f64> {\n /// C also rejects `datalen < 0`, which `usize` makes unrepresentable; the\n /// insufficient-data half of the check is preserved exactly.\n pub fn pq_getmsgbytes<'a>(msg: &'a mut StringInfo<'_>, datalen: usize) -> PgResult<&'a [u8]> {\n-    if datalen > msg.data.len().saturating_sub(msg.cursor) {\n+    if datalen > msg.data.len() - msg.cursor {\n         return Err(protocol_violation(\"insufficient data left in message\"));\n     }\n     let start = msg.cursor;\n@@ -432,7 +430,7 @@ pub fn pq_getmsgbytes<'a>(msg: &'a mut StringInfo<'_>, datalen: usize) -> PgResu\n /// `sizeof(dest)`).\n pub fn pq_copymsgbytes(msg: &mut StringInfo<'_>, buf: &mut [u8]) -> PgResult<()> {\n     let datalen = buf.len();\n-    if datalen > msg.data.len().saturating_sub(msg.cursor) {\n+    if datalen > msg.data.len() - msg.cursor {\n         return Err(protocol_violation(\"insufficient data left in message\"));\n     }\n     let start = msg.cursor;\n@@ -453,7 +451,7 @@ pub fn pq_getmsgtext<'mcx>(\n     msg: &mut StringInfo<'_>,\n     rawbytes: usize,\n ) -> PgResult<PgVec<'mcx, u8>> {\n-    if rawbytes > msg.data.len().saturating_sub(msg.cursor) {\n+    if rawbytes > msg.data.len() - msg.cursor {\n         return Err(protocol_violation(\"insufficient data left in message\"));\n     }\n     let start = msg.cursor;\ndiff --git a/crates/backend-libpq-pqformat/src/tests.rs b/crates/backend-libpq-pqformat/src/tests.rs\nindex 98ed082db..255c1afa4 100644\n--- a/crates/backend-libpq-pqformat/src/tests.rs\n+++ b/crates/backend-libpq-pqformat/src/tests.rs\n@@ -288,14 +288,9 @@ fn enlarge_cap_matches_stringinfo_error() {\n     let f = setup();\n     let mut buf = pq_beginmessage(f.ctx.mcx(), b'X').unwrap();\n     // A request that crosses MaxAllocSize must fail with stringinfo.c's\n-    // PROGRAM_LIMIT_EXCEEDED error before any allocation happens (PG 18.3\n-    // wording: errmsg(\"string buffer exceeds maximum allowed length (%zu\n-    // bytes)\", MaxAllocSize)).\n+    // PROGRAM_LIMIT_EXCEEDED \"out of memory\" before any allocation happens.\n     let err = enlarge_string_info(&mut buf, 0x4000_0000).unwrap_err();\n-    assert_eq!(\n-        err.message(),\n-        \"string buffer exceeds maximum allowed length (1073741823 bytes)\"\n-    );\n+    assert_eq!(err.message(), \"out of memory\");\n     assert_eq!(err.sqlstate(), ERRCODE_PROGRAM_LIMIT_EXCEEDED);\n     assert_eq!(\n         err.detail(),\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend-libpq-pqformat/src/lib.rs",
+      "start": 58,
+      "end": 65
+    },
+    {
+      "file": "crates/backend-libpq-pqformat/src/lib.rs",
+      "start": 417,
+      "end": 423
+    },
+    {
+      "file": "crates/backend-libpq-pqformat/src/lib.rs",
+      "start": 430,
+      "end": 436
+    },
+    {
+      "file": "crates/backend-libpq-pqformat/src/lib.rs",
+      "start": 451,
+      "end": 457
+    },
+    {
+      "file": "crates/backend-libpq-pqformat/src/tests.rs",
+      "start": 288,
+      "end": 296
+    }
+  ],
+  "pr_title": "Align buffer limit error message and simplify pqformat length checks",
+  "pr_description": "`enlarge_string_info`'s error on exceeding the allocation cap spelled out the byte counts in the message text, whereas the rest of the crate's allocation-limit errors just say \"out of memory\" and let the `.with_detail(...)` carry the specifics. This aligns the message with that convention and simplifies the remaining-length checks in `pq_getmsgbytes`, `pq_copymsgbytes`, and `pq_getmsgtext` to a plain subtraction instead of `saturating_sub`, along with the matching test update."
+}

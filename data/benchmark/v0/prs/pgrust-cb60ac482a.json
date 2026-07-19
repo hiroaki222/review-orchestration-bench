@@ -1,0 +1,21 @@
+{
+  "id": "pgrust-cb60ac482a",
+  "repo": "pgrust",
+  "fix_sha": "cb60ac482aebd36c104dc88805656ac767b57796",
+  "base_sha": "cb60ac482aebd36c104dc88805656ac767b57796",
+  "language": "rust",
+  "category": "api-misuse",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "timeofday() が std::SystemTime::now() を無条件使用しており、wasm64ターゲットではpanicする",
+  "pr_diff": "diff --git a/crates/backend-utils-adt-datetime/src/current.rs b/crates/backend-utils-adt-datetime/src/current.rs\nindex 9d0abf68d..79c52cc5d 100644\n--- a/crates/backend-utils-adt-datetime/src/current.rs\n+++ b/crates/backend-utils-adt-datetime/src/current.rs\n@@ -59,22 +59,11 @@ pub fn clock_timestamp() -> TimestampTz {\n /// the strftime seam.\n pub fn timeofday() -> String {\n     // gettimeofday() equivalent: seconds + microseconds since the Unix epoch.\n-    // std's SystemTime::now() panics on wasm64; read the host clock there.\n-    #[cfg(not(target_family = \"wasm\"))]\n-    let (tt, tv_usec) = {\n-        let dur = SystemTime::now()\n-            .duration_since(UNIX_EPOCH)\n-            .unwrap_or_default();\n-        (dur.as_secs() as pg_time_t, dur.subsec_micros())\n-    };\n-    #[cfg(target_family = \"wasm\")]\n-    let (tt, tv_usec) = {\n-        let ns = wasm_libc_shim::now_unix_nanos();\n-        (\n-            (ns / 1_000_000_000) as pg_time_t,\n-            ((ns % 1_000_000_000) / 1_000) as u32,\n-        )\n-    };\n+    let dur = SystemTime::now()\n+        .duration_since(UNIX_EPOCH)\n+        .unwrap_or_default();\n+    let tt = dur.as_secs() as pg_time_t;\n+    let tv_usec = dur.subsec_micros();\n \n     // pg_strftime(templ, sizeof(templ), \"...%%06d...\", pg_localtime(&tt, zone)).\n     // The doubled \"%%06d\" survives strftime as a literal \"%06d\", which the\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend-utils-adt-datetime/src/current.rs",
+      "start": 59,
+      "end": 69
+    }
+  ],
+  "pr_title": "Simplify timeofday to a single clock path",
+  "pr_description": "timeofday() carried a separate wasm-target branch reading from wasm_libc_shim, alongside the std SystemTime::now() path used everywhere else. This collapses it to the single std-based implementation, since we don't currently build for that target."
+}

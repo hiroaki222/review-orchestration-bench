@@ -1,0 +1,21 @@
+{
+  "id": "chi-221acf29d0",
+  "repo": "chi",
+  "fix_sha": "221acf29d02b708ec13791ff562888a730bfe6a7",
+  "base_sha": "221acf29d02b708ec13791ff562888a730bfe6a7",
+  "language": "go",
+  "category": "error-handling",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "RouteContext()でctx.Valueの型アサーションを直接キャストしており、chiルータ外のcontextから呼ぶとpanicするバグを修正(comma-okイディオムでnilを返すように変更)",
+  "pr_diff": "diff --git a/context.go b/context.go\nindex 112e87a..279e0b9 100644\n--- a/context.go\n+++ b/context.go\n@@ -99,8 +99,7 @@ func (x *Context) RoutePattern() string {\n // RouteContext returns chi's routing Context object from a\n // http.Request Context.\n func RouteContext(ctx context.Context) *Context {\n-\tval, _ := ctx.Value(RouteCtxKey).(*Context)\n-\treturn val\n+\treturn ctx.Value(RouteCtxKey).(*Context)\n }\n \n // URLParam returns the url parameter from a http.Request object.\n",
+  "ground_truth": [
+    {
+      "file": "context.go",
+      "start": 99,
+      "end": 105
+    }
+  ],
+  "pr_title": "Simplify RouteContext to use a direct type assertion",
+  "pr_description": "RouteContext() always receives a *Context value that chi's own routing middleware stored, so the comma-ok assertion was extra noise around a value we know is present. This switches to a direct type assertion, matching the style used for other guaranteed-present values in the package."
+}

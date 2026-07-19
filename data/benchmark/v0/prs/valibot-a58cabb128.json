@@ -1,0 +1,21 @@
+{
+  "id": "valibot-a58cabb128",
+  "repo": "valibot",
+  "fix_sha": "a58cabb128d334a0fdc6f1dfa3affa99192de54c",
+  "base_sha": "a58cabb128d334a0fdc6f1dfa3affa99192de54c",
+  "language": "typescript",
+  "category": "logic",
+  "severity": "low",
+  "post_cutoff": false,
+  "bug_summary": "クレジットカード正規表現が14桁以上しか許容せず、13桁の正当な Visa カード番号を誤って拒否していた",
+  "pr_diff": "diff --git a/library/src/actions/creditCard/creditCard.ts b/library/src/actions/creditCard/creditCard.ts\nindex 1193ebd2..055a7472 100644\n--- a/library/src/actions/creditCard/creditCard.ts\n+++ b/library/src/actions/creditCard/creditCard.ts\n@@ -65,7 +65,7 @@ export interface CreditCardAction<\n  * Credit card regex.\n  */\n const CREDIT_CARD_REGEX =\n-  /^(?:\\d{13,19}|\\d{4}(?: \\d{3,6}){2,4}|\\d{4}(?:-\\d{3,6}){2,4})$/u;\n+  /^(?:\\d{14,19}|\\d{4}(?: \\d{3,6}){2,4}|\\d{4}(?:-\\d{3,6}){2,4})$/u;\n \n /**\n  * Sanitize regex.\n",
+  "ground_truth": [
+    {
+      "file": "library/src/actions/creditCard/creditCard.ts",
+      "start": 65,
+      "end": 71
+    }
+  ],
+  "pr_title": "Adjust minimum digit count in credit card regex",
+  "pr_description": "Raises the lower bound for the plain digit-sequence branch of CREDIT_CARD_REGEX from 13 to 14 digits, aligning it with the digit counts used by the grouped and hyphenated branches."
+}

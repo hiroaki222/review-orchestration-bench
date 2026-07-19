@@ -1,0 +1,31 @@
+{
+  "id": "fastapi-861598b4e3",
+  "repo": "fastapi",
+  "fix_sha": "861598b4e30a7a7297aee803097f77431f799ea5",
+  "base_sha": "861598b4e30a7a7297aee803097f77431f799ea5",
+  "language": "python",
+  "category": "api-misuse",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "Python3.10以降でPEP563文字列化アノテーションをeval_str=Trueで評価していなかったため、__call__を持つインスタンス依存等で型解決に失敗する",
+  "pr_diff": "diff --git a/fastapi/dependencies/utils.py b/fastapi/dependencies/utils.py\nindex 1ff35f648..91348c8ea 100644\n--- a/fastapi/dependencies/utils.py\n+++ b/fastapi/dependencies/utils.py\n@@ -1,6 +1,5 @@\n import dataclasses\n import inspect\n-import sys\n from contextlib import AsyncExitStack, contextmanager\n from copy import copy, deepcopy\n from dataclasses import dataclass\n@@ -192,10 +191,7 @@ def get_flat_params(dependant: Dependant) -> List[ModelField]:\n \n \n def get_typed_signature(call: Callable[..., Any]) -> inspect.Signature:\n-    if sys.version_info >= (3, 10):\n-        signature = inspect.signature(call, eval_str=True)\n-    else:\n-        signature = inspect.signature(call)\n+    signature = inspect.signature(call)\n     unwrapped = inspect.unwrap(call)\n     globalns = getattr(unwrapped, \"__globals__\", {})\n     typed_params = [\n@@ -221,10 +217,7 @@ def get_typed_annotation(annotation: Any, globalns: Dict[str, Any]) -> Any:\n \n \n def get_typed_return_annotation(call: Callable[..., Any]) -> Any:\n-    if sys.version_info >= (3, 10):\n-        signature = inspect.signature(call, eval_str=True)\n-    else:\n-        signature = inspect.signature(call)\n+    signature = inspect.signature(call)\n     unwrapped = inspect.unwrap(call)\n     annotation = signature.return_annotation\n \n",
+  "ground_truth": [
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 1,
+      "end": 5
+    },
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 191,
+      "end": 197
+    },
+    {
+      "file": "fastapi/dependencies/utils.py",
+      "start": 217,
+      "end": 223
+    }
+  ],
+  "pr_title": "Simplify get_typed_signature and get_typed_return_annotation",
+  "pr_description": "Drops the sys.version_info branch and the now-unused sys import from both helpers, calling inspect.signature(call) directly instead. Reduces duplicated conditional logic across the two functions."
+}

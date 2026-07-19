@@ -1,0 +1,21 @@
+{
+  "id": "pgrust-9e64677f72",
+  "repo": "pgrust",
+  "fix_sha": "9e64677f72edf92bdd46a6753e3a0ead8b74c5fe",
+  "base_sha": "9e64677f72edf92bdd46a6753e3a0ead8b74c5fe",
+  "language": "rust",
+  "category": "logic",
+  "severity": "low",
+  "post_cutoff": true,
+  "bug_summary": "GUC_LIST_QUOTE定数の値が誤っており(0x0004ではなく0x0002が正)、pg_get_functiondefのSET句でリスト型GUCが個別要素の再クオートされず1つの文字列リテラルとして出力されていた",
+  "pr_diff": "diff --git a/crates/backend-utils-adt-ruleutils/src/functiondef.rs b/crates/backend-utils-adt-ruleutils/src/functiondef.rs\nindex 8926214cd..50270c5c0 100644\n--- a/crates/backend-utils-adt-ruleutils/src/functiondef.rs\n+++ b/crates/backend-utils-adt-ruleutils/src/functiondef.rs\n@@ -48,8 +48,8 @@ const ClanguageId: Oid = 13;\n const SQLlanguageId: Oid = 14;\n /// `INTERNALOID` (`catalog/pg_type.h`).\n const INTERNALOID: Oid = 2281;\n-/// `GUC_LIST_QUOTE` (`utils/guc.h`): `0x000002`, \"double-quote list elements\".\n-const GUC_LIST_QUOTE: i32 = 0x0002;\n+/// `GUC_LIST_QUOTE` (`utils/guc.h`).\n+const GUC_LIST_QUOTE: i32 = 0x0004;\n \n /// `pg_get_functiondef(funcid)` (ruleutils.c 2926-3170). Returns the full\n /// `CREATE OR REPLACE FUNCTION|PROCEDURE` text, or `Ok(None)` when the function\n",
+  "ground_truth": [
+    {
+      "file": "crates/backend-utils-adt-ruleutils/src/functiondef.rs",
+      "start": 48,
+      "end": 55
+    }
+  ],
+  "pr_title": "Update GUC_LIST_QUOTE value in functiondef",
+  "pr_description": "Adjusts the `GUC_LIST_QUOTE` constant used by `pg_get_functiondef` when rendering `SET` clauses for list-valued GUCs, and drops the inline hex-value comment now that the constant's name is self-explanatory."
+}

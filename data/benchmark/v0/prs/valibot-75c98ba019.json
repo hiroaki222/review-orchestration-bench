@@ -1,0 +1,21 @@
+{
+  "id": "valibot-75c98ba019",
+  "repo": "valibot",
+  "fix_sha": "75c98ba0194f1c534159a792eeac1ff1d1b7c20f",
+  "base_sha": "75c98ba0194f1c534159a792eeac1ff1d1b7c20f",
+  "language": "typescript",
+  "category": "security",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "DOMAIN_REGEXからiu(大文字小文字無視+Unicode)フラグを外し明示的な文字クラスに変更。Unicodeケースフォールディングにより本来ASCIIのみを想定したドメイン名バリデーションが非ASCII文字でもマッチしてしまう問題を修正。",
+  "pr_diff": "diff --git a/library/src/regex.ts b/library/src/regex.ts\nindex 443db335..1c260a73 100644\n--- a/library/src/regex.ts\n+++ b/library/src/regex.ts\n@@ -32,8 +32,7 @@ export const DIGITS_REGEX: RegExp = /^\\d+$/u;\n  * before validation using a separate transformation.\n  */\n export const DOMAIN_REGEX: RegExp =\n-  // eslint-disable-next-line redos-detector/no-unsafe-regex, regexp/require-unicode-regexp\n-  /^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$/;\n+  /^([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,}$/iu;\n \n /**\n  * [Email address](https://en.wikipedia.org/wiki/Email_address) regex.\n",
+  "ground_truth": [
+    {
+      "file": "library/src/regex.ts",
+      "start": 32,
+      "end": 38
+    }
+  ],
+  "pr_title": "Simplify DOMAIN_REGEX with case-insensitive/unicode flags",
+  "pr_description": "Rewrites `DOMAIN_REGEX` to a lowercase character class combined with the `i`/`u` flags rather than spelling out the uppercase range explicitly, matching how the other format regexes in this module are written."
+}

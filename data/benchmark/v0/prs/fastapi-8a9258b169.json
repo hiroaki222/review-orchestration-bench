@@ -1,0 +1,36 @@
+{
+  "id": "fastapi-8a9258b169",
+  "repo": "fastapi",
+  "fix_sha": "8a9258b169dce3e321f614c14b1877c18750d6c7",
+  "base_sha": "8a9258b169dce3e321f614c14b1877c18750d6c7",
+  "language": "python",
+  "category": "concurrency",
+  "severity": "medium",
+  "post_cutoff": true,
+  "bug_summary": "SSEストリーミングでTaskGroupを非同期ジェネレータのyieldから直接使っており、GeneratorExitによる不適切な終了処理でエラーが起きうる(PEP789関連)",
+  "pr_diff": "diff --git a/fastapi/routing.py b/fastapi/routing.py\nindex e2c83aa7b..a52271690 100644\n--- a/fastapi/routing.py\n+++ b/fastapi/routing.py\n@@ -30,7 +30,6 @@ from typing import (\n \n import anyio\n from annotated_doc import Doc\n-from anyio.abc import ObjectReceiveStream\n from fastapi import params\n from fastapi._compat import (\n     ModelField,\n@@ -527,10 +526,7 @@ def get_request_handler(\n                 else:\n                     sse_aiter = iterate_in_threadpool(gen)\n \n-                @asynccontextmanager\n-                async def _sse_producer_cm() -> AsyncIterator[\n-                    ObjectReceiveStream[bytes]\n-                ]:\n+                async def _async_stream_sse() -> AsyncIterator[bytes]:\n                     # Use a memory stream to decouple generator iteration\n                     # from the keepalive timer. A producer task pulls items\n                     # from the generator independently, so\n@@ -538,13 +534,6 @@ def get_request_handler(\n                     # `__anext__` directly - avoiding CancelledError that\n                     # would finalize the generator and also working for sync\n                     # generators running in a thread pool.\n-                    #\n-                    # This context manager is entered on the request-scoped\n-                    # AsyncExitStack so its __aexit__ (which cancels the\n-                    # task group) is called by the exit stack after the\n-                    # streaming response completes — not by async generator\n-                    # finalization via GeneratorExit.\n-                    # Ref: https://peps.python.org/pep-0789/\n                     send_stream, receive_stream = anyio.create_memory_object_stream[\n                         bytes\n                     ](max_buffer_size=1)\n@@ -554,54 +543,25 @@ def get_request_handler(\n                             async for raw_item in sse_aiter:\n                                 await send_stream.send(_serialize_sse_item(raw_item))\n \n-                    send_keepalive, receive_keepalive = (\n-                        anyio.create_memory_object_stream[bytes](max_buffer_size=1)\n-                    )\n-\n-                    async def _keepalive_inserter() -> None:\n-                        \"\"\"Read from the producer and forward to the output,\n-                        inserting keepalive comments on timeout.\"\"\"\n-                        async with send_keepalive, receive_stream:\n+                    async with anyio.create_task_group() as tg:\n+                        tg.start_soon(_producer)\n+                        async with receive_stream:\n                             try:\n                                 while True:\n                                     try:\n                                         with anyio.fail_after(_PING_INTERVAL):\n                                             data = await receive_stream.receive()\n-                                        await send_keepalive.send(data)\n+                                        yield data\n+                                        # To allow for cancellation to trigger\n+                                        # Ref: https://github.com/fastapi/fastapi/issues/14680\n+                                        await anyio.sleep(0)\n                                     except TimeoutError:\n-                                        await send_keepalive.send(KEEPALIVE_COMMENT)\n+                                        yield KEEPALIVE_COMMENT\n                             except anyio.EndOfStream:\n                                 pass\n \n-                    async with anyio.create_task_group() as tg:\n-                        tg.start_soon(_producer)\n-                        tg.start_soon(_keepalive_inserter)\n-                        yield receive_keepalive\n-                        tg.cancel_scope.cancel()\n-\n-                # Enter the SSE context manager on the request-scoped\n-                # exit stack. The stack outlives the streaming response,\n-                # so __aexit__ runs via proper structured teardown, not\n-                # via GeneratorExit thrown into an async generator.\n-                sse_receive_stream = await async_exit_stack.enter_async_context(\n-                    _sse_producer_cm()\n-                )\n-                # Ensure the receive stream is closed when the exit stack\n-                # unwinds, preventing ResourceWarning from __del__.\n-                async_exit_stack.push_async_callback(sse_receive_stream.aclose)\n-\n-                async def _sse_with_checkpoints(\n-                    stream: ObjectReceiveStream[bytes],\n-                ) -> AsyncIterator[bytes]:\n-                    async for data in stream:\n-                        yield data\n-                        # Guarantee a checkpoint so cancellation can be\n-                        # delivered even when the producer is faster than\n-                        # the consumer and receive() never suspends.\n-                        await anyio.sleep(0)\n-\n                 sse_stream_content: AsyncIterator[bytes] | Iterator[bytes] = (\n-                    _sse_with_checkpoints(sse_receive_stream)\n+                    _async_stream_sse()\n                 )\n \n                 response = StreamingResponse(\n",
+  "ground_truth": [
+    {
+      "file": "fastapi/routing.py",
+      "start": 30,
+      "end": 35
+    },
+    {
+      "file": "fastapi/routing.py",
+      "start": 526,
+      "end": 532
+    },
+    {
+      "file": "fastapi/routing.py",
+      "start": 534,
+      "end": 539
+    },
+    {
+      "file": "fastapi/routing.py",
+      "start": 543,
+      "end": 567
+    }
+  ],
+  "pr_title": "Simplify SSE streaming to a single async generator",
+  "pr_description": "Replace the `_sse_producer_cm` async-context-manager-plus-`AsyncExitStack` wiring with a plain `_async_stream_sse` async generator that runs the producer task group and keepalive loop inline. This removes the separate keepalive-inserter task and the intermediate `receive_keepalive` stream, since the generator can yield keepalive comments directly on timeout. Also drops the now-unused `ObjectReceiveStream` import."
+}

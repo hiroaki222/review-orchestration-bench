@@ -1,0 +1,36 @@
+{
+  "id": "fastapi-812a1926f0",
+  "repo": "fastapi",
+  "fix_sha": "812a1926f06391b22b081fdb11fe7528e3b91293",
+  "base_sha": "812a1926f06391b22b081fdb11fe7528e3b91293",
+  "language": "python",
+  "category": "logic",
+  "severity": "low",
+  "post_cutoff": false,
+  "bug_summary": "computed_fieldの有無判定がフィールド集合全体へのグローバル判定になっており、無関係なモデルのスキーマ結合抑制に影響してしまう",
+  "pr_diff": "diff --git a/fastapi/_compat/v2.py b/fastapi/_compat/v2.py\nindex acd23d846..0faa7d5a8 100644\n--- a/fastapi/_compat/v2.py\n+++ b/fastapi/_compat/v2.py\n@@ -171,13 +171,6 @@ def _get_model_config(model: BaseModel) -> Any:\n     return model.model_config\n \n \n-def _has_computed_fields(field: ModelField) -> bool:\n-    computed_fields = field._type_adapter.core_schema.get(\"schema\", {}).get(\n-        \"computed_fields\", []\n-    )\n-    return len(computed_fields) > 0\n-\n-\n def get_schema_from_model_field(\n     *,\n     field: ModelField,\n@@ -187,9 +180,12 @@ def get_schema_from_model_field(\n     ],\n     separate_input_output_schemas: bool = True,\n ) -> Dict[str, Any]:\n+    computed_fields = field._type_adapter.core_schema.get(\"schema\", {}).get(\n+        \"computed_fields\", []\n+    )\n     override_mode: Union[Literal[\"validation\"], None] = (\n         None\n-        if (separate_input_output_schemas or _has_computed_fields(field))\n+        if (separate_input_output_schemas or len(computed_fields) > 0)\n         else \"validation\"\n     )\n     # This expects that GenerateJsonSchema was already used to generate the definitions\n@@ -212,7 +208,15 @@ def get_definitions(\n     Dict[Tuple[ModelField, Literal[\"validation\", \"serialization\"]], JsonSchemaValue],\n     Dict[str, Dict[str, Any]],\n ]:\n+    has_computed_fields: bool = any(\n+        field._type_adapter.core_schema.get(\"schema\", {}).get(\"computed_fields\", [])\n+        for field in fields\n+    )\n+\n     schema_generator = GenerateJsonSchema(ref_template=REF_TEMPLATE)\n+    override_mode: Union[Literal[\"validation\"], None] = (\n+        None if (separate_input_output_schemas or has_computed_fields) else \"validation\"\n+    )\n     validation_fields = [field for field in fields if field.mode == \"validation\"]\n     serialization_fields = [field for field in fields if field.mode == \"serialization\"]\n     flat_validation_models = get_flat_models_from_fields(\n@@ -242,16 +246,9 @@ def get_definitions(\n     unique_flat_model_fields = {\n         f for f in flat_model_fields if f.type_ not in input_types\n     }\n+\n     inputs = [\n-        (\n-            field,\n-            (\n-                field.mode\n-                if (separate_input_output_schemas or _has_computed_fields(field))\n-                else \"validation\"\n-            ),\n-            field._type_adapter.core_schema,\n-        )\n+        (field, override_mode or field.mode, field._type_adapter.core_schema)\n         for field in list(fields) + list(unique_flat_model_fields)\n     ]\n     field_mapping, definitions = schema_generator.generate_definitions(inputs=inputs)\n",
+  "ground_truth": [
+    {
+      "file": "fastapi/_compat/v2.py",
+      "start": 171,
+      "end": 176
+    },
+    {
+      "file": "fastapi/_compat/v2.py",
+      "start": 180,
+      "end": 191
+    },
+    {
+      "file": "fastapi/_compat/v2.py",
+      "start": 208,
+      "end": 222
+    },
+    {
+      "file": "fastapi/_compat/v2.py",
+      "start": 246,
+      "end": 254
+    }
+  ],
+  "pr_title": "Compute the computed-field override once per field set",
+  "pr_description": "_has_computed_fields re-ran the same core-schema lookup for every field it was asked about. This inlines the check and hoists a single has_computed_fields/override_mode computation into get_definitions, reusing that result across the validation and serialization field lists instead of recalculating it per field."
+}

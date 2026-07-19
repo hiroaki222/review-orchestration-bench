@@ -1,0 +1,41 @@
+{
+  "id": "fastapi-42b250d14d",
+  "repo": "fastapi",
+  "fix_sha": "42b250d14dd42d3c0c24dd085fa53878172a985f",
+  "base_sha": "42b250d14dd42d3c0c24dd085fa53878172a985f",
+  "language": "python",
+  "category": "logic",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "arbitrary_types_allowed=TrueなフィールドのTypeAdapter生成時にモデルのConfigDictが渡らず、カスタムシリアライザ等を使う任意型フィールドが正しく処理されない",
+  "pr_diff": "diff --git a/fastapi/_compat/v2.py b/fastapi/_compat/v2.py\nindex 46a30b3ee..acd23d846 100644\n--- a/fastapi/_compat/v2.py\n+++ b/fastapi/_compat/v2.py\n@@ -1,7 +1,7 @@\n import re\n import warnings\n from copy import copy, deepcopy\n-from dataclasses import dataclass, is_dataclass\n+from dataclasses import dataclass\n from enum import Enum\n from typing import (\n     Any,\n@@ -18,7 +18,7 @@ from typing import (\n from fastapi._compat import may_v1, shared\n from fastapi.openapi.constants import REF_TEMPLATE\n from fastapi.types import IncEx, ModelNameMap, UnionType\n-from pydantic import BaseModel, ConfigDict, TypeAdapter, create_model\n+from pydantic import BaseModel, TypeAdapter, create_model\n from pydantic import PydanticSchemaGenerationError as PydanticSchemaGenerationError\n from pydantic import PydanticUndefinedAnnotation as PydanticUndefinedAnnotation\n from pydantic import ValidationError as ValidationError\n@@ -64,7 +64,6 @@ class ModelField:\n     field_info: FieldInfo\n     name: str\n     mode: Literal[\"validation\", \"serialization\"] = \"validation\"\n-    config: Union[ConfigDict, None] = None\n \n     @property\n     def alias(self) -> str:\n@@ -95,14 +94,8 @@ class ModelField:\n                 warnings.simplefilter(\n                     \"ignore\", category=UnsupportedFieldAttributeWarning\n                 )\n-            annotated_args = (\n-                self.field_info.annotation,\n-                *self.field_info.metadata,\n-                self.field_info,\n-            )\n             self._type_adapter: TypeAdapter[Any] = TypeAdapter(\n-                Annotated[annotated_args],\n-                config=self.config,\n+                Annotated[self.field_info.annotation, self.field_info]\n             )\n \n     def get_default(self) -> Any:\n@@ -419,21 +412,10 @@ def create_body_model(\n \n \n def get_model_fields(model: Type[BaseModel]) -> List[ModelField]:\n-    model_fields: List[ModelField] = []\n-    for name, field_info in model.model_fields.items():\n-        type_ = field_info.annotation\n-        if lenient_issubclass(type_, (BaseModel, dict)) or is_dataclass(type_):\n-            model_config = None\n-        else:\n-            model_config = model.model_config\n-        model_fields.append(\n-            ModelField(\n-                field_info=field_info,\n-                name=name,\n-                config=model_config,\n-            )\n-        )\n-    return model_fields\n+    return [\n+        ModelField(field_info=field_info, name=name)\n+        for name, field_info in model.model_fields.items()\n+    ]\n \n \n # Duplicate of several schema functions from Pydantic v1 to make them compatible with\n",
+  "ground_truth": [
+    {
+      "file": "fastapi/_compat/v2.py",
+      "start": 1,
+      "end": 7
+    },
+    {
+      "file": "fastapi/_compat/v2.py",
+      "start": 18,
+      "end": 24
+    },
+    {
+      "file": "fastapi/_compat/v2.py",
+      "start": 64,
+      "end": 69
+    },
+    {
+      "file": "fastapi/_compat/v2.py",
+      "start": 94,
+      "end": 101
+    },
+    {
+      "file": "fastapi/_compat/v2.py",
+      "start": 412,
+      "end": 421
+    }
+  ],
+  "pr_title": "Simplify ModelField's TypeAdapter construction",
+  "pr_description": "Drops the per-field `config` plumbing from `ModelField` and builds the `TypeAdapter` directly from the field's annotation and `FieldInfo`, removing the branching in `get_model_fields` that decided whether to pass the model's config through. Keeps the schema/validation path for arbitrary-typed fields more direct."
+}

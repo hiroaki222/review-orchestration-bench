@@ -1,0 +1,26 @@
+{
+  "id": "chi-f3105d4f53",
+  "repo": "chi",
+  "fix_sha": "f3105d4f534ddf08d2bd0cc351cec4053e765e6e",
+  "base_sha": "f3105d4f534ddf08d2bd0cc351cec4053e765e6e",
+  "language": "go",
+  "category": "error-handling",
+  "severity": "medium",
+  "post_cutoff": false,
+  "bug_summary": "Route()にnil関数を渡すと空のサブルータが黙って登録され、Mount()にnilハンドラを渡すと後でnil pointerによりクラッシュする問題を修正し、明示的にpanicして早期検知するよう変更",
+  "pr_diff": "diff --git a/mux.go b/mux.go\nindex 70c1521..52950e9 100644\n--- a/mux.go\n+++ b/mux.go\n@@ -261,11 +261,10 @@ func (mx *Mux) Group(fn func(r Router)) Router {\n // along the `pattern` as a subrouter. Effectively, this is a short-hand\n // call to Mount. See _examples/.\n func (mx *Mux) Route(pattern string, fn func(r Router)) Router {\n-\tif fn == nil {\n-\t\tpanic(fmt.Sprintf(\"chi: attempting to Route() a nil subrouter on '%s'\", pattern))\n-\t}\n \tsubRouter := NewRouter()\n-\tfn(subRouter)\n+\tif fn != nil {\n+\t\tfn(subRouter)\n+\t}\n \tmx.Mount(pattern, subRouter)\n \treturn subRouter\n }\n@@ -278,10 +277,6 @@ func (mx *Mux) Route(pattern string, fn func(r Router)) Router {\n // routing at the `handler`, which in most cases is another chi.Router. As a result,\n // if you define two Mount() routes on the exact same pattern the mount will panic.\n func (mx *Mux) Mount(pattern string, handler http.Handler) {\n-\tif handler == nil {\n-\t\tpanic(fmt.Sprintf(\"chi: attempting to Mount() a nil handler on '%s'\", pattern))\n-\t}\n-\n \t// Provide runtime safety for ensuring a pattern isn't mounted on an existing\n \t// routing pattern.\n \tif mx.tree.findPattern(pattern+\"*\") || mx.tree.findPattern(pattern+\"/*\") {\n",
+  "ground_truth": [
+    {
+      "file": "mux.go",
+      "start": 261,
+      "end": 270
+    },
+    {
+      "file": "mux.go",
+      "start": 277,
+      "end": 282
+    }
+  ],
+  "pr_title": "Allow nil Route callback and simplify Mount registration",
+  "pr_description": "Route no longer panics when given a nil configuration callback; it just skips invoking it and mounts an empty subrouter. Mount drops its own nil-handler panic as well, keeping validation centered on pattern conflicts rather than argument presence."
+}
