@@ -2,8 +2,8 @@
 
 \Vol{41}
 \No{1}
-\jtitle{トークン予算統制下における AI コードレビュー・\\オーケストレーション構成の欠陥検出性能比較}
-\etitle{Comparing AI Code Review Orchestration Configurations under Matched Token Budgets}
+\jtitle{同一コスト予算下における AI コードレビュー・\\オーケストレーション構成の欠陥検出性能比較}
+\etitle{Comparing AI Code Review Orchestration Configurations under Matched Cost Budgets}
 
 \author{%
  \name{高原}{大明}{Hiroaki Takahara}
@@ -13,7 +13,7 @@
 }
 
 \begin{keyword}
-LLM, code review, multi-agent systems, benchmark, token budget
+LLM, code review, multi-agent systems, benchmark, cost budget
 \end{keyword}
 
 \begin{summary}
@@ -36,7 +36,7 @@ postdates current model cutoffs; it serves as a leakage-free control
 group. We describe the benchmark design and an experimental plan that
 compares four orchestration configurations (single reviewer,
 aspect-parallel, adversarial critique, and multi-run aggregation)
-under matched token budgets, measuring detection rate, false-positive
+under matched cost budgets, measuring detection rate, false-positive
 rate, and cost efficiency.
 \end{summary}
 
@@ -52,7 +52,7 @@ rate, and cost efficiency.
 偽陽性コストが非対称な欠陥検出タスクであるコードレビューにおいて，この知見が成立するかは未検証である．
 
 本研究は次の 3 つの研究課題を設定する．
-\textbf{RQ1}: トークン予算を統制したとき，オーケストレーション構成の間に欠陥検出率・偽陽性率の差があるか．
+\textbf{RQ1}: コスト予算を統制したとき，オーケストレーション構成の間に欠陥検出率・偽陽性率の差があるか．
 \textbf{RQ2}: 観点別並列構成の優位性 (があるとすれば) は，同一予算の multi-run 集約 (純粋な計算量増加) と比較しても残るか．
 \textbf{RQ3}: 欠陥の種別によって有利な構成は異なるか．
 
@@ -137,18 +137,18 @@ LLM エージェントにより各候補の diff を読ませ，(a) 実挙動バ
 
 \section{実験計画}
 
-構築したベンチマークを用い，次の 4 構成を同一総トークン予算の下で比較する:
+構築したベンチマークを用い，次の 4 構成を同一コスト予算下で比較する:
 (i) \textbf{Single}: 単一レビュアが全観点を担当，
 (ii) \textbf{Parallel}: 観点別レビュアを並列に実行し集約，
 (iii) \textbf{Adversarial}: レビュアと，その指摘を反証する批評エージェント，
 (iv) \textbf{Multi-run}: 同一プロンプトを $N$ 回実行し集約 (計算量統制の対照群)．
 
-従属変数は欠陥検出率 (recall)・偽陽性率・F1 およびコスト効率 (検出 1 件あたりのトークン数・金額) とし，独立変数はレビュー構成 4 種 $\times$ モデル 2--3 種 $\times$ トークン予算 2--3 水準とする．
+従属変数は欠陥検出率 (recall)・偽陽性率・F1 およびコスト効率 (検出 1 件あたりの金額・トークン数) とし，独立変数はレビュー構成 4 種 $\times$ モデル 2--3 種 $\times$ コスト予算 2--3 水準とする．
 検出判定は「指摘が ground truth の変更箇所と位置・論点の両方で重なるか」を LLM judge で自動判定し，サンプルの人手検証で judge の信頼性を確認する．
 
 \section{おわりに}
 
-トークン予算統制下で AI コードレビューのオーケストレーション構成を比較するためのベンチマーク構築手法を提案し，4 言語 4 リポジトリから 85 件の実バグ由来課題を構築した．
+コスト予算統制下で AI コードレビューのオーケストレーション構成を比較するためのベンチマーク構築手法を提案し，4 言語 4 リポジトリから 85 件の実バグ由来課題を構築した．
 今後，パイロット実験として 4 構成 $\times$ 2 モデル $\times$ 2 予算水準の比較を実施し，RQ1--RQ3 に対する予備的知見を報告する予定である．
 
 \bibliography{refs}
