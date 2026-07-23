@@ -1,0 +1,157 @@
+\documentclass[shortpaper]{jsaiart}
+
+\Vol{41}
+\No{1}
+\jtitle{トークン予算統制下における AI コードレビュー・\\オーケストレーション構成の欠陥検出性能比較}
+\etitle{Comparing AI Code Review Orchestration Configurations under Matched Token Budgets}
+
+\author{%
+ \name{高原}{大明}{Hiroaki Takahara}
+ \affiliation{北陸先端科学技術大学院大学}%
+     {Japan Advanced Institute of Science and Technology}%
+     {}
+}
+
+\begin{keyword}
+LLM, code review, multi-agent systems, benchmark, token budget
+\end{keyword}
+
+\begin{summary}
+Researchers and commercial tool builders have proposed multi-agent
+orchestration configurations for LLM-based code review, including
+aspect-parallel reviewers, adversarial critics, and multi-run
+aggregation, yet no study has compared these configurations under
+matched computational budgets. Current evaluations cannot show whether
+the orchestration structure improves detection or whether the gains
+come from increased computation alone. We construct a defect-detection
+benchmark by re-injecting real bug-fix commits from four
+single-language OSS repositories (Python, TypeScript, Go, and Rust) as
+synthesized buggy pull requests. Our pipeline mines fix commits,
+filters them by diff size and file count, classifies them with LLM
+agents, re-verifies the classifications with an adversarial pass, and
+stratifies the final sample of 85 bugs by category and by
+knowledge-cutoff timing to control for training-data leakage. One
+target repository is an AI-developed codebase whose entire history
+postdates current model cutoffs; it serves as a leakage-free control
+group. We describe the benchmark design and an experimental plan that
+compares four orchestration configurations (single reviewer,
+aspect-parallel, adversarial critique, and multi-run aggregation)
+under matched token budgets, measuring detection rate, false-positive
+rate, and cost efficiency.
+\end{summary}
+
+\begin{document}
+\maketitle
+
+\section{はじめに}
+
+大規模言語モデル (LLM) によるコードレビューの自動化が研究・商用の両面で普及している．
+単一のレビュアで全観点を確認する構成に加え，観点別に並列化した複数レビュア，レビュアの指摘を反証する批評エージェント，同一プロンプトの複数回実行と集約など，オーケストレーション構成の提案が相次いでいる\cite{codeagent}．
+しかし，これらの構成の優位性を報告する評価の多くは計算量 (トークン消費) を統制しておらず，観測された性能差が構成の構造に由来するのか，単なる計算量増加に由来するのかを切り分けられない．
+一般推論ドメインでは，予算を揃えると multi-agent debate 等の優位が消失・逆転するとの報告が複数ある\cite{mad}．
+偽陽性コストが非対称な欠陥検出タスクであるコードレビューにおいて，この知見が成立するかは未検証である．
+
+本研究は次の 3 つの研究課題を設定する．
+\textbf{RQ1}: トークン予算を統制したとき，オーケストレーション構成の間に欠陥検出率・偽陽性率の差があるか．
+\textbf{RQ2}: 観点別並列構成の優位性 (があるとすれば) は，同一予算の multi-run 集約 (純粋な計算量増加) と比較しても残るか．
+\textbf{RQ3}: 欠陥の種別によって有利な構成は異なるか．
+
+本稿では，これらの検証に必要な，実 OSS バグを統制条件下で再注入したベンチマークの構築手法と結果，および実験計画を報告する．
+
+\section{関連研究}
+
+\textbf{Multi-agent コードレビュー．}
+役割分担型のレビューエージェント\cite{codeagent}をはじめ，multi-agent 構成による欠陥検出の提案は多い．
+一方，商用レビューエージェントの実証評価では，多数のツールで指摘のシグナル比が低くノイズ過多であることが報告されており，偽陽性コストを含めて評価する必要がある．
+
+\textbf{計算量統制下の multi-agent 評価．}
+一般推論タスクでは，multi-agent debate \cite{mad}や self-refinement \cite{reflexion}の性能向上が，同一計算量の単純な多数決やベストオブ N と比較すると消失するとの報告がある．
+コードレビュードメインでこの統制比較を行った研究は，我々の調査の範囲では存在しない．
+
+\textbf{欠陥ベンチマーク．}
+Defects4J \cite{defects4j}や SWE-bench \cite{swebench}など実バグ由来のベンチマークが広く使われているが，いずれも修正パッチ生成の評価が主目的であり，レビュー (差分に対する指摘) の評価を目的とした，計算予算を統制できる形式のベンチマークは整備されていない．
+また，これら既知ベンチマークは LLM の学習データに含まれる可能性が高く，暗記による性能の過大評価 (leakage) が指摘されている．
+
+\section{ベンチマーク構築}
+
+\subsection{設計方針}
+
+実 OSS の bug fix コミット $F$ を逆適用し，「バグを含む変更を提出する pull request」を合成する．
+基底状態を $F$ 適用後の正常コードとし，$F^{-1}$ をレビュー対象の差分として提示する．
+これにより (1) 全リポジトリ・全バグに一律の手続きが適用でき，(2) 正解 (ground truth) が fix の変更箇所として機械的に定まる．
+合成 PR であって実在した PR ではない点は本手法の限界であり，考察で議論する．
+
+\subsection{対象リポジトリ}
+
+\ref{tab:repos}の 4 リポジトリを対象とする．
+リポジトリ効果と言語効果を分離するため，各リポジトリが単一言語で構成されるものを選定し，言語 (Python / TypeScript / Go / Rust)・ドメイン (Web フレームワーク / スキーマ検証 / HTTP ルータ / データベースエンジン) を分散させた．
+また既存ベンチマーク (SWE-bench 等) との重複がないことを確認し，leakage リスクを下げた．
+
+pgrust は PostgreSQL の Rust 移植であり，全履歴が 2026 年 6 月以降，すなわち現行主要モデルの知識カットオフ後に作られた AI 支援開発リポジトリである．
+このため (1) 完全に leakage-free な統制群として機能し，(2) AI が書いたコードを AI がレビューするという実務シナリオを代表し，(3) PostgreSQL の回帰テスト群 (46,000 クエリ超) を欠陥実在性の客観的 oracle として利用できる．
+一方で単独作者・AI 支援というバグ分布の偏りは threat to validity として明記する．
+
+\begin{table}[tb]
+ \centering
+ \caption{対象リポジトリ}
+ \label{tab:repos}
+ \small
+ \begin{tabular}{lllll}
+  \hline
+  リポジトリ & 言語 & ドメイン & ライセンス \\
+  \hline
+  fastapi & Python & Web フレームワーク & MIT \\
+  valibot & TypeScript & スキーマ検証 & MIT \\
+  chi & Go & HTTP ルータ & MIT \\
+  pgrust & Rust & DB エンジン & AGPL-3.0 \\
+  \hline
+ \end{tabular}
+\end{table}
+
+\subsection{構築パイプライン}
+
+構築は 4 段階からなる．
+各段階の生成物 (候補一覧・分類判定・選定結果) はすべて JSON として公開リポジトリに保存し，第三者が選定過程を監査できるようにした．
+
+\textbf{(1) 抽出．}
+リポジトリごとの commit 規約に合わせた正規表現で bug fix 候補コミットを抽出した (計 1,544 件)．
+
+\textbf{(2) 機械フィルタ．}
+非テストコードの変更が 100 行以下かつ 5 ファイル以下，docs・typo・revert 等を除外する条件で 816 件に絞った．
+行数はテストコードを除いて数える (1 行の修正に大規模なテストが付随するケースを誤って除外しないため)．
+
+\textbf{(3) LLM 分類と懐疑的再検証．}
+LLM エージェントにより各候補の diff を読ませ，(a) 実挙動バグの修正か (機能追加・リファクタ・移植作業の補完等を除外)，(b) 逆適用が自然なレビュー課題になるか，(c) バグ種別，(d) 深刻度を判定した (201 件を分類)．
+分類エージェントはバッチ間で判定基準がぶれるため，判定が極端なバッチには反証する側に立たせるプロンプトの再検証エージェントを適用し，4 件の判定を覆した．
+この結果，使用可能なバグは 136 件となった．
+
+\textbf{(4) 層別サンプリング．}
+乱数を用いない決定的アルゴリズム (知識カットオフ後のコミットを優先し，残りをバグ種別のラウンドロビンで補充) により，85 件 (fastapi 25 / valibot 20 / chi 15 / pgrust 25) を選定した．
+内訳はカットオフ後 50 件・カットオフ前 35 件であり，種別は logic 34，type-safety 15，error-handling 10，security 8，concurrency 7，その他 11 である．
+
+\subsection{Leakage 統制}
+
+使用予定モデルの知識カットオフ以降のコミットを優先的に採用し，不足分をカットオフ前から補充した上で，前後の別を共変量として分析に組み込む．
+これにより暗記による検出の寄与を定量化できる．
+事前調査では，カットオフ後の fix コミットのみで必要数を確保できるリポジトリは pgrust のみであり (他 3 リポジトリは 4〜15 件)，時期混合と共変量統制は必須であった．
+
+\section{実験計画}
+
+構築したベンチマークを用い，次の 4 構成を同一総トークン予算の下で比較する:
+(i) \textbf{Single}: 単一レビュアが全観点を担当，
+(ii) \textbf{Parallel}: 観点別レビュアを並列に実行し集約，
+(iii) \textbf{Adversarial}: レビュアと，その指摘を反証する批評エージェント，
+(iv) \textbf{Multi-run}: 同一プロンプトを $N$ 回実行し集約 (計算量統制の対照群)．
+
+従属変数は欠陥検出率 (recall)・偽陽性率・F1 およびコスト効率 (検出 1 件あたりのトークン数・金額) とし，独立変数はレビュー構成 4 種 $\times$ モデル 2--3 種 $\times$ トークン予算 2--3 水準とする．
+検出判定は「指摘が ground truth の変更箇所と位置・論点の両方で重なるか」を LLM judge で自動判定し，サンプルの人手検証で judge の信頼性を確認する．
+
+\section{おわりに}
+
+トークン予算統制下で AI コードレビューのオーケストレーション構成を比較するためのベンチマーク構築手法を提案し，4 言語 4 リポジトリから 85 件の実バグ由来課題を構築した．
+今後，パイロット実験として 4 構成 $\times$ 2 モデル $\times$ 2 予算水準の比較を実施し，RQ1--RQ3 に対する予備的知見を報告する予定である．
+
+\bibliography{refs}
+\bibliographystyle{jsai}
+
+\end{document}
