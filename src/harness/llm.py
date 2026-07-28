@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from dotenv import load_dotenv
 
 from .ledger import Ledger
+from .usage import _normalize_anthropic, _normalize_gemini, _normalize_openai
 
 load_dotenv()
 
@@ -27,28 +28,6 @@ class ChatResult:
     stop_reason: str
 
 
-def _normalize_anthropic(usage) -> dict:
-    return {
-        "input_tokens": usage.input_tokens,
-        "output_tokens": usage.output_tokens,
-        "cache_read_tokens": getattr(usage, "cache_read_input_tokens", 0) or 0,
-        "cache_write_tokens": getattr(usage, "cache_creation_input_tokens", 0) or 0,
-    }
-
-
-def _normalize_openai(usage) -> dict:
-    cached = 0
-    details = getattr(usage, "prompt_tokens_details", None)
-    if details is not None:
-        cached = getattr(details, "cached_tokens", 0) or 0
-    return {
-        "input_tokens": usage.prompt_tokens - cached,
-        "output_tokens": usage.completion_tokens,
-        "cache_read_tokens": cached,
-        "cache_write_tokens": 0,
-    }
-
-
 class Client:
     def __init__(self, ledger: Ledger, run_id: str, budget_usd: float | None = None):
         self.ledger = ledger
@@ -56,6 +35,7 @@ class Client:
         self.budget_usd = budget_usd
         self._anthropic = None
         self._openai = None
+        self._google = None
 
     def _check_budget(self):
         if self.budget_usd is not None:
@@ -92,6 +72,23 @@ class Client:
             usage_raw = resp.usage.model_dump()
             usage = _normalize_openai(resp.usage)
             stop = resp.choices[0].finish_reason
+        elif provider == "google":
+            if self._google is None:
+                from google import genai
+                self._google = genai.Client(api_key=os.environ["GOOGLE_API_KEY_EXPERIMENT"])
+            from google.genai import types as gt
+            resp = self._google.models.generate_content(
+                model=model,
+                contents=user,
+                config=gt.GenerateContentConfig(
+                    system_instruction=system,
+                    max_output_tokens=max_tokens,
+                ),
+            )
+            text = resp.text or ""
+            usage_raw = resp.usage_metadata.model_dump()
+            usage = _normalize_gemini(resp.usage_metadata)
+            stop = resp.candidates[0].finish_reason.name if resp.candidates else "unknown"
         else:
             raise ValueError(f"unknown provider: {provider}")
 
