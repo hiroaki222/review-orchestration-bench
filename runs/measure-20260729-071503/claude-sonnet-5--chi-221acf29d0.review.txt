@@ -1,0 +1,7 @@
+## Finding
+
+**File:** `context.go`, lines 99-103 (function `RouteContext`)
+
+**Severity:** High
+
+**Explanation:** This change replaces a safe comma-ok type assertion with a direct type assertion, converting a graceful nil-return into a runtime panic whenever `RouteCtxKey` is absent from the context or holds an unexpected type. The PR's justification—that `RouteContext()` "always receives a `*Context` value that chi's own routing middleware stored"—is not actually guaranteed by the type system or by all call sites: `RouteContext` is a public, exported API function, and callers can (and do) invoke it with contexts that were never routed through chi (e.g., in unit tests constructing a bare `context.Background()`, in middleware that runs before the router mounts `RouteCtxKey`, or in code paths where request handling failed before context setup). Previously such misuse safely returned `nil`, which callers could check; now it panics, turning a recoverable programming error into a crash. This is a breaking change to the public contract of `RouteContext` and should not be made without a major version bump and clear documentation, if at all.

@@ -1,0 +1,170 @@
+{
+  "run_id": "measure-20260729-071503",
+  "items": 3,
+  "per_model": {
+    "claude-haiku-4-5": {
+      "total_usd": 0.003585,
+      "mean_usd": 0.001195,
+      "mean_in": 330.0,
+      "mean_out": 173.0,
+      "results": [
+        {
+          "item": "chi-05f1ef7bb5",
+          "usage": {
+            "input_tokens": 327,
+            "output_tokens": 167,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "cost_usd": 0.001162,
+          "latency_ms": null
+        },
+        {
+          "item": "chi-1c2d011f59",
+          "usage": {
+            "input_tokens": 331,
+            "output_tokens": 164,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "cost_usd": 0.0011510000000000001,
+          "latency_ms": null
+        },
+        {
+          "item": "chi-221acf29d0",
+          "usage": {
+            "input_tokens": 332,
+            "output_tokens": 188,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "cost_usd": 0.001272,
+          "latency_ms": null
+        }
+      ]
+    },
+    "claude-sonnet-5": {
+      "total_usd": 0.022212,
+      "mean_usd": 0.007404,
+      "mean_in": 435.3333333333333,
+      "mean_out": 653.3333333333334,
+      "results": [
+        {
+          "item": "chi-05f1ef7bb5",
+          "usage": {
+            "input_tokens": 438,
+            "output_tokens": 573,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "cost_usd": 0.006606,
+          "latency_ms": null
+        },
+        {
+          "item": "chi-1c2d011f59",
+          "usage": {
+            "input_tokens": 432,
+            "output_tokens": 784,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "cost_usd": 0.008704,
+          "latency_ms": null
+        },
+        {
+          "item": "chi-221acf29d0",
+          "usage": {
+            "input_tokens": 436,
+            "output_tokens": 603,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "cost_usd": 0.006902,
+          "latency_ms": null
+        }
+      ]
+    },
+    "gpt-5-mini": {
+      "total_usd": 0.00574775,
+      "mean_usd": 0.0019159166666666667,
+      "mean_in": 279.6666666666667,
+      "mean_out": 923.0,
+      "results": [
+        {
+          "item": "chi-05f1ef7bb5",
+          "usage": {
+            "input_tokens": 285,
+            "output_tokens": 1175,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "cost_usd": 0.0024212500000000002,
+          "latency_ms": null
+        },
+        {
+          "item": "chi-1c2d011f59",
+          "usage": {
+            "input_tokens": 276,
+            "output_tokens": 905,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "cost_usd": 0.001879,
+          "latency_ms": null
+        },
+        {
+          "item": "chi-221acf29d0",
+          "usage": {
+            "input_tokens": 278,
+            "output_tokens": 689,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "cost_usd": 0.0014475,
+          "latency_ms": null
+        }
+      ]
+    },
+    "gpt-5": {
+      "total_usd": 0.06542875000000001,
+      "mean_usd": 0.021809583333333337,
+      "mean_in": 279.6666666666667,
+      "mean_out": 2146.0,
+      "results": [
+        {
+          "item": "chi-05f1ef7bb5",
+          "usage": {
+            "input_tokens": 285,
+            "output_tokens": 2004,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "cost_usd": 0.020396249999999998,
+          "latency_ms": null
+        },
+        {
+          "item": "chi-1c2d011f59",
+          "usage": {
+            "input_tokens": 276,
+            "output_tokens": 2555,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "cost_usd": 0.025895,
+          "latency_ms": null
+        },
+        {
+          "item": "chi-221acf29d0",
+          "usage": {
+            "input_tokens": 278,
+            "output_tokens": 1879,
+            "cache_read_tokens": 0,
+            "cache_write_tokens": 0
+          },
+          "cost_usd": 0.0191375,
+          "latency_ms": null
+        }
+      ]
+    }
+  }
+}

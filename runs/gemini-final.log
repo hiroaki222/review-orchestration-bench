@@ -1,0 +1,6 @@
+run=sanity-20260729-072233  models=1  configs=1  items=30  combos=30  already_done=1438  remaining=-1408
+[   1/-1408] gemini-3.1-pro-preview multi        pgrust-e447385f06      passes= 5 tp=1 fp=0 fn=0 $0.1397 ( 90.9s) cum=$80.085
+[   2/-1408] gemini-3.1-pro-preview multi        pgrust-29576c75c0      passes= 5 tp=1 fp=0 fn=1 $0.1754 (113.0s) cum=$80.261
+
+done in 3.4 min. total ledger spend: $80.2605
+results: /home/research/workspace/review-orchestration-bench/data/experiments/v0/sanity-20260729-072233.results.jsonl

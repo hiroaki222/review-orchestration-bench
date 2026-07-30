@@ -1,0 +1,7 @@
+## Finding
+
+**File:** `middleware/url_format.go`, lines 63–68 (context of `rctx.RoutePath = path[:idx]`)
+
+**Severity:** high
+
+**Explanation:** The removed check guarded against `rctx` being `nil`. Earlier in this same function, `rctx` is obtained via `chi.RouteContext(r.Context())` and is explicitly allowed to be `nil` — the existing code falls back to `r.URL.Path` when `rctx` is `nil` (this is exactly why the original nil check existed). The PR assumes a routing context is "always populated," but that assumption doesn't hold whenever `URLFormat` is invoked without a chi router context in `r.Context()` (e.g., middleware used standalone, in tests with a raw `httptest` request, or mounted ahead of `chi.RouteContext` middleware). In those cases `rctx` is `nil`, and this change turns a previously safe no-op into a nil-pointer dereference panic when the format-stripping branch is entered. This is a functional regression, not just a code-cleanliness change, and should be reverted or replaced with a proper guard that still permits path stripping without requiring a non-nil `rctx`.

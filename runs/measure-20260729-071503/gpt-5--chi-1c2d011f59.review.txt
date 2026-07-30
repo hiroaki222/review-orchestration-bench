@@ -1,0 +1,3 @@
+- file and line range: middleware/url_format.go:63-69
+  severity: high
+  explanation: Removing the nil check and unconditionally assigning rctx.RoutePath will panic when rctx is nil. URLFormat can be used outside a chi.Mux (e.g., wrapping a standard net/http mux or placed “above” the chi router), where chi.RouteContext(r.Context()) returns nil. The previous guard made this safe in those scenarios; this change introduces a runtime nil pointer dereference and a backward-incompatible behavior for users relying on that flexibility.

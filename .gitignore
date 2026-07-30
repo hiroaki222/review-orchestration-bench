@@ -5,27 +5,28 @@ drafts/
 repos/*
 !repos/fetch.sh
 
-# LaTeX build artifacts
-*.aux
-*.log
-*.nav
-*.out
-*.snm
-*.toc
-*.synctex.gz
-*.fls
-*.fdb_latexmk
-*.dvi
-*.bbl
-*.blg
+# LaTeX build artifacts (scoped to docs/paper/ to avoid catching run logs)
+docs/paper/**/*.aux
+docs/paper/**/*.log
+docs/paper/**/*.nav
+docs/paper/**/*.out
+docs/paper/**/*.snm
+docs/paper/**/*.toc
+docs/paper/**/*.synctex.gz
+docs/paper/**/*.fls
+docs/paper/**/*.fdb_latexmk
+docs/paper/**/*.dvi
+docs/paper/**/*.bbl
+docs/paper/**/*.blg
 
 # JSAI style files (redistribution not permitted by JSAI)
 docs/paper/jsai_5_0_1_template/
+docs/paper/jsai_sig-1_0_0/
+
+# author contact info (kept out of source, injected from PAPER_EMAIL env at build)
+docs/paper/**/email.tex
 
 # secrets / local env
 .env
-
-# experiment raw outputs (committed selectively per run)
-runs/
 
 __pycache__/

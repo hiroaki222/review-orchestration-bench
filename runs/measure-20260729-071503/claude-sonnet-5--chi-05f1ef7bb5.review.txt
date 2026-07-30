@@ -1,0 +1,5 @@
+**Finding:**
+
+- **File/lines:** `middleware/route_headers.go`, lines 79–83 (the `if len(hr) == 0 { ... }` block)
+- **Severity:** High
+- **Explanation:** Removing the `return` causes execution to fall through into the subsequent route-matching logic even when `hr` is empty. Since `hr` has zero routes, the matching loop presumably does nothing, but any fallback logic afterward (e.g., a default call to `next.ServeHTTP` after failing to match a route) would now execute a second time, resulting in `next.ServeHTTP` being invoked twice for the empty-router case. Calling a handler twice can cause duplicate writes to the `http.ResponseWriter`, "superfluous response.WriteHeader" warnings, corrupted responses, or panics depending on the downstream handler's idempotency. The PR's premise—that removing the `return` is a safe simplification because it was "the last statement executed anyway"—is incorrect unless the code after the `if` block is guaranteed to be a no-op when `hr` is empty, which is not evident from the diff context.

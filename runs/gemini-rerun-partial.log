@@ -1,0 +1,34 @@
+run=sanity-20260729-072233  models=1  configs=1  items=30  combos=30  already_done=1410  remaining=-1380
+[   1/-1380] gemini-3.1-pro-preview multi        fastapi-7fe315c21a     passes= 4 tp=1 fp=1 fn=2 $0.2549 (164.9s) cum=$75.082
+[   2/-1380] gemini-3.1-pro-preview multi        fastapi-eb75fd078e     passes= 4 tp=1 fp=1 fn=0 $0.2753 (192.4s) cum=$75.357
+[   3/-1380] gemini-3.1-pro-preview multi        fastapi-d8aad201eb     passes= 5 tp=0 fp=0 fn=1 $0.2085 (158.9s) cum=$75.566
+[   4/-1380] gemini-3.1-pro-preview multi        fastapi-8a9258b169     passes= 4 tp=1 fp=0 fn=3 $0.3620 (273.4s) cum=$75.928
+[   5/-1380] gemini-3.1-pro-preview multi        fastapi-e8b98d2187     passes= 5 tp=1 fp=0 fn=2 $0.1324 ( 90.6s) cum=$76.060
+[   6/-1380] gemini-3.1-pro-preview multi        fastapi-ed2512a5ec     passes= 5 tp=0 fp=0 fn=2 $0.2918 (201.2s) cum=$76.352
+[   7/-1380] gemini-3.1-pro-preview multi        fastapi-c5fd75a321     passes= 5 tp=1 fp=0 fn=1 $0.1701 (127.3s) cum=$76.522
+[   8/-1380] gemini-3.1-pro-preview multi        fastapi-09f5941f0e     passes= 5 tp=1 fp=0 fn=0 $0.0913 ( 71.8s) cum=$76.613
+[   9/-1380] gemini-3.1-pro-preview multi        fastapi-1d96b3e3f1     passes= 5 tp=1 fp=0 fn=0 $0.0921 ( 80.6s) cum=$76.705
+[  10/-1380] gemini-3.1-pro-preview multi        valibot-1bd01c3046     passes= 5 tp=2 fp=0 fn=0 $0.2294 (168.9s) cum=$76.935
+[  11/-1380] gemini-3.1-pro-preview multi        valibot-27ecfefc2f     passes= 5 tp=2 fp=0 fn=1 $0.1036 ( 77.0s) cum=$77.038
+[  12/-1380] gemini-3.1-pro-preview multi        valibot-b16fdf9ba6     passes= 5 tp=2 fp=0 fn=1 $0.1977 (131.6s) cum=$77.236
+[  13/-1380] gemini-3.1-pro-preview multi        valibot-17cd7ed5b8     passes= 5 tp=0 fp=0 fn=1 $0.0739 ( 63.5s) cum=$77.310
+[  14/-1380] gemini-3.1-pro-preview multi        valibot-0634c1b704     passes= 3 tp=1 fp=0 fn=2 $0.3920 (355.2s) cum=$77.702
+[  15/-1380] gemini-3.1-pro-preview multi        valibot-0cb97f72b3     passes= 5 tp=1 fp=0 fn=0 $0.0764 ( 57.0s) cum=$77.778
+[  16/-1380] gemini-3.1-pro-preview multi        valibot-ef4166c04e     passes= 5 tp=3 fp=0 fn=5 $0.1667 (112.1s) cum=$77.945
+[  17/-1380] gemini-3.1-pro-preview multi        chi-878fe71fc9         passes= 5 tp=1 fp=0 fn=2 $0.0848 ( 64.7s) cum=$78.030
+[  18/-1380] gemini-3.1-pro-preview multi        chi-818fdcfc47         passes= 5 tp=1 fp=0 fn=0 $0.1507 (122.3s) cum=$78.181
+[  19/-1380] gemini-3.1-pro-preview multi        chi-4ef87eaf2c         passes= 5 tp=1 fp=0 fn=0 $0.0844 ( 68.2s) cum=$78.265
+[  20/-1380] gemini-3.1-pro-preview multi        chi-05f1ef7bb5         passes= 5 tp=1 fp=0 fn=0 $0.0966 ( 79.2s) cum=$78.362
+[  21/-1380] gemini-3.1-pro-preview multi        chi-b750c805b4         passes= 5 tp=1 fp=0 fn=0 $0.0757 ( 65.0s) cum=$78.437
+[  22/-1380] gemini-3.1-pro-preview multi        pgrust-cb60ac482a      passes= 5 tp=0 fp=0 fn=1 $0.0810 ( 59.3s) cum=$78.518
+[  23/-1380] gemini-3.1-pro-preview multi        pgrust-da0531b249      passes= 5 tp=2 fp=0 fn=0 $0.1982 (120.0s) cum=$78.717
+[  24/-1380] gemini-3.1-pro-preview multi        pgrust-4e4126c1b1      passes= 3 tp=0 fp=0 fn=5 $0.3036 (206.1s) cum=$79.020
+[  25/-1380] gemini-3.1-pro-preview multi        pgrust-b09c0f9aa6      passes= 5 tp=1 fp=0 fn=5 $0.1773 (114.2s) cum=$79.198
+[  26/-1380] gemini-3.1-pro-preview multi        pgrust-c76dce36c8      passes= 5 tp=1 fp=0 fn=0 $0.1430 (101.3s) cum=$79.341
+[  27/-1380] gemini-3.1-pro-preview multi        pgrust-931761fd34      passes= 4 tp=2 fp=3 fn=0 $0.3158 (202.0s) cum=$79.656
+[  28/-1380] gemini-3.1-pro-preview multi        pgrust-1b8b1896fc      passes= 5 tp=1 fp=0 fn=1 $0.2891 (211.3s) cum=$79.945
+ERR gemini-3.1-pro-preview multi        pgrust-e447385f06      ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}
+ERR gemini-3.1-pro-preview multi        pgrust-29576c75c0      ClientError: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}
+
+done in 62.4 min. total ledger spend: $79.9454
+results: /home/research/workspace/review-orchestration-bench/data/experiments/v0/sanity-20260729-072233.results.jsonl
