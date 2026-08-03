@@ -1,0 +1,14 @@
+\begin{tabular}{@{}lllr@{}}
+\toprule
+バグ種別 & 最良 (モデル / 構成) & $F_2$ & N \\
+\midrule
+logic & GPT-5 mini / Multi-run & 0.779 & 15 \\
+type-safety & Haiku 4.5 / Single & 1.000 & 2$^{\dagger}$ \\
+error-handling & Haiku 4.5 / Multi-run & 1.000 & 1$^{\dagger}$ \\
+concurrency & Haiku 4.5 / Adversarial & 0.667 & 3 \\
+api-misuse & GPT-5 mini / Multi-run & 1.000 & 4 \\
+security & GPT-5 mini / Adversarial & 0.833 & 1$^{\dagger}$ \\
+resource-leak & GPT-5 mini / Multi-run & 0.897 & 2$^{\dagger}$ \\
+other & GPT-5 mini / Adversarial & 1.000 & 2$^{\dagger}$ \\
+\bottomrule
+\end{tabular}

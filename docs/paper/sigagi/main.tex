@@ -1,75 +1,99 @@
-\documentclass[shortpaper]{jsaiart}
+\documentclass[a4j]{jarticle}
 
-\Vol{41}
-\No{1}
-\jtitle{同一コスト予算下における AI コードレビュー・\\オーケストレーション構成の欠陥検出性能比較}
-\etitle{Comparing AI Code Review Orchestration Configurations under Matched Cost Budgets}
+\usepackage{jsaisig}
+\usepackage[dvipdfmx]{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage[dvipdfmx,hidelinks]{hyperref}
+\usepackage[absolute,overlay]{textpos}
+\setlength{\TPHorizModule}{1mm}
+\setlength{\TPVertModule}{1mm}
 
-\author{%
- \name{高原}{大明}{Hiroaki Takahara}
- \affiliation{北陸先端科学技術大学院大学}%
-     {Japan Advanced Institute of Science and Technology}%
-     {}
-}
+\input{email}
+\input{tables/macros}
 
-\begin{keyword}
-LLM, code review, multi-agent systems, benchmark, cost budget
-\end{keyword}
-
-\begin{summary}
-Researchers and commercial tool builders have proposed multi-agent
-orchestration configurations for LLM-based code review, including
-aspect-parallel reviewers, adversarial critics, and multi-run
-aggregation, yet no study has compared these configurations under
-matched computational budgets. Current evaluations cannot show whether
-the orchestration structure improves detection or whether the gains
-come from increased computation alone. We construct a defect-detection
-benchmark by re-injecting real bug-fix commits from four
-single-language OSS repositories (Python, TypeScript, Go, and Rust) as
-synthesized buggy pull requests. Our pipeline mines fix commits,
-filters them by diff size and file count, classifies them with LLM
-agents, re-verifies the classifications with an adversarial pass, and
-stratifies the final sample of 85 bugs by category and by
-knowledge-cutoff timing to control for training-data leakage. One
-target repository is an AI-developed codebase whose entire history
-postdates current model cutoffs; it serves as a leakage-free control
-group. We describe the benchmark design and an experimental plan that
-compares four orchestration configurations (single reviewer,
-aspect-parallel, adversarial critique, and multi-run aggregation)
-under matched cost budgets, measuring detection rate, false-positive
-rate, and cost efficiency.
-\end{summary}
+\setlength{\intextsep}{6pt}
+\setlength{\textfloatsep}{8pt}
+\setlength{\floatsep}{6pt}
 
 \begin{document}
+
+\title{同一予算下における AI コードレビュー・オーケストレーション構成の欠陥検出性能比較}
+
+\etitle{Comparing AI Code Review Orchestration Configurations under Matched Cost Budgets}
+
+\author{高原 大明\afil{1}%
+\thanks{連絡先: 北陸先端科学技術大学院大学 \newline%
+E-mail: \authorEmail}\\
+Hiroaki Takahara\afil{1}}
+
+\affiliation{%
+\afil{1} 北陸先端科学技術大学院大学\\
+\afil{1} Japan Advanced Institute of Science and Technology}
+
+\abstract{%
+Aspect-parallel review, adversarial critique, and multi-run
+aggregation extend LLM code review beyond single-reviewer setups.
+Prior evaluations do not control compute budget, so we cannot tell
+whether these constructions add anything the raw compute would not.
+We build a defect-detection benchmark by inverting real bug-fix
+commits from four single-language open-source (OSS) repositories
+(Python, TypeScript, Go, Rust). One repository postdates current
+model cutoffs, giving a leakage-free control. Across \nItems{} items,
+\nModels{} models, \nVendors{} vendors, and 4 orchestrations, we
+rank by $F_2$ (Recall weighted 4$\times$ over Precision to match
+the asymmetric cost of missed defects). \dominatedCount{} of
+\nModels{} models (none of their 4 configurations enters the front)
+fall off the cost-$F_2$ Pareto front. Multi-run aggregation
+wins in \modelMultiWins{} of \nModels{} models and every one of
+the four repositories. Under matched per-item budget, cheap models
+running Multi-run beat premium single-shot selection above
+\$0.01/item; returns flatten above \$0.05.
+}
+
 \maketitle
+\thispagestyle{empty}
+\begin{textblock*}{60mm}(140mm,15mm)
+\raggedleft\small
+人工知能学会第二種研究会資料\\
+汎用人工知能研究会\\
+SIG-AGI-033-07
+\end{textblock*}
 
 \section{はじめに}
 
 大規模言語モデル (LLM) によるコードレビューの自動化が研究・商用の両面で普及している．
-単一のレビュアで全観点を確認する構成に加え，観点別に並列化した複数レビュア，レビュアの指摘を反証する批評エージェント，同一プロンプトの複数回実行と集約など，オーケストレーション構成の提案が相次いでいる\cite{codeagent}．
-しかし，これらの構成の優位性を報告する評価の多くは計算量 (トークン消費) を統制しておらず，観測された性能差が構成の構造に由来するのか，単なる計算量増加に由来するのかを切り分けられない．
+LLM を用いたコードレビューの手法として，単一レビュアで全観点を確認する構成が広く使われてきた．
+近年はさらに，観点別並列 (Parallel), 反証エージェント (Adversarial), 多数決集約 (Multi-run) などオーケストレーション構成の提案が続いている\cite{codeagent}．
+しかし，これらの構成の優位性を報告する評価の多くは計算量 (トークン消費) を統制しておらず，観測された性能差が構成の構造に由来するのか，単なる計算量増加に由来するのかは切り分けられない．
 一般推論ドメインでは，予算を揃えると multi-agent debate 等の優位が消失・逆転するとの報告が複数ある\cite{mad}．
 偽陽性コストが非対称な欠陥検出タスクであるコードレビューにおいて，この知見が成立するかは未検証である．
 
 本研究は次の 3 つの研究課題を設定する．
-\textbf{RQ1}: コスト予算を統制したとき，オーケストレーション構成の間に欠陥検出率・偽陽性率の差があるか．
-\textbf{RQ2}: 観点別並列構成の優位性 (があるとすれば) は，同一予算の multi-run 集約 (純粋な計算量増加) と比較しても残るか．
-\textbf{RQ3}: 欠陥の種別によって有利な構成は異なるか．
+\begin{itemize}
+\setlength{\itemsep}{2pt}
+\item \textbf{RQ1}: 予算を統制したとき，オーケストレーション構成の間に欠陥検出率・偽陽性率の差があるか．
+\item \textbf{RQ2}: 観点別並列構成の優位性 (があるとすれば) は，同一予算の Multi-run 集約 (純粋な計算量増加) と比較しても残るか．
+\item \textbf{RQ3}: 欠陥の種別によって有利な構成は異なるか．
+\end{itemize}
 
-本稿では，これらの検証に必要な，実 OSS バグを統制条件下で再注入したベンチマークの構築手法と結果，および実験計画を報告する．
+本稿では，これらの検証に必要なベンチマークを実オープンソースソフトウェア (以下 OSS) の bug fix コミット逆適用により構築し，\nItems{} 件 (\nModels{} モデル $\times$ \nConfigs{} 構成) で得た (コスト, $F_2$) の Pareto 前線を報告する．
 
 \section{関連研究}
 
 \textbf{Multi-agent コードレビュー．}
-役割分担型のレビューエージェント\cite{codeagent}をはじめ，multi-agent 構成による欠陥検出の提案は多い．
+役割分担型のレビューエージェント\cite{codeagent}をはじめ，LLM multi-agent 構成による欠陥検出の提案は多く, 分野の整理は近年の survey\cite{guo2024largelanguagemodelbased}が詳しい．
+これら既存研究は個別構成の効果を報告するが, 同一予算下で複数構成を横断比較したものは調査の範囲では存在しない．
 一方，商用レビューエージェントの実証評価では，多数のツールで指摘のシグナル比が低くノイズ過多であることが報告されており，偽陽性コストを含めて評価する必要がある．
 
 \textbf{計算量統制下の multi-agent 評価．}
-一般推論タスクでは，multi-agent debate \cite{mad}や self-refinement \cite{reflexion}の性能向上が，同一計算量の単純な多数決やベストオブ N と比較すると消失するとの報告がある．
-コードレビュードメインでこの統制比較を行った研究は，我々の調査の範囲では存在しない．
+一般推論タスクでは，multi-agent debate\cite{mad}や self-refinement\cite{reflexion}の性能向上が，同一計算量の単純な多数決や複数候補からの最良選択と比較すると消失するとの報告がある．
+Wang らは強い prompt を与えた single-agent が multi-agent 議論のほぼ最良と同等となることを実証し, multi-agent 優位の境界を再考している\cite{wang2024rethinkingboundsllmreasoning}．
+コードレビュードメインでこの統制比較を行った研究は，調査の範囲では存在しない．
 
 \textbf{欠陥ベンチマーク．}
-Defects4J \cite{defects4j}や SWE-bench \cite{swebench}など実バグ由来のベンチマークが広く使われているが，いずれも修正パッチ生成の評価が主目的であり，レビュー (差分に対する指摘) の評価を目的とした，計算予算を統制できる形式のベンチマークは整備されていない．
+Defects4J\cite{defects4j}や SWE-bench\cite{swebench}など実バグ由来のベンチマークが広く使われているが，いずれも修正パッチ生成の評価が主目的であり，レビュー (差分に対する指摘) の評価を目的とした，計算予算を統制できる形式のベンチマークは整備されていない (SE における LLM 応用の広範な整理は\cite{zhang2024surveylargelanguagemodels}を参照)．
 また，これら既知ベンチマークは LLM の学習データに含まれる可能性が高く，暗記による性能の過大評価 (leakage) が指摘されている．
 
 \section{ベンチマーク構築}
@@ -78,40 +102,51 @@ Defects4J \cite{defects4j}や SWE-bench \cite{swebench}など実バグ由来の�
 
 実 OSS の bug fix コミット $F$ を逆適用し，「バグを含む変更を提出する pull request」を合成する．
 基底状態を $F$ 適用後の正常コードとし，$F^{-1}$ をレビュー対象の差分として提示する．
-これにより (1) 全リポジトリ・全バグに一律の手続きが適用でき，(2) 正解 (ground truth) が fix の変更箇所として機械的に定まる．
-合成 PR であって実在した PR ではない点は本手法の限界であり，考察で議論する．
+これにより全リポジトリ・全バグに一律の手続きを適用でき, 正解 (ground truth) も fix の変更箇所として機械的に定まる．
+合成 PR であって実在した PR ではない点は本手法の限界であり，\ref{sec:limitations} 節で議論する．
 
 \subsection{対象リポジトリ}
 
-\ref{tab:repos}の 4 リポジトリを対象とする．
+表\ref{tab:repos}の 4 リポジトリを対象とする．
 リポジトリ効果と言語効果を分離するため，各リポジトリが単一言語で構成されるものを選定し，言語 (Python / TypeScript / Go / Rust)・ドメイン (Web フレームワーク / スキーマ検証 / HTTP ルータ / データベースエンジン) を分散させた．
 また既存ベンチマーク (SWE-bench 等) との重複がないことを確認し，leakage リスクを下げた．
 
 pgrust は PostgreSQL の Rust 移植であり，全履歴が 2026 年 6 月以降，すなわち現行主要モデルの知識カットオフ後に作られた AI 支援開発リポジトリである．
-このため (1) 完全に leakage-free な統制群として機能し，(2) AI が書いたコードを AI がレビューするという実務シナリオを代表し，(3) PostgreSQL の回帰テスト群 (46,000 クエリ超) を欠陥実在性の客観的 oracle として利用できる．
-一方で単独作者・AI 支援というバグ分布の偏りは threat to validity として明記する．
+このため leakage を完全排除できる唯一の統制群として機能し, AI が書いたコードを AI がレビューする実務シナリオも代表する．
+さらに PostgreSQL の回帰テスト群 (46,000 クエリ超) を欠陥実在性の客観的 oracle として利用できる．
+一方で単独作者・AI 支援によるバグ分布の偏りは \ref{sec:limitations} 節で明記する．
 
-\begin{table}[tb]
+\begin{table}[!t]
  \centering
- \caption{対象リポジトリ}
+ \caption{対象リポジトリ．全 SHA は下記脚注に固定．}
  \label{tab:repos}
- \small
- \begin{tabular}{lllll}
-  \hline
+ \footnotesize
+ \setlength{\tabcolsep}{4pt}
+ \begin{tabular}{llll}
+  \toprule
   リポジトリ & 言語 & ドメイン & ライセンス \\
-  \hline
-  fastapi & Python & Web フレームワーク & MIT \\
-  valibot & TypeScript & スキーマ検証 & MIT \\
+  \midrule
+  fastapi & Python & Web FW & MIT \\
+  valibot & TypeScript & Schema検証 & MIT \\
   chi & Go & HTTP ルータ & MIT \\
   pgrust & Rust & DB エンジン & AGPL-3.0 \\
-  \hline
+  \bottomrule
  \end{tabular}
 \end{table}
+
+\footnotetext[1]{%
+\scriptsize
+fastapi: \url{https://github.com/fastapi/fastapi} commit \href{https://github.com/fastapi/fastapi/commit/afe4112}{\texttt{afe4112}};\quad
+valibot: \url{https://github.com/open-circle/valibot} commit \href{https://github.com/open-circle/valibot/commit/32247b3}{\texttt{32247b3}};\quad
+chi: \url{https://github.com/go-chi/chi} commit \href{https://github.com/go-chi/chi/commit/8b258c7}{\texttt{8b258c7}};\quad
+pgrust: \url{https://github.com/malisper/pgrust} commit \href{https://github.com/malisper/pgrust/commit/c9aecbd}{\texttt{c9aecbd}}．%
+}
+\addtocounter{footnote}{1}
 
 \subsection{構築パイプライン}
 
 構築は 4 段階からなる．
-各段階の生成物 (候補一覧・分類判定・選定結果) はすべて JSON として公開リポジトリに保存し，第三者が選定過程を監査できるようにした．
+各段階の生成物は JSON としてリポジトリ\footnote{\url{https://github.com/hiroaki222/review-orchestration-bench}}で公開している．
 
 \textbf{(1) 抽出．}
 リポジトリごとの commit 規約に合わせた正規表現で bug fix 候補コミットを抽出した (計 1,544 件)．
@@ -121,37 +156,161 @@ pgrust は PostgreSQL の Rust 移植であり，全履歴が 2026 年 6 月以�
 行数はテストコードを除いて数える (1 行の修正に大規模なテストが付随するケースを誤って除外しないため)．
 
 \textbf{(3) LLM 分類と懐疑的再検証．}
-LLM エージェントにより各候補の diff を読ませ，(a) 実挙動バグの修正か (機能追加・リファクタ・移植作業の補完等を除外)，(b) 逆適用が自然なレビュー課題になるか，(c) バグ種別，(d) 深刻度を判定した (201 件を分類)．
-分類エージェントはバッチ間で判定基準がぶれるため，判定が極端なバッチには反証する側に立たせるプロンプトの再検証エージェントを適用し，4 件の判定を覆した．
-この結果，使用可能なバグは 136 件となった．
+API コスト削減のため 816 件全数投入は避け, post-cutoff 全数と目標未達リポジトリの pre-cutoff 補充を反復投入して累計 201 件を分類した．
+LLM エージェントに各候補の diff を読ませ, (a) 実挙動バグの修正か (機能追加・リファクタ・移植作業の補完等を除外), (b) 逆適用が自然なレビュー課題になるか, (c) バグ種別, (d) 深刻度を判定した．
+バッチ間で LLM の判定基準は一貫せず，判定が極端なバッチには反証プロンプトの再検証エージェントを適用し, 4 件の判定を反転させた．
+最終的に 201 件中 135 件が injectable (真のバグ修正かつ逆適用が自然) と判定された (目標 85 に対し margin $\sim 1.6\times$)．
+分類は Claude 系 (Sonnet 5) で行い, 異系統 LLM (Codex/GPT 系) による 17 件 (repo 比例層別) の独立再判定で 12 件一致を確認した．LLM 分類に由来する選定バイアスの議論は \ref{sec:limitations} 節に譲る．
 
 \textbf{(4) 層別サンプリング．}
 乱数を用いない決定的アルゴリズム (知識カットオフ後のコミットを優先し，残りをバグ種別のラウンドロビンで補充) により，85 件 (fastapi 25 / valibot 20 / chi 15 / pgrust 25) を選定した．
-内訳はカットオフ後 50 件・カットオフ前 35 件であり，種別は logic 34，type-safety 15，error-handling 10，security 8，concurrency 7，その他 11 である．
+内訳はカットオフ後 49 件・カットオフ前 36 件であり，種別は logic 34，type-safety 15，error-handling 10，concurrency 7，security 6，その他 13 である．
 
 \subsection{Leakage 統制}
 
-使用予定モデルの知識カットオフ以降のコミットを優先的に採用し，不足分をカットオフ前から補充した上で，前後の別を共変量として分析に組み込む．
-これにより暗記による検出の寄与を定量化できる．
-事前調査では，カットオフ後の fix コミットのみで必要数を確保できるリポジトリは pgrust のみであり (他 3 リポジトリは 4〜15 件)，時期混合と共変量統制は必須であった．
+境界日を 2026-01-01 に設定し, 以降のコミットを post-cutoff として優先採用, 不足分は pre-cutoff から補充した上で, 前後の別を共変量として分析に組み込む．
+この境界は主要モデルのカットオフのうち下限に近い日付を選び, 全モデルで「安全に post」と言える範囲を最大化した．モデルごとの真のカットオフは異なるため厳密には近似だが, pgrust は全履歴が 2026-06 以降のため全モデル共通で universal post-cutoff となる．
+事前調査では，post-cutoff のみで必要数を確保できるリポジトリは pgrust のみであり (他 3 リポジトリの post-cutoff injectable は 4〜11 件)，時期混合と共変量統制は必須であった．
 
-\section{実験計画}
+\section{実験設計}
 
-構築したベンチマークを用い，次の 4 構成を同一コスト予算下で比較する:
-(i) \textbf{Single}: 単一レビュアが全観点を担当，
-(ii) \textbf{Parallel}: 観点別レビュアを並列に実行し集約，
-(iii) \textbf{Adversarial}: レビュアと，その指摘を反証する批評エージェント，
-(iv) \textbf{Multi-run}: 同一プロンプトを $N$ 回実行し集約 (計算量統制の対照群)．
+構築したベンチマークから \nItems{} 件を層別抽出し，次の \nConfigs{} 構成 $\times$ \nModels{} モデル $\times$ \nItems{} 件のグリッドで欠陥検出性能とコストを実測した．
+括弧内の call は LLM の 1 回呼び出しを表す単位である．
+\begin{itemize}
+\setlength{\itemsep}{2pt}
+\item \textbf{Single}: 単一レビュアが全観点を担当 (1 call)．
+\item \textbf{Parallel}: 4 観点 (correctness, concurrency, api-misuse, security) を独立実行し和集合を取得 (4 calls)．
+\item \textbf{Adversarial}: レビュアが指摘を生成する初回 1 call の後, 各指摘に反証プロンプトを 2 回適用し多数決で残す (指摘数 $k$ に対し $1+2k$ calls)．
+\item \textbf{Multi-run}: 同一プロンプトを 5 回実行し 2 票以上の指摘のみ採用する計算量統制の対照群 (5 calls)．
+\end{itemize}
 
-従属変数は欠陥検出率 (recall)・偽陽性率・F1 およびコスト効率 (検出 1 件あたりの金額・トークン数) とし，独立変数はレビュー構成 4 種 $\times$ モデル 2--3 種 $\times$ コスト予算 2--3 水準とする．
-検出判定は「指摘が ground truth の変更箇所と位置・論点の両方で重なるか」を LLM judge で自動判定し，サンプルの人手検証で judge の信頼性を確認する．
+全構成でシステムプロンプトは共通の基底 \textit{``You are a senior software engineer reviewing a pull request for defects the change would introduce (not stylistic nitpicks).''} を用い, 各指摘を \texttt{\{file, line\_start, line\_end, severity, category, summary\}} の JSON 配列として出力させる．
+Parallel では 4 観点 (correctness, concurrency, api-misuse, security) それぞれに焦点範囲を絞る補助文を前置し, Adversarial の反証プロンプトは \textit{``Default to REFUTED unless the diff clearly demonstrates the bug.''} を用いる．
+Multi-run は Single と同一プロンプトを 5 回反復する．
+完全な文言は公開リポジトリの \href{https://github.com/hiroaki222/review-orchestration-bench/blob/main/src/harness/prompts.py}{\texttt{src/harness/prompts.py}} を参照．
+
+モデルは Anthropic (Haiku 4.5, Sonnet 5, Opus 5, Fable 5), OpenAI (GPT-5 mini, GPT-5, GPT-5.6 luna, GPT-5.6 terra, o3), Google (Gemini 3.5 flash-lite, 3.6 flash, 3.1 pro-preview) の \nVendors{} ベンダ \nModels{} モデルを対象とし, 各ベンダで budget から frontier までの価格帯を横断させた．
+検出判定は指摘の (file, line 範囲) と ground truth のハンク範囲の重なり (許容 $\pm 2$ 行) を機械判定する．
+主指標には, 見逃し (偽陰性) のコストが過剰指摘 (偽陽性) より高いコードレビューの非対称性を反映し, Recall を Precision の 4 倍重視する $F_2$ スコア ($\beta = 2$, $F_2 = 5PR / (4P + R)$) を採用する．参考として Precision と Recall も併記する．
+
+\section{結果}
+
+\nItems{} 件 $\times$ \nModels{} モデル $\times$ \nConfigs{} 構成 $=$ \nCombos{} 件の結果を表\ref{tab:main}に示す (Pareto 前線 6 点は $^{P}$ で明示)．コスト・$F_2$ 散布は図\ref{fig:pareto}に示す．
+
+\begin{table}[!t]
+  \centering
+  \caption{構成別の検出性能とコスト (各セル 30 件平均, $N=30$)．太字はモデル内 best $F_2$, 下線付き太字は全体 best, $^{P}$ は Pareto 前線 (図\ref{fig:pareto}と対応). 略号: Sin = Single, Par = Parallel, Adv = Adversarial, MR = Multi-run.}
+  \label{tab:main}
+  \scriptsize
+  \setlength{\tabcolsep}{2pt}
+  \resizebox{\linewidth}{!}{\input{tables/table_main}}
+\end{table}
+
+\begin{table}[!t]
+  \centering
+  \caption{バグ種別ごとの $F_2$ 首位 (モデル, 構成) と種別あたり項目数 N．$\dagger$ 付き N は小標本 (N $\le$ 2), 個別順位は暫定．}
+  \label{tab:cat_best}
+  \footnotesize
+  \input{tables/table_category_best}
+\end{table}
+
+\begin{table}[!t]
+  \centering
+  \caption{リポジトリ (言語) 別の $F_2$ 首位 (モデル, 構成)．}
+  \label{tab:repo_best}
+  \footnotesize
+  \input{tables/table_repo_best}
+\end{table}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\linewidth]{fig/pareto.pdf}
+  \caption{項目あたりコスト (対数軸) と $F_2$ の散布．マーカ形が構成. Pareto 前線 6 点は黒縁で強調しモデル名を注記 (表\ref{tab:main} の $^{P}$ セルに対応), 前線から外れた 42 点はグレー. 前線下のグレー領域は Pareto 支配下.}
+  \label{fig:pareto}
+\end{figure}
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=\linewidth]{fig/budget.pdf}
+  \caption{項目あたり予算帯ごとに, Single 構成のみで達成可能な最大 $F_2$ と Orchestrated (Parallel / Adversarial / Multi-run) で達成可能な最大 $F_2$ を比較. 各棒の上に勝者 (モデル / 構成) を注記. \$0.002 では集約コストが吸えず Single が優位, \$0.01 で逆転, \$0.05 以上では Opus 5 単発すら GPT-5 mini / Multi-run に敗北. \$0.05 以上は勝者不変 (予算を 4 倍積んでも改善なし).}
+  \label{fig:budget}
+\end{figure}
+\bestModel{} の \bestConfig{} 構成が最良で $F_2 = \bestFtwo{}$, 項目あたり平均 \bestCost{} を要した．
+項目あたりコストは最安 \cheapestCost{} から最高 \priciestCost{} まで \costSpread{} 倍の広がりを持つが, $F_2$ はコストに単調ではない．
+構成別平均 $F_2$ は Multi-run が \multiMeanF{} と首位で, 続いて Single \singleMeanF{}, Parallel \parallelMeanF{}, Adversarial \adversarialMeanF{} となる．
+Recall 重視の $F_2$ では, Adversarial の反証プロンプトが誤検出を減らして Precision を上げる一方で本物のバグまで却下し Recall を下げるため, 総合では Single を下回る．Multi-run の多数決は Precision と Recall 双方を伸ばし他構成を上回った．
+モデル別に最良 $F_2$ の構成を集計すると, \nModels{} モデル中 \modelMultiWins{} で Multi-run が最良となり (表\ref{tab:main}), Multi-run の優位は個別モデル選択に頑健である．この Parallel の弱さは, 一般推論で報告された「予算統制下では multi-agent debate や self-refinement の優位が消失する」\cite{mad,reflexion,wang2024rethinkingboundsllmreasoning}という知見のコードレビュー領域における確認である．
+Multi-run 優位の頑健性を統計的側面と指標感度の 2 面から確認する．最良組 (\bestModel{}/\bestConfig{}, $F_2 = \bestFtwo{}$) の項目 bootstrap 95\% 信頼区間は $[\bestCIlo{}, \bestCIhi{}]$ で, Single 最良 (\bestSingleModel{}, $F_2 = \bestSingleFtwo{}$, 信頼区間 $[\bestSingleCIlo{}, \bestSingleCIhi{}]$) と部分的に重なる．単一組間の有意差は $N=\nItems{}$ では示せないが, 前述のモデル別最良で相対優位は担保される．$\beta \in \{1, 1.5, 2, 3\}$ で $F_\beta$ を振った感度分析 (表\ref{tab:beta}) でも Multi-run は全帯で首位を維持する．Adversarial は Recall 重み増加で順位を下げ Parallel は上げるため, $\beta = 3$ では Parallel が Single を上回る．
+
+\begin{table}[!t]
+  \centering
+  \caption{$F_\beta$ の $\beta$ sensitivity (構成別平均 $F_\beta$)．太字は各 $\beta$ 列の首位．}
+  \label{tab:beta}
+  \footnotesize
+  \input{tables/table_beta}
+\end{table}
+Pareto 前線に着目すると, 全構成で他モデルに (コスト, $F_2$) の両面で劣位となり前線から外れたモデルは \dominatedModels{} である．
+Multi-run が単発を上回るのは項目あたり \$0.01 以上の予算帯からで, それ以上では価格帯上位モデルを単純選択するよりも下位モデルに Multi-run を組み合わせる方が支配的な戦略となる．
+極小予算 (\$0.002) では集約コストが吸えず下位モデル単発 (Haiku 4.5 / Single) が最良となる．また \$0.05 以上は勝者が変わらず, 予算を 4 倍積んでも達成 $F_2$ の上限は動かない (図\ref{fig:budget}).
+本実験の総 API 支出は \totalSpend{} であり, 追試に必要な計算量が実務範囲に収まることを示す．
+
+バグ種別ごとの $F_2$ 首位を表\ref{tab:cat_best}に示す．全 \nCategories{} 種別で勝者となるのは \catWinners{} であり, 種別に応じて最適な (モデル, 構成) が入れ替わる．
+種別別最良 $F_2$ は \perfectCats{} の \perfectCount{} 種で 1.000 に達する一方, \hardestCat{} は最良でも \hardestBestFtwo{} と全モデル共通の弱点として残った．
+種別あたりの標本数は \catNmin{}〜\catNmax{} 件と小さく個別順位は暫定的だが, RQ3 に対する予備知見として, 種別に応じた構成の最適性がベンダに直交して現れる傾向を示唆する．
+
+言語別の $F_2$ 首位を表\ref{tab:repo_best}に示す．全 4 リポで GPT-5 mini / Multi-run が首位となり, Multi-run の汎化を示す．
+一方で達成 $F_2$ は Python \bestByFastapiF{}, TypeScript \bestByValibotF{}, Go \bestByChiF{}, Rust \bestByPgrustF{} と大きく変動し, タスクの言語・ドメインが検出難度を左右する．
+
+\section{本手法の限界}
+\label{sec:limitations}
+
+\textbf{合成 PR の再現性．}
+逆適用 PR は実在した PR ではないため, レビュー体験の再現性に限界がある．
+今後は実発掘 PR サブセットとの相関を確認する．
+
+\textbf{意味一致判定の欠如．}
+現状のマッチングは (file, line) の重なりに基づく機械判定であり, 意味的に等価な指摘を捕捉できない場合がある．
+LLM 判定器\cite{zheng2023judgingllmasajudgemtbenchchatbot}はコード翻訳・生成タスクで人手評価に迫る精度を示す\cite{wang2025llmsreplacehumanevaluators}一方, コード評価では変数名・整形などの表層的差異による判定バイアスも報告されており\cite{moon2025dontjudgecodecover}, これらを踏まえた意味一致判定器の導入が今後の課題である．
+
+\textbf{対象モデルの限定．}
+本実験は主要商用 API モデル (\nVendors{} ベンダ \nModels{} モデル) に限定される．
+open-weight モデル (Qwen, DeepSeek 系等) はセルフホストの GPU 時間・電気代が主コストとなり本研究の API コスト統制と評価軸が異なるため, 別途統制軸を再定義した比較設計が今後の課題である．
+
+\textbf{リポジトリの偏り．}
+pgrust は単独著者かつ AI 支援開発リポジトリのため, 一般的な OSS のバグ分布とは性質が異なる可能性がある．
+また対象 4 リポジトリは Web フレームワーク / スキーマ検証 / HTTP ルータ / DB エンジンに限定され, フロントエンドの component ライブラリやモバイル・ML ライブラリなど別ドメイン, および Kotlin, Swift, C++ 等の他言語は含まれない．
+リポジトリ数・言語・ドメインの拡張は今後の課題である．
+
+\textbf{バグ種別サンプリングの偏り．}
+30 items の層別サンプリングはリポジトリ比例で行い, バグ種別で均等化していないため, logic (N=15) 以外の 7 種別は N $\le$ 4 で個別順位の統計的信頼性が低い (表\ref{tab:cat_best} の $\dagger$ セルは特に小標本)．
+
+\textbf{反証プロンプトの設計依存性．}
+Adversarial の反証プロンプトは「差分が明確に示さない限り REFUTED を返せ」と REFUTED 寄りに設計されており, Recall 低下の一因である可能性がある．より中立な反証設計 (例: 「支持と反証を両側から論じ, より強い側を選べ」) の下では Adversarial の性能順位が変わる余地がある．
+
+\textbf{カットオフの単一境界近似．}
+post-cutoff 判定は 2026-01-01 の単一境界で行っており, モデルごとの真のカットオフ差 (数ヶ月オーダ) は考慮していない．
+pgrust については全モデル共通の universal post-cutoff のため影響ゼロだが, 他 3 リポでは境界周辺で誤ラベルの余地が残る．
+
+\textbf{LLM-mediated 選定バイアス．}
+候補選定に LLM 分類を用いているため, 特定 LLM ファミリーが検出しやすいバグに標本が偏る余地がある．全候補は OSS 開発者が \texttt{fix:} でラベルした修正コミット由来のため, バグの真実性そのものは commit 記録で担保される．分類本体は Claude 系 (Sonnet 5) で, 異系統 LLM (Codex/GPT 系) の独立再判定 17 件で 12 件一致, 最終除外は 1 件 (全 85 件の 1.2\%) にとどまる．構成別 $F_2$ 差は 0.08 レンジ (Multi-run 0.610 対 Adversarial 0.479) であり, 1.2\% の選定変動でこの差が反転する余地はない．また分類に用いた Claude 系モデル自体が Pareto 前線から外れており (\dominatedCount{}/\nModels{}), 分類側が有利となる方向のバイアスも実結果に効いていない．
 
 \section{おわりに}
 
-コスト予算統制下で AI コードレビューのオーケストレーション構成を比較するためのベンチマーク構築手法を提案し，4 言語 4 リポジトリから 85 件の実バグ由来課題を構築した．
-今後，パイロット実験として 4 構成 $\times$ 2 モデル $\times$ 2 予算水準の比較を実施し，RQ1--RQ3 に対する予備的知見を報告する予定である．
+予算統制下で AI コードレビューのオーケストレーション構成を比較するためのベンチマーク構築手法を提案し，4 言語 4 リポジトリから 85 件の実バグ由来課題を構築した．
+\nItems{} 件を対象に \nConfigs{} 構成 $\times$ \nModels{} モデル $=$ \nCombos{} 実行を実測し，同一コスト水準における構成間の性能差と，構成に依存した Pareto 前線の形を確認した．
+今後の研究方向として, オーケストレーション特化の 3 系統を計画する:
+\begin{itemize}
+\setlength{\itemsep}{2pt}
+\item RQ3 で観察された種別ごとのモデル得意不得意を活かした観点別役割割り当ての最適化 (バグ種別と Parallel の観点・モデル対応の設計).
+\item Parallel と Adversarial を組み合わせて Parallel の過剰指摘を反証プロンプトで抑制する複合構成.
+\item 動的ルーティングや階層集約などオーケストレーション特化構造\cite{guo2024largelanguagemodelbased}の設計比較.
+\end{itemize}
+残された課題として, 構成非依存のシステムプロンプト最適化, サンプル拡大 (85 件全数, かつ各バグ種別 N の均等化) と扱うバグ種別の追加・細分化が挙がる．
+意味一致判定器の実装については, 現版判定器の (file, line) 表層一致を意味一致判定に置換するため, コード翻訳・生成タスクで人手評価と高い一致 (Pearson $\ge 0.81$) が報告されている個別採点方式\cite{wang2025llmsreplacehumanevaluators}を借用する．具体的には, GPT-4o および DeepSeek-V2.5 を判定 LLM とし, 各指摘に対して位置一致と意味一致の 2 観点 $\times$ 5 段階の評価基準で採点, temperature 0 の貪欲復号 + \texttt{Overall: X/5} 形式で機械抽出する．G-Eval や BatchEval などの推論戦略は費用が 20--50 倍かかるため\cite{wang2025llmsreplacehumanevaluators}, 予算統制の本枠組みでは通常の個別採点方式に固定する．判定器のコード領域における判定バイアス\cite{moon2025dontjudgecodecover} (変数名変更, コメント挿入, カバーストーリー説明文などの表層的特徴への感受性) を回避するため, 判定プロンプトからは PR 説明文を非表示化し, 6 種の判定バイアスの事前検査を採用モデル選択に組み込む．人手アノテータ間の一致上限 (81\%)\cite{zheng2023judgingllmasajudgemtbenchchatbot}を基準値として, 2 名アノテータの Spearman $\rho$ で妥当性を検証する．
+さらに Qwen や Llama 系などの open-weight LLM を第三者判定として組み合わせれば, 被験モデルの Claude/OpenAI/Google 系とは独立の複数判定による一致度検証も可能となり, 判定 LLM ファミリー由来のバイアスを更に排除する余地がある．
+ベンチマークデータ・ハーネスコードに加え, 全 \nCombos{} 実行の ledger (\href{https://github.com/hiroaki222/review-orchestration-bench/tree/main/data/experiments/v0}{\texttt{data/experiments/v0/*.results.jsonl}}) と API 通信ログ (\href{https://github.com/hiroaki222/review-orchestration-bench/tree/main/runs}{\texttt{runs/*/ledger.jsonl}}) も配布し, 第三者による追試とコスト再計算を可能にしている．
 
+\bibliographystyle{unsrt}
 \bibliography{refs}
-\bibliographystyle{jsai}
 
 \end{document}

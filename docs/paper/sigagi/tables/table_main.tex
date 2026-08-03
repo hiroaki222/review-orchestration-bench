@@ -1,0 +1,70 @@
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Model & Cfg & Prec & Rec & $F_2$ & \$/item \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{Anthropic}} \\[1pt]
+\multirow[t]{4}{*}{Haiku 4.5} & Sin & 0.80 & 0.60 & 0.635$^{P}$ & 0.0019 \\
+ & Par & 0.25 & 0.68 & 0.503 & 0.0076 \\
+ & Adv & 0.86 & 0.47 & 0.518 & 0.0066 \\
+ & MR & 0.79 & 0.65 & \textbf{0.671}$^{P}$ & 0.0096 \\
+\addlinespace[2pt]
+\multirow[t]{4}{*}{Sonnet 5} & Sin & 0.88 & 0.51 & 0.561 & 0.0091 \\
+ & Par & 0.33 & 0.62 & 0.526 & 0.0276 \\
+ & Adv & 0.90 & 0.38 & 0.432 & 0.0204 \\
+ & MR & 0.81 & 0.57 & \textbf{0.609} & 0.0402 \\
+\addlinespace[2pt]
+\multirow[t]{4}{*}{Opus 5} & Sin & 0.82 & 0.72 & \textbf{0.738} & 0.0341 \\
+ & Par & 0.25 & 0.74 & 0.533 & 0.1215 \\
+ & Adv & 0.84 & 0.53 & 0.571 & 0.1243 \\
+ & MR & 0.80 & 0.72 & 0.736 & 0.1755 \\
+\addlinespace[2pt]
+\multirow[t]{4}{*}{Fable 5} & Sin & 0.70 & 0.56 & 0.583 & 0.0584 \\
+ & Par & 0.29 & 0.62 & 0.502 & 0.1747 \\
+ & Adv & 0.85 & 0.41 & 0.459 & 0.1461 \\
+ & MR & 0.85 & 0.59 & \textbf{0.627} & 0.2182 \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{OpenAI}} \\[1pt]
+\multirow[t]{4}{*}{GPT-5 mini} & Sin & 0.59 & 0.29 & 0.327 & 0.0035 \\
+ & Par & 0.25 & 0.68 & 0.503 & 0.0143 \\
+ & Adv & 0.74 & 0.74 & 0.735$^{P}$ & 0.0102 \\
+ & MR & 0.84 & 0.82 & \underline{\textbf{0.826}}$^{P}$ & 0.0206 \\
+\addlinespace[2pt]
+\multirow[t]{4}{*}{GPT-5} & Sin & 0.88 & 0.53 & \textbf{0.575} & 0.0341 \\
+ & Par & 0.36 & 0.57 & 0.513 & 0.1036 \\
+ & Adv & 0.91 & 0.43 & 0.477 & 0.0682 \\
+ & MR & 0.65 & 0.53 & 0.550 & 0.1794 \\
+\addlinespace[2pt]
+\multirow[t]{4}{*}{GPT-5.6 luna} & Sin & 0.97 & 0.49 & 0.539 & 0.0067 \\
+ & Par & 0.38 & 0.57 & 0.521 & 0.0234 \\
+ & Adv & 0.91 & 0.44 & 0.492 & 0.0119 \\
+ & MR & 0.82 & 0.53 & \textbf{0.570} & 0.0378 \\
+\addlinespace[2pt]
+\multirow[t]{4}{*}{GPT-5.6 terra} & Sin & 0.97 & 0.50 & 0.554 & 0.0161 \\
+ & Par & 0.33 & 0.54 & 0.482 & 0.0464 \\
+ & Adv & 0.97 & 0.44 & 0.495 & 0.0238 \\
+ & MR & 0.86 & 0.54 & \textbf{0.587} & 0.0796 \\
+\addlinespace[2pt]
+\multirow[t]{4}{*}{o3} & Sin & 0.94 & 0.47 & 0.523 & 0.0153 \\
+ & Par & 0.33 & 0.63 & 0.532 & 0.0487 \\
+ & Adv & 0.95 & 0.29 & 0.341 & 0.0357 \\
+ & MR & 0.86 & 0.56 & \textbf{0.601} & 0.0728 \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{Google}} \\[1pt]
+\multirow[t]{4}{*}{Gemini 3.5 flash-lite} & Sin & 0.96 & 0.38 & 0.435$^{P}$ & 0.0005 \\
+ & Par & 0.45 & 0.53 & \textbf{0.511}$^{P}$ & 0.0019 \\
+ & Adv & 0.94 & 0.24 & 0.277 & 0.0011 \\
+ & MR & 0.88 & 0.34 & 0.386 & 0.0024 \\
+\addlinespace[2pt]
+\multirow[t]{4}{*}{Gemini 3.6 flash} & Sin & 0.93 & 0.40 & 0.449 & 0.0224 \\
+ & Par & 0.44 & 0.53 & 0.510 & 0.0650 \\
+ & Adv & 0.93 & 0.40 & 0.449 & 0.0364 \\
+ & MR & 0.89 & 0.50 & \textbf{0.548} & 0.1090 \\
+\addlinespace[2pt]
+\multirow[t]{4}{*}{Gemini 3.1 pro-preview} & Sin & 0.86 & 0.47 & 0.518 & 0.0331 \\
+ & Par & 0.36 & 0.60 & \textbf{0.532} & 0.1191 \\
+ & Adv & 0.94 & 0.46 & 0.508 & 0.0595 \\
+ & MR & 0.86 & 0.47 & 0.518 & 0.1811 \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{Mean $F_2$ over models}: Sin\,0.536 / Par\,0.514 / Adv\,0.479 / MR\,\textbf{0.602}} \\
+\bottomrule
+\end{tabular}
