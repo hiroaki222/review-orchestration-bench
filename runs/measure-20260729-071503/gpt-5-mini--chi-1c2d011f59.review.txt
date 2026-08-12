@@ -1,0 +1,5 @@
+- File: middleware/url_format.go, lines ~63-69
+  - Severity: High
+  - Explanation: The change removes the nil-check around rctx before setting rctx.RoutePath. If chi.RouteContext(r.Context()) returns nil (for example when this middleware is used outside of a chi router, earlier than route context initialization, or in certain tests), writing to rctx.RoutePath will cause a nil pointer dereference and crash the server. The original guard prevented that; removing it assumes the routing context is always present, which is not guaranteed by the public API and introduces a runtime panic risk.
+
+No other defects found.

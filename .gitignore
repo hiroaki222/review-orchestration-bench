@@ -19,5 +19,17 @@ repos/*
 *.bbl
 *.blg
 
+# ...except experiment stdout logs under runs/
+!runs/**/*.log
+
 # JSAI style files (redistribution not permitted by JSAI)
 docs/paper/jsai_5_0_1_template/
+docs/paper/jsai_sig-1_0_0/
+
+# author contact info (kept out of source, injected from PAPER_EMAIL env at build)
+docs/paper/**/email.tex
+
+# secrets / local env
+.env
+
+__pycache__/

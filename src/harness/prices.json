@@ -1,0 +1,23 @@
+{
+  "_comment": "USD per 1M tokens. retrieved_at must be set from the provider pricing page before any run; the harness refuses to start while it is null. cache_write=null means either the provider has no explicit cache-write cost (OpenAI, Gemini implicit caching) or the harness is not using explicit caching for that provider.",
+  "retrieved_at": "2026-07-29",
+  "sources": {
+    "anthropic": "https://platform.claude.com/docs/en/docs/about-claude/pricing",
+    "openai": "https://developers.openai.com/api/docs/pricing",
+    "google": "https://ai.google.dev/gemini-api/docs/pricing"
+  },
+  "models": {
+    "claude-fable-5":        {"provider": "anthropic", "input": 10.0, "output": 50.0, "cache_read": 1.0, "cache_write": 12.5},
+    "claude-opus-5":         {"provider": "anthropic", "input": 5.0, "output": 25.0, "cache_read": 0.50, "cache_write": 6.25},
+    "claude-sonnet-5":       {"provider": "anthropic", "input": 2.0, "output": 10.0, "cache_read": 0.20, "cache_write": 2.50, "_note": "introductory pricing through 2026-08-31; standard $3/$15 from 2026-09-01. Uses newer tokenizer (~30% more tokens for same text)."},
+    "claude-haiku-4-5":      {"provider": "anthropic", "input": 1.0, "output": 5.0,  "cache_read": 0.10, "cache_write": 1.25},
+    "gpt-5.6-terra":         {"provider": "openai",    "input": 2.50, "output": 15.0, "cache_read": 0.25, "cache_write": null},
+    "gpt-5.6-luna":          {"provider": "openai",    "input": 1.00, "output": 6.0,  "cache_read": 0.10, "cache_write": null},
+    "gpt-5":                 {"provider": "openai",    "input": 1.25, "output": 10.0, "cache_read": 0.125, "cache_write": null},
+    "gpt-5-mini":            {"provider": "openai",    "input": 0.25, "output": 2.0,  "cache_read": 0.025, "cache_write": null},
+    "o3":                    {"provider": "openai",    "input": 2.0, "output": 8.0, "cache_read": 0.50, "cache_write": null},
+    "gemini-3.1-pro-preview":{"provider": "google",    "input": 2.0, "output": 12.0, "cache_read": null, "cache_write": null, "_note": "preview pricing; may change"},
+    "gemini-3.6-flash":      {"provider": "google",    "input": 1.5, "output": 7.5,  "cache_read": null, "cache_write": null},
+    "gemini-3.5-flash-lite": {"provider": "google",    "input": 0.30, "output": 2.50, "cache_read": null, "cache_write": null}
+  }
+}

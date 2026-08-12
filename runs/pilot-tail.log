@@ -1,0 +1,829 @@
+run=sanity-20260729-072233  models=4  configs=4  items=30  combos=480  already_done=90  remaining=390
+[   1/390] claude-haiku-4-5     multi        fastapi-7fe315c21a     passes= 5 tp=1 fp=3 fn=2 $0.0173 ( 16.0s) cum=$0.506
+[   2/390] claude-haiku-4-5     multi        fastapi-eb75fd078e     passes= 5 tp=1 fp=2 fn=0 $0.0111 ( 15.1s) cum=$0.517
+[   3/390] claude-haiku-4-5     multi        fastapi-d8aad201eb     passes= 5 tp=1 fp=0 fn=0 $0.0067 ( 11.1s) cum=$0.524
+[   4/390] claude-haiku-4-5     multi        fastapi-8a9258b169     passes= 5 tp=2 fp=0 fn=2 $0.0156 ( 16.4s) cum=$0.539
+[   5/390] claude-haiku-4-5     multi        fastapi-e8b98d2187     passes= 5 tp=2 fp=0 fn=1 $0.0094 ( 10.2s) cum=$0.549
+[   6/390] claude-haiku-4-5     multi        fastapi-ed2512a5ec     passes= 5 tp=1 fp=0 fn=1 $0.0082 (  8.8s) cum=$0.557
+[   7/390] claude-haiku-4-5     multi        fastapi-c5fd75a321     passes= 5 tp=2 fp=0 fn=0 $0.0079 ( 10.6s) cum=$0.565
+[   8/390] claude-haiku-4-5     multi        fastapi-09f5941f0e     passes= 5 tp=1 fp=0 fn=0 $0.0055 (  7.4s) cum=$0.570
+[   9/390] claude-haiku-4-5     multi        fastapi-1d96b3e3f1     passes= 5 tp=1 fp=0 fn=0 $0.0044 (  7.2s) cum=$0.575
+[  10/390] claude-haiku-4-5     multi        valibot-1bd01c3046     passes= 5 tp=2 fp=0 fn=0 $0.0088 ( 12.6s) cum=$0.583
+[  11/390] claude-haiku-4-5     multi        valibot-27ecfefc2f     passes= 5 tp=2 fp=0 fn=1 $0.0096 ( 13.0s) cum=$0.593
+[  12/390] claude-haiku-4-5     multi        valibot-b16fdf9ba6     passes= 5 tp=3 fp=0 fn=0 $0.0099 ( 10.1s) cum=$0.603
+[  13/390] claude-haiku-4-5     multi        valibot-17cd7ed5b8     passes= 5 tp=0 fp=0 fn=1 $0.0042 (  6.4s) cum=$0.607
+[  14/390] claude-haiku-4-5     multi        valibot-0634c1b704     passes= 5 tp=2 fp=0 fn=1 $0.0125 ( 14.9s) cum=$0.620
+[  15/390] claude-haiku-4-5     multi        valibot-0cb97f72b3     passes= 5 tp=1 fp=0 fn=0 $0.0058 ( 12.9s) cum=$0.625
+[  16/390] claude-haiku-4-5     multi        valibot-ef4166c04e     passes= 5 tp=3 fp=0 fn=5 $0.0156 ( 13.5s) cum=$0.641
+[  17/390] claude-haiku-4-5     multi        chi-878fe71fc9         passes= 5 tp=1 fp=0 fn=2 $0.0067 ( 11.0s) cum=$0.648
+[  18/390] claude-haiku-4-5     multi        chi-818fdcfc47         passes= 5 tp=1 fp=0 fn=0 $0.0050 (  9.3s) cum=$0.653
+[  19/390] claude-haiku-4-5     multi        chi-4ef87eaf2c         passes= 5 tp=1 fp=0 fn=0 $0.0053 (  7.9s) cum=$0.658
+[  20/390] claude-haiku-4-5     multi        chi-05f1ef7bb5         passes= 5 tp=1 fp=0 fn=0 $0.0048 (  7.8s) cum=$0.663
+[  21/390] claude-haiku-4-5     multi        chi-b750c805b4         passes= 5 tp=1 fp=0 fn=0 $0.0049 (  8.9s) cum=$0.668
+[  22/390] claude-haiku-4-5     multi        pgrust-cb60ac482a      passes= 5 tp=1 fp=0 fn=0 $0.0075 (  8.6s) cum=$0.675
+[  23/390] claude-haiku-4-5     multi        pgrust-da0531b249      passes= 5 tp=2 fp=1 fn=0 $0.0157 ( 15.4s) cum=$0.691
+[  24/390] claude-haiku-4-5     multi        pgrust-4e4126c1b1      passes= 5 tp=3 fp=0 fn=2 $0.0155 ( 11.8s) cum=$0.706
+[  25/390] claude-haiku-4-5     multi        pgrust-b09c0f9aa6      passes= 5 tp=1 fp=0 fn=5 $0.0155 ( 10.6s) cum=$0.722
+[  26/390] claude-haiku-4-5     multi        pgrust-c76dce36c8      passes= 5 tp=1 fp=0 fn=0 $0.0074 (  8.2s) cum=$0.729
+[  27/390] claude-haiku-4-5     multi        pgrust-931761fd34      passes= 5 tp=2 fp=5 fn=0 $0.0188 ( 25.7s) cum=$0.748
+[  28/390] claude-haiku-4-5     multi        pgrust-1b8b1896fc      passes= 5 tp=2 fp=0 fn=0 $0.0115 ( 11.6s) cum=$0.760
+[  29/390] claude-haiku-4-5     multi        pgrust-e447385f06      passes= 5 tp=1 fp=0 fn=0 $0.0075 (  7.6s) cum=$0.767
+[  30/390] claude-haiku-4-5     multi        pgrust-29576c75c0      passes= 5 tp=1 fp=1 fn=1 $0.0086 ( 10.4s) cum=$0.776
+[  31/390] claude-sonnet-5      single       fastapi-7fe315c21a     passes= 1 tp=1 fp=1 fn=2 $0.0110 (  8.6s) cum=$0.787
+[  32/390] claude-sonnet-5      single       fastapi-eb75fd078e     passes= 1 tp=1 fp=2 fn=0 $0.0156 ( 15.2s) cum=$0.802
+[  33/390] claude-sonnet-5      single       fastapi-d8aad201eb     passes= 1 tp=0 fp=0 fn=1 $0.0115 ( 11.9s) cum=$0.814
+[  34/390] claude-sonnet-5      single       fastapi-8a9258b169     passes= 1 tp=1 fp=0 fn=3 $0.0152 ( 13.5s) cum=$0.829
+[  35/390] claude-sonnet-5      single       fastapi-e8b98d2187     passes= 1 tp=1 fp=0 fn=2 $0.0100 (  8.2s) cum=$0.839
+[  36/390] claude-sonnet-5      single       fastapi-ed2512a5ec     passes= 1 tp=0 fp=0 fn=2 $0.0227 ( 18.5s) cum=$0.862
+[  37/390] claude-sonnet-5      single       fastapi-c5fd75a321     passes= 1 tp=1 fp=0 fn=1 $0.0045 (  4.1s) cum=$0.866
+[  38/390] claude-sonnet-5      single       fastapi-09f5941f0e     passes= 1 tp=1 fp=0 fn=0 $0.0056 (  8.7s) cum=$0.872
+[  39/390] claude-sonnet-5      single       fastapi-1d96b3e3f1     passes= 1 tp=1 fp=0 fn=0 $0.0034 (  3.2s) cum=$0.875
+[  40/390] claude-sonnet-5      single       valibot-1bd01c3046     passes= 1 tp=2 fp=0 fn=0 $0.0161 ( 15.1s) cum=$0.891
+[  41/390] claude-sonnet-5      single       valibot-27ecfefc2f     passes= 1 tp=2 fp=0 fn=1 $0.0046 (  3.1s) cum=$0.896
+[  42/390] claude-sonnet-5      single       valibot-b16fdf9ba6     passes= 1 tp=1 fp=0 fn=2 $0.0080 (  7.5s) cum=$0.904
+[  43/390] claude-sonnet-5      single       valibot-17cd7ed5b8     passes= 1 tp=1 fp=0 fn=0 $0.0026 (  2.4s) cum=$0.906
+[  44/390] claude-sonnet-5      single       valibot-0634c1b704     passes= 1 tp=3 fp=0 fn=0 $0.0183 ( 18.1s) cum=$0.925
+[  45/390] claude-sonnet-5      single       valibot-0cb97f72b3     passes= 1 tp=1 fp=0 fn=0 $0.0054 (  4.8s) cum=$0.930
+[  46/390] claude-sonnet-5      single       valibot-ef4166c04e     passes= 1 tp=2 fp=0 fn=6 $0.0066 (  3.5s) cum=$0.937
+[  47/390] claude-sonnet-5      single       chi-878fe71fc9         passes= 1 tp=2 fp=0 fn=1 $0.0059 (  4.5s) cum=$0.943
+[  48/390] claude-sonnet-5      single       chi-818fdcfc47         passes= 1 tp=1 fp=0 fn=0 $0.0186 ( 20.6s) cum=$0.961
+[  49/390] claude-sonnet-5      single       chi-4ef87eaf2c         passes= 1 tp=0 fp=0 fn=1 $0.0024 (  2.0s) cum=$0.964
+[  50/390] claude-sonnet-5      single       chi-05f1ef7bb5         passes= 1 tp=1 fp=0 fn=0 $0.0037 (  3.7s) cum=$0.967
+[  51/390] claude-sonnet-5      single       chi-b750c805b4         passes= 1 tp=1 fp=0 fn=0 $0.0035 (  3.7s) cum=$0.971
+[  52/390] claude-sonnet-5      single       pgrust-cb60ac482a      passes= 1 tp=0 fp=0 fn=1 $0.0021 (  1.5s) cum=$0.973
+[  53/390] claude-sonnet-5      single       pgrust-da0531b249      passes= 1 tp=2 fp=0 fn=0 $0.0093 (  8.3s) cum=$0.982
+[  54/390] claude-sonnet-5      single       pgrust-4e4126c1b1      passes= 1 tp=3 fp=0 fn=2 $0.0099 (  5.8s) cum=$0.992
+[  55/390] claude-sonnet-5      single       pgrust-b09c0f9aa6      passes= 1 tp=1 fp=0 fn=5 $0.0101 (  4.2s) cum=$1.002
+[  56/390] claude-sonnet-5      single       pgrust-c76dce36c8      passes= 1 tp=1 fp=0 fn=0 $0.0038 (  2.6s) cum=$1.006
+[  57/390] claude-sonnet-5      single       pgrust-931761fd34      passes= 1 tp=2 fp=2 fn=0 $0.0083 (  4.6s) cum=$1.014
+[  58/390] claude-sonnet-5      single       pgrust-1b8b1896fc      passes= 1 tp=0 fp=0 fn=2 $0.0243 ( 23.5s) cum=$1.039
+[  59/390] claude-sonnet-5      single       pgrust-e447385f06      passes= 1 tp=1 fp=0 fn=0 $0.0033 (  2.6s) cum=$1.042
+[  60/390] claude-sonnet-5      single       pgrust-29576c75c0      passes= 1 tp=1 fp=0 fn=1 $0.0068 (  5.4s) cum=$1.049
+[  61/390] claude-sonnet-5      parallel     fastapi-7fe315c21a     passes= 4 tp=1 fp=7 fn=2 $0.0320 ( 19.0s) cum=$1.081
+[  62/390] claude-sonnet-5      parallel     fastapi-eb75fd078e     passes= 4 tp=1 fp=1 fn=0 $0.0533 ( 58.3s) cum=$1.134
+[  63/390] claude-sonnet-5      parallel     fastapi-d8aad201eb     passes= 4 tp=0 fp=0 fn=1 $0.0287 ( 28.4s) cum=$1.163
+[  64/390] claude-sonnet-5      parallel     fastapi-8a9258b169     passes= 4 tp=1 fp=0 fn=3 $0.0929 ( 87.7s) cum=$1.256
+[  65/390] claude-sonnet-5      parallel     fastapi-e8b98d2187     passes= 4 tp=1 fp=1 fn=2 $0.0329 ( 32.0s) cum=$1.288
+[  66/390] claude-sonnet-5      parallel     fastapi-ed2512a5ec     passes= 4 tp=0 fp=0 fn=2 $0.0145 ( 17.7s) cum=$1.303
+[  67/390] claude-sonnet-5      parallel     fastapi-c5fd75a321     passes= 4 tp=1 fp=1 fn=1 $0.0158 ( 21.5s) cum=$1.319
+[  68/390] claude-sonnet-5      parallel     fastapi-09f5941f0e     passes= 4 tp=1 fp=1 fn=0 $0.0112 ( 13.3s) cum=$1.330
+[  69/390] claude-sonnet-5      parallel     fastapi-1d96b3e3f1     passes= 4 tp=1 fp=2 fn=0 $0.0110 ( 13.3s) cum=$1.341
+[  70/390] claude-sonnet-5      parallel     valibot-1bd01c3046     passes= 4 tp=2 fp=4 fn=0 $0.0267 ( 27.1s) cum=$1.368
+[  71/390] claude-sonnet-5      parallel     valibot-27ecfefc2f     passes= 4 tp=2 fp=4 fn=1 $0.0193 ( 17.4s) cum=$1.387
+[  72/390] claude-sonnet-5      parallel     valibot-b16fdf9ba6     passes= 4 tp=3 fp=3 fn=0 $0.0227 ( 21.5s) cum=$1.410
+[  73/390] claude-sonnet-5      parallel     valibot-17cd7ed5b8     passes= 4 tp=0 fp=0 fn=1 $0.0057 (  7.6s) cum=$1.415
+[  74/390] claude-sonnet-5      parallel     valibot-0634c1b704     passes= 4 tp=2 fp=0 fn=1 $0.0263 ( 27.8s) cum=$1.442
+[  75/390] claude-sonnet-5      parallel     valibot-0cb97f72b3     passes= 4 tp=1 fp=3 fn=0 $0.0160 ( 16.6s) cum=$1.458
+[  76/390] claude-sonnet-5      parallel     valibot-ef4166c04e     passes= 4 tp=3 fp=9 fn=5 $0.0306 ( 20.6s) cum=$1.488
+[  77/390] claude-sonnet-5      parallel     chi-878fe71fc9         passes= 4 tp=1 fp=2 fn=2 $0.0183 ( 17.8s) cum=$1.507
+[  78/390] claude-sonnet-5      parallel     chi-818fdcfc47         passes= 4 tp=1 fp=3 fn=0 $0.0383 ( 43.8s) cum=$1.545
+[  79/390] claude-sonnet-5      parallel     chi-4ef87eaf2c         passes= 4 tp=1 fp=2 fn=0 $0.0102 ( 10.4s) cum=$1.555
+[  80/390] claude-sonnet-5      parallel     chi-05f1ef7bb5         passes= 4 tp=1 fp=3 fn=0 $0.0135 ( 15.7s) cum=$1.569
+[  81/390] claude-sonnet-5      parallel     chi-b750c805b4         passes= 4 tp=1 fp=2 fn=0 $0.0128 ( 12.3s) cum=$1.581
+[  82/390] claude-sonnet-5      parallel     pgrust-cb60ac482a      passes= 4 tp=1 fp=0 fn=0 $0.0099 (  8.8s) cum=$1.591
+[  83/390] claude-sonnet-5      parallel     pgrust-da0531b249      passes= 4 tp=2 fp=6 fn=0 $0.0332 ( 18.0s) cum=$1.625
+[  84/390] claude-sonnet-5      parallel     pgrust-4e4126c1b1      passes= 4 tp=3 fp=5 fn=2 $0.0425 ( 29.5s) cum=$1.667
+[  85/390] claude-sonnet-5      parallel     pgrust-b09c0f9aa6      passes= 4 tp=4 fp=2 fn=2 $0.0449 ( 22.7s) cum=$1.712
+[  86/390] claude-sonnet-5      parallel     pgrust-c76dce36c8      passes= 4 tp=1 fp=3 fn=0 $0.0238 ( 19.6s) cum=$1.736
+[  87/390] claude-sonnet-5      parallel     pgrust-931761fd34      passes= 4 tp=2 fp=14 fn=0 $0.0363 ( 21.7s) cum=$1.772
+[  88/390] claude-sonnet-5      parallel     pgrust-1b8b1896fc      passes= 4 tp=2 fp=1 fn=0 $0.0663 ( 68.6s) cum=$1.838
+[  89/390] claude-sonnet-5      parallel     pgrust-e447385f06      passes= 4 tp=1 fp=3 fn=0 $0.0137 ( 17.4s) cum=$1.852
+[  90/390] claude-sonnet-5      parallel     pgrust-29576c75c0      passes= 4 tp=1 fp=3 fn=1 $0.0254 ( 21.8s) cum=$1.877
+[  91/390] claude-sonnet-5      adversarial  fastapi-7fe315c21a     passes= 5 tp=1 fp=1 fn=2 $0.0258 ( 17.4s) cum=$1.903
+[  92/390] claude-sonnet-5      adversarial  fastapi-eb75fd078e     passes= 1 tp=0 fp=0 fn=1 $0.0222 ( 21.8s) cum=$1.925
+[  93/390] claude-sonnet-5      adversarial  fastapi-d8aad201eb     passes= 3 tp=0 fp=0 fn=1 $0.0304 ( 33.4s) cum=$1.956
+[  94/390] claude-sonnet-5      adversarial  fastapi-8a9258b169     passes= 1 tp=0 fp=0 fn=4 $0.0247 ( 24.8s) cum=$1.980
+[  95/390] claude-sonnet-5      adversarial  fastapi-e8b98d2187     passes= 3 tp=0 fp=0 fn=3 $0.0178 ( 14.3s) cum=$1.998
+[  96/390] claude-sonnet-5      adversarial  fastapi-ed2512a5ec     passes= 1 tp=0 fp=0 fn=2 $0.0055 (  4.6s) cum=$2.004
+[  97/390] claude-sonnet-5      adversarial  fastapi-c5fd75a321     passes= 3 tp=1 fp=0 fn=1 $0.0095 (  8.5s) cum=$2.013
+[  98/390] claude-sonnet-5      adversarial  fastapi-09f5941f0e     passes= 3 tp=1 fp=0 fn=0 $0.0071 (  7.6s) cum=$2.020
+[  99/390] claude-sonnet-5      adversarial  fastapi-1d96b3e3f1     passes= 3 tp=1 fp=0 fn=0 $0.0061 (  7.4s) cum=$2.026
+[ 100/390] claude-sonnet-5      adversarial  valibot-1bd01c3046     passes= 5 tp=2 fp=0 fn=0 $0.0389 ( 35.6s) cum=$2.065
+[ 101/390] claude-sonnet-5      adversarial  valibot-27ecfefc2f     passes= 5 tp=2 fp=0 fn=1 $0.0155 ( 13.3s) cum=$2.081
+[ 102/390] claude-sonnet-5      adversarial  valibot-b16fdf9ba6     passes= 5 tp=2 fp=0 fn=1 $0.0189 ( 15.0s) cum=$2.100
+[ 103/390] claude-sonnet-5      adversarial  valibot-17cd7ed5b8     passes= 3 tp=0 fp=0 fn=1 $0.0065 (  7.3s) cum=$2.106
+[ 104/390] claude-sonnet-5      adversarial  valibot-0634c1b704     passes= 9 tp=0 fp=0 fn=3 $0.0313 ( 33.3s) cum=$2.138
+[ 105/390] claude-sonnet-5      adversarial  valibot-0cb97f72b3     passes= 3 tp=1 fp=0 fn=0 $0.0093 ( 10.7s) cum=$2.147
+[ 106/390] claude-sonnet-5      adversarial  valibot-ef4166c04e     passes= 7 tp=3 fp=0 fn=5 $0.0362 ( 19.3s) cum=$2.183
+[ 107/390] claude-sonnet-5      adversarial  chi-878fe71fc9         passes= 3 tp=1 fp=0 fn=2 $0.0104 (  9.4s) cum=$2.193
+[ 108/390] claude-sonnet-5      adversarial  chi-818fdcfc47         passes= 3 tp=0 fp=0 fn=1 $0.0223 ( 27.7s) cum=$2.216
+[ 109/390] claude-sonnet-5      adversarial  chi-4ef87eaf2c         passes= 1 tp=0 fp=0 fn=1 $0.0024 (  5.0s) cum=$2.218
+[ 110/390] claude-sonnet-5      adversarial  chi-05f1ef7bb5         passes= 3 tp=1 fp=0 fn=0 $0.0099 ( 11.7s) cum=$2.228
+[ 111/390] claude-sonnet-5      adversarial  chi-b750c805b4         passes= 3 tp=1 fp=0 fn=0 $0.0062 (  6.8s) cum=$2.234
+[ 112/390] claude-sonnet-5      adversarial  pgrust-cb60ac482a      passes= 3 tp=1 fp=0 fn=0 $0.0085 (  7.5s) cum=$2.243
+[ 113/390] claude-sonnet-5      adversarial  pgrust-da0531b249      passes= 5 tp=2 fp=0 fn=0 $0.0346 ( 24.3s) cum=$2.277
+[ 114/390] claude-sonnet-5      adversarial  pgrust-4e4126c1b1      passes= 7 tp=0 fp=0 fn=5 $0.0650 ( 49.2s) cum=$2.342
+[ 115/390] claude-sonnet-5      adversarial  pgrust-b09c0f9aa6      passes= 3 tp=1 fp=0 fn=5 $0.0254 ( 11.1s) cum=$2.368
+[ 116/390] claude-sonnet-5      adversarial  pgrust-c76dce36c8      passes= 3 tp=1 fp=0 fn=0 $0.0098 (  7.3s) cum=$2.377
+[ 117/390] claude-sonnet-5      adversarial  pgrust-931761fd34      passes= 9 tp=2 fp=2 fn=0 $0.0406 ( 27.3s) cum=$2.418
+[ 118/390] claude-sonnet-5      adversarial  pgrust-1b8b1896fc      passes= 5 tp=1 fp=0 fn=1 $0.0462 ( 35.8s) cum=$2.464
+[ 119/390] claude-sonnet-5      adversarial  pgrust-e447385f06      passes= 3 tp=1 fp=0 fn=0 $0.0084 (  9.5s) cum=$2.473
+[ 120/390] claude-sonnet-5      adversarial  pgrust-29576c75c0      passes= 3 tp=0 fp=0 fn=2 $0.0179 ( 13.8s) cum=$2.491
+[ 121/390] claude-sonnet-5      multi        fastapi-7fe315c21a     passes= 5 tp=1 fp=1 fn=2 $0.0319 ( 18.4s) cum=$2.523
+[ 122/390] claude-sonnet-5      multi        fastapi-eb75fd078e     passes= 5 tp=1 fp=0 fn=0 $0.0598 ( 60.1s) cum=$2.582
+[ 123/390] claude-sonnet-5      multi        fastapi-d8aad201eb     passes= 5 tp=1 fp=0 fn=0 $0.0748 ( 79.9s) cum=$2.657
+[ 124/390] claude-sonnet-5      multi        fastapi-8a9258b169     passes= 5 tp=0 fp=0 fn=4 $0.1139 (105.4s) cum=$2.771
+[ 125/390] claude-sonnet-5      multi        fastapi-e8b98d2187     passes= 5 tp=1 fp=0 fn=2 $0.0566 ( 49.3s) cum=$2.828
+[ 126/390] claude-sonnet-5      multi        fastapi-ed2512a5ec     passes= 5 tp=0 fp=0 fn=2 $0.0786 ( 74.9s) cum=$2.906
+[ 127/390] claude-sonnet-5      multi        fastapi-c5fd75a321     passes= 5 tp=1 fp=0 fn=1 $0.0236 ( 19.3s) cum=$2.930
+[ 128/390] claude-sonnet-5      multi        fastapi-09f5941f0e     passes= 5 tp=1 fp=0 fn=0 $0.0212 ( 21.4s) cum=$2.951
+[ 129/390] claude-sonnet-5      multi        fastapi-1d96b3e3f1     passes= 5 tp=1 fp=0 fn=0 $0.0167 ( 18.2s) cum=$2.968
+[ 130/390] claude-sonnet-5      multi        valibot-1bd01c3046     passes= 5 tp=2 fp=0 fn=0 $0.0625 ( 59.2s) cum=$3.030
+[ 131/390] claude-sonnet-5      multi        valibot-27ecfefc2f     passes= 5 tp=2 fp=0 fn=1 $0.0226 ( 15.0s) cum=$3.053
+[ 132/390] claude-sonnet-5      multi        valibot-b16fdf9ba6     passes= 5 tp=1 fp=0 fn=2 $0.0315 ( 32.8s) cum=$3.084
+[ 133/390] claude-sonnet-5      multi        valibot-17cd7ed5b8     passes= 5 tp=1 fp=0 fn=0 $0.0128 ( 11.5s) cum=$3.097
+[ 134/390] claude-sonnet-5      multi        valibot-0634c1b704     passes= 5 tp=2 fp=0 fn=1 $0.0650 ( 66.4s) cum=$3.162
+[ 135/390] claude-sonnet-5      multi        valibot-0cb97f72b3     passes= 5 tp=1 fp=1 fn=0 $0.0185 ( 16.4s) cum=$3.181
+[ 136/390] claude-sonnet-5      multi        valibot-ef4166c04e     passes= 5 tp=3 fp=1 fn=5 $0.0348 ( 16.8s) cum=$3.215
+[ 137/390] claude-sonnet-5      multi        chi-878fe71fc9         passes= 5 tp=2 fp=0 fn=1 $0.0238 ( 19.9s) cum=$3.239
+[ 138/390] claude-sonnet-5      multi        chi-818fdcfc47         passes= 5 tp=1 fp=0 fn=0 $0.0535 ( 55.0s) cum=$3.293
+[ 139/390] claude-sonnet-5      multi        chi-4ef87eaf2c         passes= 5 tp=1 fp=0 fn=0 $0.0134 ( 11.9s) cum=$3.306
+[ 140/390] claude-sonnet-5      multi        chi-05f1ef7bb5         passes= 5 tp=1 fp=0 fn=0 $0.0163 ( 18.8s) cum=$3.322
+[ 141/390] claude-sonnet-5      multi        chi-b750c805b4         passes= 5 tp=1 fp=0 fn=0 $0.0153 ( 14.5s) cum=$3.338
+[ 142/390] claude-sonnet-5      multi        pgrust-cb60ac482a      passes= 5 tp=1 fp=1 fn=0 $0.0152 ( 11.1s) cum=$3.353
+[ 143/390] claude-sonnet-5      multi        pgrust-da0531b249      passes= 5 tp=2 fp=1 fn=0 $0.0442 ( 21.3s) cum=$3.397
+[ 144/390] claude-sonnet-5      multi        pgrust-4e4126c1b1      passes= 5 tp=3 fp=0 fn=2 $0.0566 ( 42.2s) cum=$3.454
+[ 145/390] claude-sonnet-5      multi        pgrust-b09c0f9aa6      passes= 5 tp=1 fp=0 fn=5 $0.0490 ( 22.6s) cum=$3.503
+[ 146/390] claude-sonnet-5      multi        pgrust-c76dce36c8      passes= 5 tp=1 fp=0 fn=0 $0.0209 ( 18.3s) cum=$3.524
+[ 147/390] claude-sonnet-5      multi        pgrust-931761fd34      passes= 5 tp=2 fp=3 fn=0 $0.0414 ( 24.3s) cum=$3.565
+[ 148/390] claude-sonnet-5      multi        pgrust-1b8b1896fc      passes= 5 tp=2 fp=0 fn=0 $0.0795 ( 68.6s) cum=$3.644
+[ 149/390] claude-sonnet-5      multi        pgrust-e447385f06      passes= 5 tp=1 fp=0 fn=0 $0.0168 ( 12.3s) cum=$3.661
+[ 150/390] claude-sonnet-5      multi        pgrust-29576c75c0      passes= 5 tp=1 fp=1 fn=1 $0.0363 ( 27.9s) cum=$3.698
+[ 151/390] gpt-5-mini           single       fastapi-7fe315c21a     passes= 1 tp=0 fp=0 fn=3 $0.0044 ( 34.2s) cum=$3.702
+[ 152/390] gpt-5-mini           single       fastapi-eb75fd078e     passes= 1 tp=0 fp=0 fn=1 $0.0042 ( 31.0s) cum=$3.706
+[ 153/390] gpt-5-mini           single       fastapi-d8aad201eb     passes= 1 tp=1 fp=1 fn=0 $0.0031 ( 22.2s) cum=$3.709
+[ 154/390] gpt-5-mini           single       fastapi-8a9258b169     passes= 1 tp=0 fp=0 fn=4 $0.0044 ( 28.2s) cum=$3.714
+[ 155/390] gpt-5-mini           single       fastapi-e8b98d2187     passes= 1 tp=0 fp=0 fn=3 $0.0043 ( 28.8s) cum=$3.718
+[ 156/390] gpt-5-mini           single       fastapi-ed2512a5ec     passes= 1 tp=0 fp=0 fn=2 $0.0015 ( 12.8s) cum=$3.720
+[ 157/390] gpt-5-mini           single       fastapi-c5fd75a321     passes= 1 tp=1 fp=1 fn=1 $0.0032 ( 22.6s) cum=$3.723
+[ 158/390] gpt-5-mini           single       fastapi-09f5941f0e     passes= 1 tp=1 fp=1 fn=0 $0.0032 ( 22.5s) cum=$3.726
+[ 159/390] gpt-5-mini           single       fastapi-1d96b3e3f1     passes= 1 tp=1 fp=2 fn=0 $0.0031 ( 25.4s) cum=$3.729
+[ 160/390] gpt-5-mini           single       valibot-1bd01c3046     passes= 1 tp=0 fp=0 fn=2 $0.0042 ( 25.2s) cum=$3.733
+[ 161/390] gpt-5-mini           single       valibot-27ecfefc2f     passes= 1 tp=2 fp=0 fn=1 $0.0033 ( 30.5s) cum=$3.737
+[ 162/390] gpt-5-mini           single       valibot-b16fdf9ba6     passes= 1 tp=0 fp=0 fn=3 $0.0043 ( 33.2s) cum=$3.741
+[ 163/390] gpt-5-mini           single       valibot-17cd7ed5b8     passes= 1 tp=1 fp=1 fn=0 $0.0028 ( 30.2s) cum=$3.744
+[ 164/390] gpt-5-mini           single       valibot-0634c1b704     passes= 1 tp=0 fp=0 fn=3 $0.0042 ( 24.9s) cum=$3.748
+[ 165/390] gpt-5-mini           single       valibot-0cb97f72b3     passes= 1 tp=0 fp=0 fn=1 $0.0042 ( 30.1s) cum=$3.752
+[ 166/390] gpt-5-mini           single       valibot-ef4166c04e     passes= 1 tp=2 fp=0 fn=6 $0.0042 ( 28.3s) cum=$3.756
+[ 167/390] gpt-5-mini           single       chi-878fe71fc9         passes= 1 tp=0 fp=0 fn=3 $0.0043 ( 28.3s) cum=$3.761
+[ 168/390] gpt-5-mini           single       chi-818fdcfc47         passes= 1 tp=1 fp=0 fn=0 $0.0020 ( 12.3s) cum=$3.763
+[ 169/390] gpt-5-mini           single       chi-4ef87eaf2c         passes= 1 tp=1 fp=2 fn=0 $0.0022 ( 14.1s) cum=$3.765
+[ 170/390] gpt-5-mini           single       chi-05f1ef7bb5         passes= 1 tp=1 fp=1 fn=0 $0.0020 ( 14.4s) cum=$3.767
+[ 171/390] gpt-5-mini           single       chi-b750c805b4         passes= 1 tp=1 fp=0 fn=0 $0.0015 ( 10.7s) cum=$3.768
+[ 172/390] gpt-5-mini           single       pgrust-cb60ac482a      passes= 1 tp=1 fp=1 fn=0 $0.0029 ( 20.1s) cum=$3.771
+[ 173/390] gpt-5-mini           single       pgrust-da0531b249      passes= 1 tp=2 fp=0 fn=0 $0.0028 ( 20.8s) cum=$3.774
+[ 174/390] gpt-5-mini           single       pgrust-4e4126c1b1      passes= 1 tp=0 fp=0 fn=5 $0.0044 ( 29.0s) cum=$3.778
+[ 175/390] gpt-5-mini           single       pgrust-b09c0f9aa6      passes= 1 tp=0 fp=0 fn=6 $0.0046 ( 26.4s) cum=$3.783
+[ 176/390] gpt-5-mini           single       pgrust-c76dce36c8      passes= 1 tp=1 fp=2 fn=0 $0.0038 ( 25.8s) cum=$3.787
+[ 177/390] gpt-5-mini           single       pgrust-931761fd34      passes= 1 tp=0 fp=0 fn=2 $0.0043 ( 28.8s) cum=$3.791
+[ 178/390] gpt-5-mini           single       pgrust-1b8b1896fc      passes= 1 tp=0 fp=0 fn=2 $0.0044 ( 32.6s) cum=$3.795
+[ 179/390] gpt-5-mini           single       pgrust-e447385f06      passes= 1 tp=1 fp=2 fn=0 $0.0037 ( 29.0s) cum=$3.799
+[ 180/390] gpt-5-mini           single       pgrust-29576c75c0      passes= 1 tp=2 fp=0 fn=0 $0.0037 ( 24.5s) cum=$3.803
+[ 181/390] gpt-5-mini           parallel     fastapi-7fe315c21a     passes= 4 tp=1 fp=1 fn=2 $0.0176 (113.3s) cum=$3.821
+[ 182/390] gpt-5-mini           parallel     fastapi-eb75fd078e     passes= 4 tp=0 fp=0 fn=1 $0.0138 ( 98.7s) cum=$3.834
+[ 183/390] gpt-5-mini           parallel     fastapi-d8aad201eb     passes= 4 tp=1 fp=2 fn=0 $0.0127 ( 89.8s) cum=$3.847
+[ 184/390] gpt-5-mini           parallel     fastapi-8a9258b169     passes= 4 tp=0 fp=0 fn=4 $0.0177 (125.4s) cum=$3.865
+[ 185/390] gpt-5-mini           parallel     fastapi-e8b98d2187     passes= 4 tp=0 fp=0 fn=3 $0.0104 ( 64.3s) cum=$3.875
+[ 186/390] gpt-5-mini           parallel     fastapi-ed2512a5ec     passes= 4 tp=0 fp=0 fn=2 $0.0120 ( 83.3s) cum=$3.887
+[ 187/390] gpt-5-mini           parallel     fastapi-c5fd75a321     passes= 4 tp=1 fp=1 fn=1 $0.0121 ( 81.3s) cum=$3.899
+[ 188/390] gpt-5-mini           parallel     fastapi-09f5941f0e     passes= 4 tp=1 fp=4 fn=0 $0.0105 ( 77.4s) cum=$3.910
+[ 189/390] gpt-5-mini           parallel     fastapi-1d96b3e3f1     passes= 4 tp=1 fp=5 fn=0 $0.0087 ( 59.8s) cum=$3.918
+[ 190/390] gpt-5-mini           parallel     valibot-1bd01c3046     passes= 4 tp=0 fp=0 fn=2 $0.0142 ( 92.3s) cum=$3.933
+[ 191/390] gpt-5-mini           parallel     valibot-27ecfefc2f     passes= 4 tp=2 fp=4 fn=1 $0.0121 ( 76.4s) cum=$3.945
+[ 192/390] gpt-5-mini           parallel     valibot-b16fdf9ba6     passes= 4 tp=3 fp=1 fn=0 $0.0162 (101.3s) cum=$3.961
+[ 193/390] gpt-5-mini           parallel     valibot-17cd7ed5b8     passes= 4 tp=1 fp=3 fn=0 $0.0106 ( 72.5s) cum=$3.972
+ERR gpt-5-mini           parallel     valibot-0634c1b704     BadRequestError: Error code: 400 - {'error': {'message': 'Could not finish the message because max_tokens or model output limit was reached. Please try again with higher max_tokens.', 'type': 'invalid_request_error', 'param': None, 'code': None}}
+[ 194/390] gpt-5-mini           parallel     valibot-0cb97f72b3     passes= 4 tp=0 fp=0 fn=1 $0.0134 ( 87.0s) cum=$3.994
+Traceback (most recent call last):
+  File "/home/research/workspace/review-orchestration-bench/scripts/run_pilot.py", line 137, in <module>
+    main()
+    ~~~~^^
+  File "/home/research/workspace/review-orchestration-bench/scripts/run_pilot.py", line 95, in main
+    result = runner(pkg, per_item_client, model)
+  File "/home/research/workspace/review-orchestration-bench/src/harness/review.py", line 172, in run_parallel
+    text, cost, _ = _call(client, model, hint + "\n\n" + BASE_SYSTEM,
+                    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          pr_prompt(pkg), pkg["id"], "parallel", f"aspect:{name}")
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/src/harness/review.py", line 147, in _call
+    r = client.chat(
+        model=model, system=system, user=user, max_tokens=max_tokens,
+        context={"item": item_id, "config": config, "pass": pass_name, "model": model},
+    )
+  File "/home/research/workspace/review-orchestration-bench/src/harness/llm.py", line 99, in chat
+    resp = self._openai.chat.completions.create(
+        model=model, max_completion_tokens=max_tokens,
+        messages=[{"role": "system", "content": system},
+                  {"role": "user", "content": user}])
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/openai/_utils/_utils.py", line 298, in wrapper
+    return func(*args, **kwargs)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/openai/resources/chat/completions/completions.py", line 1281, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/chat/completions",
+        ^^^^^^^^^^^^^^^^^^^^
+    ...<53 lines>...
+        stream_cls=Stream[ChatCompletionChunk],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1332, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1037, in request
+    response = self._send_request(
+        request,
+        stream=stream or self._should_stream_response_body(request=request),
+        **kwargs,
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/openai/_client.py", line 478, in _send_request
+    response = self._send_with_auth_retry(request, stream=stream, **kwargs)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/openai/_client.py", line 456, in _send_with_auth_retry
+    response = super()._send_request(request, stream=stream, **kwargs)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 964, in _send_request
+    return self._client.send(request, stream=stream, **kwargs)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+        request,
+    ...<2 lines>...
+        history=[],
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+        request,
+        follow_redirects=follow_redirects,
+        history=history,
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+        pool_request.request
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
+    return self._connection.handle_request(request)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
+    raise exc
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 106, in handle_request
+    ) = self._receive_response_headers(**kwargs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 177, in _receive_response_headers
+    event = self._receive_event(timeout=timeout)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 217, in _receive_event
+    data = self._network_stream.read(
+        self.READ_NUM_BYTES, timeout=timeout
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_backends/sync.py", line 128, in read
+    return self._sock.recv(max_bytes)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/home/linuxbrew/.linuxbrew/opt/python@3.14/lib/python3.14/ssl.py", line 1285, in recv
+    return self.read(buflen)
+           ~~~~~~~~~^^^^^^^^
+  File "/home/linuxbrew/.linuxbrew/opt/python@3.14/lib/python3.14/ssl.py", line 1140, in read
+    return self._sslobj.read(len)
+           ~~~~~~~~~~~~~~~~~^^^^^
+KeyboardInterrupt
+run=sanity-20260729-072233  models=4  configs=4  items=30  combos=480  already_done=284  remaining=196
+[   1/196] gpt-5-mini           parallel     valibot-0634c1b704     passes= 4 tp=3 fp=8 fn=0 $0.0152 ( 78.4s) cum=$4.018
+[   2/196] gpt-5-mini           parallel     valibot-ef4166c04e     passes= 4 tp=4 fp=11 fn=4 $0.0165 ( 81.8s) cum=$4.035
+[   3/196] gpt-5-mini           parallel     chi-878fe71fc9         passes= 4 tp=3 fp=4 fn=0 $0.0173 ( 92.6s) cum=$4.052
+[   4/196] gpt-5-mini           parallel     chi-818fdcfc47         passes= 4 tp=1 fp=10 fn=0 $0.0108 ( 57.8s) cum=$4.063
+[   5/196] gpt-5-mini           parallel     chi-4ef87eaf2c         passes= 4 tp=1 fp=10 fn=0 $0.0149 ( 79.5s) cum=$4.078
+[   6/196] gpt-5-mini           parallel     chi-05f1ef7bb5         passes= 4 tp=1 fp=4 fn=0 $0.0089 ( 47.5s) cum=$4.087
+[   7/196] gpt-5-mini           parallel     chi-b750c805b4         passes= 4 tp=1 fp=6 fn=0 $0.0090 ( 53.6s) cum=$4.096
+[   8/196] gpt-5-mini           parallel     pgrust-cb60ac482a      passes= 4 tp=1 fp=2 fn=0 $0.0093 ( 45.3s) cum=$4.105
+[   9/196] gpt-5-mini           parallel     pgrust-da0531b249      passes= 4 tp=2 fp=10 fn=0 $0.0146 ( 79.3s) cum=$4.119
+[  10/196] gpt-5-mini           parallel     pgrust-4e4126c1b1      passes= 4 tp=4 fp=4 fn=1 $0.0165 ( 82.3s) cum=$4.136
+[  11/196] gpt-5-mini           parallel     pgrust-b09c0f9aa6      passes= 4 tp=6 fp=9 fn=0 $0.0264 (127.1s) cum=$4.162
+[  12/196] gpt-5-mini           parallel     pgrust-c76dce36c8      passes= 4 tp=1 fp=10 fn=0 $0.0219 (103.1s) cum=$4.184
+[  13/196] gpt-5-mini           parallel     pgrust-931761fd34      passes= 4 tp=2 fp=11 fn=0 $0.0225 (103.5s) cum=$4.207
+[  14/196] gpt-5-mini           parallel     pgrust-1b8b1896fc      passes= 4 tp=2 fp=3 fn=0 $0.0126 ( 56.4s) cum=$4.219
+[  15/196] gpt-5-mini           parallel     pgrust-e447385f06      passes= 4 tp=1 fp=9 fn=0 $0.0137 ( 59.8s) cum=$4.233
+[  16/196] gpt-5-mini           parallel     pgrust-29576c75c0      passes= 4 tp=2 fp=7 fn=0 $0.0183 (107.0s) cum=$4.251
+[  17/196] gpt-5-mini           adversarial  fastapi-7fe315c21a     passes= 9 tp=1 fp=3 fn=2 $0.0256 (188.0s) cum=$4.277
+[  18/196] gpt-5-mini           adversarial  fastapi-eb75fd078e     passes= 9 tp=1 fp=2 fn=0 $0.0161 (123.0s) cum=$4.293
+[  19/196] gpt-5-mini           adversarial  fastapi-d8aad201eb     passes= 5 tp=1 fp=0 fn=0 $0.0089 ( 69.8s) cum=$4.302
+[  20/196] gpt-5-mini           adversarial  fastapi-8a9258b169     passes= 5 tp=2 fp=0 fn=2 $0.0157 (116.7s) cum=$4.318
+[  21/196] gpt-5-mini           adversarial  fastapi-e8b98d2187     passes= 7 tp=3 fp=0 fn=0 $0.0111 ( 84.3s) cum=$4.329
+[  22/196] gpt-5-mini           adversarial  fastapi-ed2512a5ec     passes= 5 tp=2 fp=0 fn=0 $0.0101 ( 77.0s) cum=$4.339
+[  23/196] gpt-5-mini           adversarial  fastapi-c5fd75a321     passes= 3 tp=1 fp=0 fn=1 $0.0050 ( 36.3s) cum=$4.344
+[  24/196] gpt-5-mini           adversarial  fastapi-09f5941f0e     passes= 3 tp=1 fp=0 fn=0 $0.0048 ( 33.9s) cum=$4.349
+[  25/196] gpt-5-mini           adversarial  fastapi-1d96b3e3f1     passes= 5 tp=1 fp=1 fn=0 $0.0052 ( 45.9s) cum=$4.354
+[  26/196] gpt-5-mini           adversarial  valibot-1bd01c3046     passes= 5 tp=2 fp=0 fn=0 $0.0112 ( 85.4s) cum=$4.365
+[  27/196] gpt-5-mini           adversarial  valibot-27ecfefc2f     passes= 5 tp=2 fp=0 fn=1 $0.0067 ( 47.9s) cum=$4.372
+[  28/196] gpt-5-mini           adversarial  valibot-b16fdf9ba6     passes= 7 tp=3 fp=0 fn=0 $0.0149 (100.6s) cum=$4.387
+[  29/196] gpt-5-mini           adversarial  valibot-17cd7ed5b8     passes= 5 tp=1 fp=1 fn=0 $0.0066 ( 50.4s) cum=$4.393
+[  30/196] gpt-5-mini           adversarial  valibot-0634c1b704     passes=11 tp=3 fp=2 fn=0 $0.0132 ( 90.0s) cum=$4.406
+[  31/196] gpt-5-mini           adversarial  valibot-0cb97f72b3     passes= 5 tp=1 fp=0 fn=0 $0.0104 ( 80.1s) cum=$4.417
+[  32/196] gpt-5-mini           adversarial  valibot-ef4166c04e     passes= 7 tp=2 fp=0 fn=6 $0.0105 ( 76.4s) cum=$4.427
+[  33/196] gpt-5-mini           adversarial  chi-878fe71fc9         passes= 5 tp=2 fp=0 fn=1 $0.0090 ( 69.5s) cum=$4.436
+[  34/196] gpt-5-mini           adversarial  chi-818fdcfc47         passes= 7 tp=1 fp=0 fn=0 $0.0083 ( 83.9s) cum=$4.445
+[  35/196] gpt-5-mini           adversarial  chi-4ef87eaf2c         passes= 7 tp=1 fp=2 fn=0 $0.0094 ( 73.4s) cum=$4.454
+[  36/196] gpt-5-mini           adversarial  chi-05f1ef7bb5         passes= 3 tp=1 fp=0 fn=0 $0.0048 ( 35.4s) cum=$4.459
+[  37/196] gpt-5-mini           adversarial  chi-b750c805b4         passes= 3 tp=1 fp=0 fn=0 $0.0033 ( 25.6s) cum=$4.462
+[  38/196] gpt-5-mini           adversarial  pgrust-cb60ac482a      passes= 3 tp=1 fp=0 fn=0 $0.0047 ( 30.2s) cum=$4.467
+[  39/196] gpt-5-mini           adversarial  pgrust-da0531b249      passes= 5 tp=2 fp=0 fn=0 $0.0065 ( 52.6s) cum=$4.473
+[  40/196] gpt-5-mini           adversarial  pgrust-4e4126c1b1      passes= 9 tp=4 fp=0 fn=1 $0.0140 ( 99.6s) cum=$4.487
+[  41/196] gpt-5-mini           adversarial  pgrust-b09c0f9aa6      passes= 7 tp=3 fp=0 fn=3 $0.0126 ( 91.0s) cum=$4.500
+[  42/196] gpt-5-mini           adversarial  pgrust-c76dce36c8      passes= 7 tp=1 fp=2 fn=0 $0.0163 (129.1s) cum=$4.516
+[  43/196] gpt-5-mini           adversarial  pgrust-931761fd34      passes= 9 tp=1 fp=3 fn=1 $0.0160 (105.6s) cum=$4.532
+[  44/196] gpt-5-mini           adversarial  pgrust-1b8b1896fc      passes= 5 tp=2 fp=0 fn=0 $0.0077 ( 57.6s) cum=$4.540
+[  45/196] gpt-5-mini           adversarial  pgrust-e447385f06      passes= 7 tp=1 fp=2 fn=0 $0.0107 ( 76.8s) cum=$4.551
+[  46/196] gpt-5-mini           adversarial  pgrust-29576c75c0      passes= 5 tp=2 fp=0 fn=0 $0.0078 ( 42.5s) cum=$4.559
+[  47/196] gpt-5-mini           multi        fastapi-7fe315c21a     passes= 5 tp=2 fp=2 fn=1 $0.0259 (158.5s) cum=$4.585
+[  48/196] gpt-5-mini           multi        fastapi-eb75fd078e     passes= 5 tp=1 fp=1 fn=0 $0.0354 (204.0s) cum=$4.620
+[  49/196] gpt-5-mini           multi        fastapi-d8aad201eb     passes= 5 tp=1 fp=1 fn=0 $0.0200 ( 93.4s) cum=$4.640
+[  50/196] gpt-5-mini           multi        fastapi-8a9258b169     passes= 5 tp=2 fp=1 fn=2 $0.0428 (196.6s) cum=$4.683
+[  51/196] gpt-5-mini           multi        fastapi-e8b98d2187     passes= 5 tp=3 fp=0 fn=0 $0.0244 (129.9s) cum=$4.707
+[  52/196] gpt-5-mini           multi        fastapi-ed2512a5ec     passes= 5 tp=1 fp=0 fn=1 $0.0214 (110.9s) cum=$4.728
+[  53/196] gpt-5-mini           multi        fastapi-c5fd75a321     passes= 5 tp=1 fp=0 fn=1 $0.0188 ( 87.6s) cum=$4.747
+[  54/196] gpt-5-mini           multi        fastapi-09f5941f0e     passes= 5 tp=1 fp=0 fn=0 $0.0140 ( 89.2s) cum=$4.761
+[  55/196] gpt-5-mini           multi        fastapi-1d96b3e3f1     passes= 5 tp=1 fp=0 fn=0 $0.0116 ( 61.7s) cum=$4.773
+[  56/196] gpt-5-mini           multi        valibot-1bd01c3046     passes= 5 tp=2 fp=0 fn=0 $0.0271 (119.8s) cum=$4.800
+[  57/196] gpt-5-mini           multi        valibot-27ecfefc2f     passes= 5 tp=2 fp=0 fn=1 $0.0132 ( 62.5s) cum=$4.813
+[  58/196] gpt-5-mini           multi        valibot-b16fdf9ba6     passes= 5 tp=3 fp=2 fn=0 $0.0285 (145.8s) cum=$4.842
+[  59/196] gpt-5-mini           multi        valibot-17cd7ed5b8     passes= 5 tp=1 fp=0 fn=0 $0.0152 (122.3s) cum=$4.857
+[  60/196] gpt-5-mini           multi        valibot-0634c1b704     passes= 5 tp=3 fp=0 fn=0 $0.0216 (164.3s) cum=$4.878
+[  61/196] gpt-5-mini           multi        valibot-0cb97f72b3     passes= 5 tp=1 fp=1 fn=0 $0.0196 (144.6s) cum=$4.898
+[  62/196] gpt-5-mini           multi        valibot-ef4166c04e     passes= 5 tp=4 fp=0 fn=4 $0.0229 (179.4s) cum=$4.921
+[  63/196] gpt-5-mini           multi        chi-878fe71fc9         passes= 5 tp=3 fp=0 fn=0 $0.0225 (170.5s) cum=$4.944
+[  64/196] gpt-5-mini           multi        chi-818fdcfc47         passes= 5 tp=1 fp=1 fn=0 $0.0148 (103.7s) cum=$4.958
+[  65/196] gpt-5-mini           multi        chi-4ef87eaf2c         passes= 5 tp=1 fp=0 fn=0 $0.0151 ( 95.0s) cum=$4.973
+[  66/196] gpt-5-mini           multi        chi-05f1ef7bb5         passes= 5 tp=1 fp=0 fn=0 $0.0127 ( 87.5s) cum=$4.986
+[  67/196] gpt-5-mini           multi        chi-b750c805b4         passes= 5 tp=1 fp=0 fn=0 $0.0091 ( 67.9s) cum=$4.995
+[  68/196] gpt-5-mini           multi        pgrust-cb60ac482a      passes= 5 tp=1 fp=0 fn=0 $0.0154 (104.2s) cum=$5.011
+[  69/196] gpt-5-mini           multi        pgrust-da0531b249      passes= 5 tp=2 fp=0 fn=0 $0.0118 ( 86.6s) cum=$5.022
+[  70/196] gpt-5-mini           multi        pgrust-4e4126c1b1      passes= 5 tp=4 fp=0 fn=1 $0.0214 (145.3s) cum=$5.044
+[  71/196] gpt-5-mini           multi        pgrust-b09c0f9aa6      passes= 5 tp=5 fp=0 fn=1 $0.0263 (140.6s) cum=$5.070
+[  72/196] gpt-5-mini           multi        pgrust-c76dce36c8      passes= 5 tp=1 fp=1 fn=0 $0.0262 (132.0s) cum=$5.096
+[  73/196] gpt-5-mini           multi        pgrust-931761fd34      passes= 5 tp=2 fp=1 fn=0 $0.0247 (170.0s) cum=$5.121
+[  74/196] gpt-5-mini           multi        pgrust-1b8b1896fc      passes= 5 tp=2 fp=0 fn=0 $0.0163 ( 90.6s) cum=$5.137
+[  75/196] gpt-5-mini           multi        pgrust-e447385f06      passes= 5 tp=1 fp=0 fn=0 $0.0210 (132.8s) cum=$5.158
+[  76/196] gpt-5-mini           multi        pgrust-29576c75c0      passes= 5 tp=2 fp=0 fn=0 $0.0193 (114.8s) cum=$5.177
+[  77/196] gpt-5                single       fastapi-7fe315c21a     passes= 1 tp=1 fp=1 fn=2 $0.0419 ( 60.3s) cum=$5.219
+[  78/196] gpt-5                single       fastapi-eb75fd078e     passes= 1 tp=1 fp=1 fn=0 $0.0523 ( 60.9s) cum=$5.272
+[  79/196] gpt-5                single       fastapi-d8aad201eb     passes= 1 tp=0 fp=0 fn=1 $0.0322 ( 47.5s) cum=$5.304
+[  80/196] gpt-5                single       fastapi-8a9258b169     passes= 1 tp=0 fp=0 fn=4 $0.0835 (108.7s) cum=$5.387
+[  81/196] gpt-5                single       fastapi-e8b98d2187     passes= 1 tp=0 fp=0 fn=3 $0.0242 ( 30.5s) cum=$5.412
+[  82/196] gpt-5                single       fastapi-ed2512a5ec     passes= 1 tp=0 fp=0 fn=2 $0.0272 ( 36.5s) cum=$5.439
+[  83/196] gpt-5                single       fastapi-c5fd75a321     passes= 1 tp=1 fp=0 fn=1 $0.0223 ( 26.3s) cum=$5.461
+[  84/196] gpt-5                single       fastapi-09f5941f0e     passes= 1 tp=1 fp=0 fn=0 $0.0381 ( 46.8s) cum=$5.499
+[  85/196] gpt-5                single       fastapi-1d96b3e3f1     passes= 1 tp=1 fp=0 fn=0 $0.0181 ( 23.1s) cum=$5.517
+[  86/196] gpt-5                single       valibot-1bd01c3046     passes= 1 tp=2 fp=0 fn=0 $0.0430 ( 51.3s) cum=$5.560
+[  87/196] gpt-5                single       valibot-27ecfefc2f     passes= 1 tp=2 fp=0 fn=1 $0.0352 ( 41.6s) cum=$5.595
+[  88/196] gpt-5                single       valibot-b16fdf9ba6     passes= 1 tp=2 fp=0 fn=1 $0.0290 ( 35.7s) cum=$5.624
+[  89/196] gpt-5                single       valibot-17cd7ed5b8     passes= 1 tp=0 fp=0 fn=1 $0.0166 ( 22.9s) cum=$5.641
+[  90/196] gpt-5                single       valibot-0634c1b704     passes= 1 tp=3 fp=0 fn=0 $0.0390 ( 52.5s) cum=$5.680
+[  91/196] gpt-5                single       valibot-0cb97f72b3     passes= 1 tp=1 fp=0 fn=0 $0.0287 ( 32.5s) cum=$5.709
+[  92/196] gpt-5                single       valibot-ef4166c04e     passes= 1 tp=2 fp=1 fn=6 $0.0393 ( 48.0s) cum=$5.748
+[  93/196] gpt-5                single       chi-878fe71fc9         passes= 1 tp=2 fp=0 fn=1 $0.0414 ( 38.4s) cum=$5.789
+[  94/196] gpt-5                single       chi-818fdcfc47         passes= 1 tp=0 fp=0 fn=1 $0.0121 ( 21.8s) cum=$5.801
+[  95/196] gpt-5                single       chi-4ef87eaf2c         passes= 1 tp=1 fp=1 fn=0 $0.0367 ( 45.3s) cum=$5.838
+[  96/196] gpt-5                single       chi-05f1ef7bb5         passes= 1 tp=1 fp=0 fn=0 $0.0188 ( 25.2s) cum=$5.857
+[  97/196] gpt-5                single       chi-b750c805b4         passes= 1 tp=1 fp=0 fn=0 $0.0167 ( 22.6s) cum=$5.874
+[  98/196] gpt-5                single       pgrust-cb60ac482a      passes= 1 tp=1 fp=0 fn=0 $0.0248 ( 37.1s) cum=$5.898
+[  99/196] gpt-5                single       pgrust-da0531b249      passes= 1 tp=2 fp=0 fn=0 $0.0177 ( 21.1s) cum=$5.916
+[ 100/196] gpt-5                single       pgrust-4e4126c1b1      passes= 1 tp=3 fp=0 fn=2 $0.0496 ( 54.0s) cum=$5.966
+[ 101/196] gpt-5                single       pgrust-b09c0f9aa6      passes= 1 tp=2 fp=1 fn=4 $0.0397 ( 54.5s) cum=$6.005
+[ 102/196] gpt-5                single       pgrust-c76dce36c8      passes= 1 tp=1 fp=0 fn=0 $0.0251 ( 39.4s) cum=$6.031
+[ 103/196] gpt-5                single       pgrust-931761fd34      passes= 1 tp=1 fp=0 fn=1 $0.0625 ( 85.3s) cum=$6.093
+[ 104/196] gpt-5                single       pgrust-1b8b1896fc      passes= 1 tp=2 fp=0 fn=0 $0.0482 ( 61.0s) cum=$6.141
+[ 105/196] gpt-5                single       pgrust-e447385f06      passes= 1 tp=1 fp=0 fn=0 $0.0320 ( 36.4s) cum=$6.173
+[ 106/196] gpt-5                single       pgrust-29576c75c0      passes= 1 tp=1 fp=0 fn=1 $0.0283 ( 27.6s) cum=$6.202
+[ 107/196] gpt-5                parallel     fastapi-7fe315c21a     passes= 4 tp=1 fp=9 fn=2 $0.1859 (248.0s) cum=$6.388
+[ 108/196] gpt-5                parallel     fastapi-eb75fd078e     passes= 4 tp=1 fp=3 fn=0 $0.1120 (122.3s) cum=$6.500
+[ 109/196] gpt-5                parallel     fastapi-d8aad201eb     passes= 4 tp=0 fp=0 fn=1 $0.0513 ( 60.3s) cum=$6.551
+[ 110/196] gpt-5                parallel     fastapi-8a9258b169     passes= 4 tp=1 fp=0 fn=3 $0.2292 (313.9s) cum=$6.780
+[ 111/196] gpt-5                parallel     fastapi-e8b98d2187     passes= 4 tp=0 fp=0 fn=3 $0.0581 ( 62.3s) cum=$6.838
+[ 112/196] gpt-5                parallel     fastapi-ed2512a5ec     passes= 4 tp=0 fp=0 fn=2 $0.0771 ( 98.7s) cum=$6.915
+[ 113/196] gpt-5                parallel     fastapi-c5fd75a321     passes= 4 tp=1 fp=1 fn=1 $0.0957 (105.8s) cum=$7.011
+[ 114/196] gpt-5                parallel     fastapi-09f5941f0e     passes= 4 tp=1 fp=0 fn=0 $0.0696 ( 66.7s) cum=$7.080
+[ 115/196] gpt-5                parallel     fastapi-1d96b3e3f1     passes= 4 tp=1 fp=2 fn=0 $0.0616 ( 68.3s) cum=$7.142
+[ 116/196] gpt-5                parallel     valibot-1bd01c3046     passes= 4 tp=2 fp=4 fn=0 $0.1243 (141.5s) cum=$7.266
+[ 117/196] gpt-5                parallel     valibot-27ecfefc2f     passes= 4 tp=2 fp=4 fn=1 $0.0640 ( 88.7s) cum=$7.330
+[ 118/196] gpt-5                parallel     valibot-b16fdf9ba6     passes= 4 tp=3 fp=2 fn=0 $0.1731 (223.0s) cum=$7.503
+[ 119/196] gpt-5                parallel     valibot-17cd7ed5b8     passes= 4 tp=0 fp=0 fn=1 $0.0416 ( 59.5s) cum=$7.545
+[ 120/196] gpt-5                parallel     valibot-0634c1b704     passes= 4 tp=2 fp=0 fn=1 $0.0848 (113.2s) cum=$7.630
+[ 121/196] gpt-5                parallel     valibot-0cb97f72b3     passes= 4 tp=1 fp=2 fn=0 $0.0882 (107.1s) cum=$7.718
+[ 122/196] gpt-5                parallel     valibot-ef4166c04e     passes= 4 tp=3 fp=9 fn=5 $0.1606 (197.2s) cum=$7.879
+[ 123/196] gpt-5                parallel     chi-878fe71fc9         passes= 4 tp=2 fp=2 fn=1 $0.1027 (117.2s) cum=$7.981
+[ 124/196] gpt-5                parallel     chi-818fdcfc47         passes= 4 tp=0 fp=0 fn=1 $0.0638 ( 99.0s) cum=$8.045
+[ 125/196] gpt-5                parallel     chi-4ef87eaf2c         passes= 4 tp=1 fp=3 fn=0 $0.0924 (166.2s) cum=$8.138
+[ 126/196] gpt-5                parallel     chi-05f1ef7bb5         passes= 4 tp=1 fp=1 fn=0 $0.0752 (116.6s) cum=$8.213
+[ 127/196] gpt-5                parallel     chi-b750c805b4         passes= 4 tp=1 fp=2 fn=0 $0.0423 ( 66.5s) cum=$8.255
+[ 128/196] gpt-5                parallel     pgrust-cb60ac482a      passes= 4 tp=1 fp=1 fn=0 $0.0633 ( 80.9s) cum=$8.318
+[ 129/196] gpt-5                parallel     pgrust-da0531b249      passes= 4 tp=2 fp=5 fn=0 $0.1324 (146.0s) cum=$8.451
+[ 130/196] gpt-5                parallel     pgrust-4e4126c1b1      passes= 4 tp=3 fp=6 fn=2 $0.1107 (145.5s) cum=$8.561
+[ 131/196] gpt-5                parallel     pgrust-b09c0f9aa6      passes= 4 tp=2 fp=6 fn=4 $0.1133 (181.0s) cum=$8.675
+[ 132/196] gpt-5                parallel     pgrust-c76dce36c8      passes= 4 tp=1 fp=2 fn=0 $0.1129 (135.3s) cum=$8.788
+[ 133/196] gpt-5                parallel     pgrust-931761fd34      passes= 4 tp=2 fp=2 fn=0 $0.1154 (157.3s) cum=$8.903
+[ 134/196] gpt-5                parallel     pgrust-1b8b1896fc      passes= 4 tp=2 fp=0 fn=0 $0.1452 (207.5s) cum=$9.048
+[ 135/196] gpt-5                parallel     pgrust-e447385f06      passes= 4 tp=1 fp=2 fn=0 $0.1111 (171.9s) cum=$9.159
+[ 136/196] gpt-5                parallel     pgrust-29576c75c0      passes= 4 tp=1 fp=1 fn=1 $0.1512 (194.2s) cum=$9.310
+[ 137/196] gpt-5                adversarial  fastapi-7fe315c21a     passes= 9 tp=1 fp=2 fn=2 $0.1576 (208.3s) cum=$9.468
+[ 138/196] gpt-5                adversarial  fastapi-eb75fd078e     passes= 7 tp=0 fp=0 fn=1 $0.1061 (138.9s) cum=$9.574
+[ 139/196] gpt-5                adversarial  fastapi-d8aad201eb     passes= 1 tp=0 fp=0 fn=1 $0.0296 ( 36.0s) cum=$9.604
+[ 140/196] gpt-5                adversarial  fastapi-8a9258b169     passes= 1 tp=0 fp=0 fn=4 $0.0835 (109.9s) cum=$9.687
+[ 141/196] gpt-5                adversarial  fastapi-e8b98d2187     passes= 1 tp=0 fp=0 fn=3 $0.0287 ( 40.4s) cum=$9.716
+[ 142/196] gpt-5                adversarial  fastapi-ed2512a5ec     passes= 1 tp=0 fp=0 fn=2 $0.0349 ( 47.4s) cum=$9.751
+[ 143/196] gpt-5                adversarial  fastapi-c5fd75a321     passes= 3 tp=1 fp=0 fn=1 $0.0836 (118.1s) cum=$9.834
+[ 144/196] gpt-5                adversarial  fastapi-09f5941f0e     passes= 3 tp=1 fp=0 fn=0 $0.0614 ( 84.1s) cum=$9.896
+[ 145/196] gpt-5                adversarial  fastapi-1d96b3e3f1     passes= 3 tp=1 fp=0 fn=0 $0.0433 ( 66.0s) cum=$9.939
+[ 146/196] gpt-5                adversarial  valibot-1bd01c3046     passes= 5 tp=1 fp=0 fn=1 $0.1140 (177.7s) cum=$10.053
+[ 147/196] gpt-5                adversarial  valibot-27ecfefc2f     passes= 5 tp=2 fp=0 fn=1 $0.0479 ( 58.6s) cum=$10.101
+[ 148/196] gpt-5                adversarial  valibot-b16fdf9ba6     passes= 5 tp=1 fp=0 fn=2 $0.1249 (173.3s) cum=$10.226
+[ 149/196] gpt-5                adversarial  valibot-17cd7ed5b8     passes= 3 tp=0 fp=0 fn=1 $0.0315 ( 44.2s) cum=$10.257
+[ 150/196] gpt-5                adversarial  valibot-0634c1b704     passes= 5 tp=0 fp=0 fn=3 $0.0849 (121.4s) cum=$10.342
+[ 151/196] gpt-5                adversarial  valibot-0cb97f72b3     passes= 3 tp=1 fp=0 fn=0 $0.0463 ( 55.7s) cum=$10.389
+[ 152/196] gpt-5                adversarial  valibot-ef4166c04e     passes= 9 tp=4 fp=0 fn=4 $0.1203 (162.2s) cum=$10.509
+[ 153/196] gpt-5                adversarial  chi-878fe71fc9         passes= 5 tp=2 fp=0 fn=1 $0.0846 (121.0s) cum=$10.593
+[ 154/196] gpt-5                adversarial  chi-818fdcfc47         passes= 1 tp=0 fp=0 fn=1 $0.0223 ( 29.7s) cum=$10.616
+[ 155/196] gpt-5                adversarial  chi-4ef87eaf2c         passes= 3 tp=1 fp=0 fn=0 $0.0418 ( 50.4s) cum=$10.658
+[ 156/196] gpt-5                adversarial  chi-05f1ef7bb5         passes= 3 tp=1 fp=0 fn=0 $0.0404 ( 54.2s) cum=$10.698
+[ 157/196] gpt-5                adversarial  chi-b750c805b4         passes= 3 tp=1 fp=0 fn=0 $0.0315 ( 41.6s) cum=$10.730
+[ 158/196] gpt-5                adversarial  pgrust-cb60ac482a      passes= 3 tp=1 fp=0 fn=0 $0.0394 ( 48.5s) cum=$10.769
+[ 159/196] gpt-5                adversarial  pgrust-da0531b249      passes= 5 tp=2 fp=0 fn=0 $0.0657 ( 86.5s) cum=$10.835
+[ 160/196] gpt-5                adversarial  pgrust-4e4126c1b1      passes= 3 tp=1 fp=0 fn=4 $0.0707 ( 91.7s) cum=$10.905
+[ 161/196] gpt-5                adversarial  pgrust-b09c0f9aa6      passes= 7 tp=2 fp=1 fn=4 $0.0987 (142.4s) cum=$11.004
+[ 162/196] gpt-5                adversarial  pgrust-c76dce36c8      passes= 3 tp=1 fp=0 fn=0 $0.0421 ( 84.7s) cum=$11.046
+[ 163/196] gpt-5                adversarial  pgrust-931761fd34      passes= 5 tp=2 fp=0 fn=0 $0.1061 (169.3s) cum=$11.152
+[ 164/196] gpt-5                adversarial  pgrust-1b8b1896fc      passes= 5 tp=1 fp=0 fn=1 $0.1078 (172.1s) cum=$11.260
+[ 165/196] gpt-5                adversarial  pgrust-e447385f06      passes= 3 tp=1 fp=0 fn=0 $0.0406 ( 57.4s) cum=$11.301
+[ 166/196] gpt-5                adversarial  pgrust-29576c75c0      passes= 1 tp=0 fp=0 fn=2 $0.0557 ( 77.8s) cum=$11.356
+[ 167/196] gpt-5                multi        fastapi-7fe315c21a     passes= 5 tp=1 fp=3 fn=2 $0.2411 (336.5s) cum=$11.597
+[ 168/196] gpt-5                multi        fastapi-eb75fd078e     passes= 5 tp=1 fp=1 fn=0 $0.2506 (371.0s) cum=$11.848
+[ 169/196] gpt-5                multi        fastapi-d8aad201eb     passes= 5 tp=0 fp=0 fn=1 $0.1288 (187.8s) cum=$11.977
+[ 170/196] gpt-5                multi        fastapi-8a9258b169     passes= 4 tp=0 fp=0 fn=4 $0.3177 (481.2s) cum=$12.295
+[ 171/196] gpt-5                multi        fastapi-e8b98d2187     passes= 5 tp=0 fp=0 fn=3 $0.1644 (244.7s) cum=$12.459
+[ 172/196] gpt-5                multi        fastapi-ed2512a5ec     passes= 5 tp=0 fp=0 fn=2 $0.1503 (205.6s) cum=$12.609
+[ 173/196] gpt-5                multi        fastapi-c5fd75a321     passes= 5 tp=1 fp=0 fn=1 $0.1971 (273.8s) cum=$12.806
+[ 174/196] gpt-5                multi        fastapi-09f5941f0e     passes= 5 tp=0 fp=0 fn=1 $0.1296 (203.1s) cum=$12.936
+[ 175/196] gpt-5                multi        fastapi-1d96b3e3f1     passes= 5 tp=1 fp=0 fn=0 $0.0912 (134.6s) cum=$13.027
+[ 176/196] gpt-5                multi        valibot-1bd01c3046     passes= 5 tp=2 fp=2 fn=0 $0.2328 (339.8s) cum=$13.260
+[ 177/196] gpt-5                multi        valibot-27ecfefc2f     passes= 5 tp=2 fp=2 fn=1 $0.1052 (144.8s) cum=$13.365
+[ 178/196] gpt-5                multi        valibot-b16fdf9ba6     passes= 5 tp=2 fp=2 fn=1 $0.3075 (411.6s) cum=$13.673
+[ 179/196] gpt-5                multi        valibot-17cd7ed5b8     passes= 5 tp=1 fp=0 fn=0 $0.1056 (153.2s) cum=$13.778
+[ 180/196] gpt-5                multi        valibot-0634c1b704     passes= 5 tp=1 fp=0 fn=2 $0.2072 (283.2s) cum=$13.985
+[ 181/196] gpt-5                multi        valibot-0cb97f72b3     passes= 5 tp=1 fp=0 fn=0 $0.1478 (184.4s) cum=$14.133
+[ 182/196] gpt-5                multi        valibot-ef4166c04e     passes= 5 tp=3 fp=0 fn=5 $0.1565 (205.6s) cum=$14.290
+[ 183/196] gpt-5                multi        chi-878fe71fc9         passes= 5 tp=2 fp=0 fn=1 $0.2021 (288.3s) cum=$14.492
+[ 184/196] gpt-5                multi        chi-818fdcfc47         passes= 5 tp=0 fp=0 fn=1 $0.1325 (206.0s) cum=$14.624
+[ 185/196] gpt-5                multi        chi-4ef87eaf2c         passes= 5 tp=1 fp=1 fn=0 $0.1524 (208.3s) cum=$14.777
+[ 186/196] gpt-5                multi        chi-05f1ef7bb5         passes= 5 tp=1 fp=1 fn=0 $0.1385 (197.8s) cum=$14.915
+[ 187/196] gpt-5                multi        chi-b750c805b4         passes= 5 tp=1 fp=0 fn=0 $0.0931 (121.7s) cum=$15.008
+[ 188/196] gpt-5                multi        pgrust-cb60ac482a      passes= 5 tp=1 fp=0 fn=0 $0.1224 (162.4s) cum=$15.131
+[ 189/196] gpt-5                multi        pgrust-da0531b249      passes= 5 tp=2 fp=0 fn=0 $0.1672 (218.0s) cum=$15.298
+[ 190/196] gpt-5                multi        pgrust-4e4126c1b1      passes= 5 tp=3 fp=1 fn=2 $0.2360 (290.7s) cum=$15.534
+[ 191/196] gpt-5                multi        pgrust-b09c0f9aa6      passes= 5 tp=2 fp=0 fn=4 $0.1852 (276.4s) cum=$15.719
+[ 192/196] gpt-5                multi        pgrust-c76dce36c8      passes= 5 tp=1 fp=1 fn=0 $0.1688 (236.6s) cum=$15.888
+[ 193/196] gpt-5                multi        pgrust-931761fd34      passes= 5 tp=2 fp=3 fn=0 $0.2243 (288.2s) cum=$16.112
+[ 194/196] gpt-5                multi        pgrust-1b8b1896fc      passes= 5 tp=2 fp=1 fn=0 $0.2442 (332.5s) cum=$16.356
+[ 195/196] gpt-5                multi        pgrust-e447385f06      passes= 5 tp=1 fp=1 fn=0 $0.1575 (215.9s) cum=$16.514
+[ 196/196] gpt-5                multi        pgrust-29576c75c0      passes= 5 tp=1 fp=0 fn=1 $0.2239 (282.3s) cum=$16.738
+
+done in 382.7 min. total ledger spend: $16.7379
+results: /home/research/workspace/review-orchestration-bench/data/experiments/v0/sanity-20260729-072233.results.jsonl
+run=sanity-20260729-072233  models=7  configs=4  items=30  combos=840  already_done=480  remaining=360
+[   1/360] claude-opus-4-8      single       fastapi-7fe315c21a     passes= 1 tp=1 fp=1 fn=2 $0.0174 (  4.7s) cum=$16.755
+[   2/360] claude-opus-4-8      single       fastapi-eb75fd078e     passes= 1 tp=1 fp=0 fn=0 $0.0077 (  2.5s) cum=$16.763
+[   3/360] claude-opus-4-8      single       fastapi-d8aad201eb     passes= 1 tp=0 fp=0 fn=1 $0.0042 (  1.3s) cum=$16.767
+[   4/360] claude-opus-4-8      single       fastapi-8a9258b169     passes= 1 tp=1 fp=1 fn=3 $0.0183 (  6.0s) cum=$16.785
+[   5/360] claude-opus-4-8      single       fastapi-e8b98d2187     passes= 1 tp=0 fp=0 fn=3 $0.0072 (  2.0s) cum=$16.793
+[   6/360] claude-opus-4-8      single       fastapi-ed2512a5ec     passes= 1 tp=0 fp=0 fn=2 $0.0056 (  1.0s) cum=$16.798
+[   7/360] claude-opus-4-8      single       fastapi-c5fd75a321     passes= 1 tp=1 fp=0 fn=1 $0.0082 (  3.1s) cum=$16.807
+[   8/360] claude-opus-4-8      single       fastapi-09f5941f0e     passes= 1 tp=0 fp=0 fn=1 $0.0035 (  1.6s) cum=$16.810
+[   9/360] claude-opus-4-8      single       fastapi-1d96b3e3f1     passes= 1 tp=1 fp=0 fn=0 $0.0061 (  2.6s) cum=$16.816
+[  10/360] claude-opus-4-8      single       valibot-1bd01c3046     passes= 1 tp=2 fp=0 fn=0 $0.0130 (  5.2s) cum=$16.829
+[  11/360] claude-opus-4-8      single       valibot-27ecfefc2f     passes= 1 tp=2 fp=0 fn=1 $0.0122 (  3.8s) cum=$16.841
+[  12/360] claude-opus-4-8      single       valibot-b16fdf9ba6     passes= 1 tp=2 fp=0 fn=1 $0.0124 ( 12.1s) cum=$16.854
+[  13/360] claude-opus-4-8      single       valibot-17cd7ed5b8     passes= 1 tp=0 fp=0 fn=1 $0.0033 (  1.3s) cum=$16.857
+[  14/360] claude-opus-4-8      single       valibot-0634c1b704     passes= 1 tp=1 fp=1 fn=2 $0.0120 (  5.0s) cum=$16.869
+[  15/360] claude-opus-4-8      single       valibot-0cb97f72b3     passes= 1 tp=1 fp=1 fn=0 $0.0114 (  4.6s) cum=$16.880
+Traceback (most recent call last):
+  File "/home/research/workspace/review-orchestration-bench/scripts/run_pilot.py", line 139, in <module>
+    main()
+    ~~~~^^
+  File "/home/research/workspace/review-orchestration-bench/scripts/run_pilot.py", line 97, in main
+    result = runner(pkg, per_item_client, model)
+  File "/home/research/workspace/review-orchestration-bench/src/harness/review.py", line 155, in run_single
+    text, cost, _ = _call(client, model, BASE_SYSTEM, pr_prompt(pkg),
+                    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          pkg["id"], "single", "reviewer")
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/src/harness/review.py", line 147, in _call
+    r = client.chat(
+        model=model, system=system, user=user, max_tokens=max_tokens,
+        context={"item": item_id, "config": config, "pass": pass_name, "model": model},
+    )
+  File "/home/research/workspace/review-orchestration-bench/src/harness/llm.py", line 90, in chat
+    resp = self._anthropic.messages.create(
+        model=model, max_tokens=max_tokens, system=system,
+        messages=[{"role": "user", "content": user}])
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/anthropic/_utils/_utils.py", line 294, in wrapper
+    return func(*args, **kwargs)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/anthropic/resources/messages/messages.py", line 1050, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/v1/messages",
+        ^^^^^^^^^^^^^^^
+    ...<30 lines>...
+        stream_cls=Stream[RawMessageStreamEvent],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/anthropic/_base_client.py", line 1536, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/anthropic/_base_client.py", line 1137, in request
+    response, prepared = self._attempt_request(
+                         ~~~~~~~~~~~~~~~~~~~~~^
+        model_copy(input_options), stream=stream, retries_taken=retries_taken
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/anthropic/_base_client.py", line 1295, in _attempt_request
+    response = self._client.send(
+        request,
+        stream=stream or self._should_stream_response_body(request=request),
+        **kwargs,
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+        request,
+    ...<2 lines>...
+        history=[],
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+        request,
+        follow_redirects=follow_redirects,
+        history=history,
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+        pool_request.request
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
+    return self._connection.handle_request(request)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
+    raise exc
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 106, in handle_request
+    ) = self._receive_response_headers(**kwargs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 177, in _receive_response_headers
+    event = self._receive_event(timeout=timeout)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 217, in _receive_event
+    data = self._network_stream.read(
+        self.READ_NUM_BYTES, timeout=timeout
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_backends/sync.py", line 128, in read
+    return self._sock.recv(max_bytes)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/home/linuxbrew/.linuxbrew/opt/python@3.14/lib/python3.14/ssl.py", line 1285, in recv
+    return self.read(buflen)
+           ~~~~~~~~~^^^^^^^^
+  File "/home/linuxbrew/.linuxbrew/opt/python@3.14/lib/python3.14/ssl.py", line 1140, in read
+    return self._sslobj.read(len)
+           ~~~~~~~~~~~~~~~~~^^^^^
+KeyboardInterrupt
+run=sanity-20260729-072233  models=10  configs=4  items=30  combos=1200  already_done=480  remaining=720
+[   1/720] claude-opus-5        single       fastapi-7fe315c21a     passes= 1 tp=1 fp=2 fn=2 $0.0587 ( 26.5s) cum=$16.939
+[   2/720] claude-opus-5        single       fastapi-eb75fd078e     passes= 1 tp=1 fp=2 fn=0 $0.0487 ( 22.6s) cum=$16.988
+[   3/720] claude-opus-5        single       fastapi-d8aad201eb     passes= 1 tp=1 fp=1 fn=0 $0.0352 ( 16.8s) cum=$17.023
+[   4/720] claude-opus-5        single       fastapi-8a9258b169     passes= 1 tp=2 fp=0 fn=2 $0.0708 ( 32.2s) cum=$17.094
+[   5/720] claude-opus-5        single       fastapi-e8b98d2187     passes= 1 tp=2 fp=0 fn=1 $0.0427 ( 17.8s) cum=$17.137
+[   6/720] claude-opus-5        single       fastapi-ed2512a5ec     passes= 1 tp=1 fp=0 fn=1 $0.0354 ( 15.1s) cum=$17.172
+[   7/720] claude-opus-5        single       fastapi-c5fd75a321     passes= 1 tp=1 fp=0 fn=1 $0.0160 (  6.8s) cum=$17.188
+Traceback (most recent call last):
+  File "/home/research/workspace/review-orchestration-bench/scripts/run_pilot.py", line 140, in <module>
+    main()
+    ~~~~^^
+  File "/home/research/workspace/review-orchestration-bench/scripts/run_pilot.py", line 98, in main
+    result = runner(pkg, per_item_client, model)
+  File "/home/research/workspace/review-orchestration-bench/src/harness/review.py", line 155, in run_single
+    text, cost, _ = _call(client, model, BASE_SYSTEM, pr_prompt(pkg),
+                    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          pkg["id"], "single", "reviewer")
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/src/harness/review.py", line 147, in _call
+    r = client.chat(
+        model=model, system=system, user=user, max_tokens=max_tokens,
+        context={"item": item_id, "config": config, "pass": pass_name, "model": model},
+    )
+  File "/home/research/workspace/review-orchestration-bench/src/harness/llm.py", line 90, in chat
+    resp = self._anthropic.messages.create(
+        model=model, max_tokens=max_tokens, system=system,
+        messages=[{"role": "user", "content": user}])
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/anthropic/_utils/_utils.py", line 294, in wrapper
+    return func(*args, **kwargs)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/anthropic/resources/messages/messages.py", line 1050, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/v1/messages",
+        ^^^^^^^^^^^^^^^
+    ...<30 lines>...
+        stream_cls=Stream[RawMessageStreamEvent],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/anthropic/_base_client.py", line 1536, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/anthropic/_base_client.py", line 1137, in request
+    response, prepared = self._attempt_request(
+                         ~~~~~~~~~~~~~~~~~~~~~^
+        model_copy(input_options), stream=stream, retries_taken=retries_taken
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/anthropic/_base_client.py", line 1295, in _attempt_request
+    response = self._client.send(
+        request,
+        stream=stream or self._should_stream_response_body(request=request),
+        **kwargs,
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+        request,
+    ...<2 lines>...
+        history=[],
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+        request,
+        follow_redirects=follow_redirects,
+        history=history,
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+        pool_request.request
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
+    return self._connection.handle_request(request)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
+    raise exc
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 106, in handle_request
+    ) = self._receive_response_headers(**kwargs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 177, in _receive_response_headers
+    event = self._receive_event(timeout=timeout)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 217, in _receive_event
+    data = self._network_stream.read(
+        self.READ_NUM_BYTES, timeout=timeout
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_backends/sync.py", line 128, in read
+    return self._sock.recv(max_bytes)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/home/linuxbrew/.linuxbrew/opt/python@3.14/lib/python3.14/ssl.py", line 1285, in recv
+    return self.read(buflen)
+           ~~~~~~~~~^^^^^^^^
+  File "/home/linuxbrew/.linuxbrew/opt/python@3.14/lib/python3.14/ssl.py", line 1140, in read
+    return self._sslobj.read(len)
+           ~~~~~~~~~~~~~~~~~^^^^^
+KeyboardInterrupt
+run=sanity-20260729-072233  models=12  configs=4  items=30  combos=1440  already_done=487  remaining=953
+[   1/953] claude-opus-5        single       fastapi-09f5941f0e     passes= 1 tp=1 fp=0 fn=0 $0.0304 ( 13.9s) cum=$17.218
+[   2/953] claude-opus-5        single       fastapi-1d96b3e3f1     passes= 1 tp=1 fp=0 fn=0 $0.0125 (  6.5s) cum=$17.231
+[   3/953] claude-opus-5        single       valibot-1bd01c3046     passes= 1 tp=2 fp=0 fn=0 $0.0302 ( 13.3s) cum=$17.261
+[   4/953] claude-opus-5        single       valibot-27ecfefc2f     passes= 1 tp=2 fp=0 fn=1 $0.0148 (  4.9s) cum=$17.276
+[   5/953] claude-opus-5        single       valibot-b16fdf9ba6     passes= 1 tp=3 fp=0 fn=0 $0.0370 ( 18.2s) cum=$17.313
+[   6/953] claude-opus-5        single       valibot-17cd7ed5b8     passes= 1 tp=1 fp=0 fn=0 $0.0118 (  6.8s) cum=$17.325
+[   7/953] claude-opus-5        single       valibot-0634c1b704     passes= 1 tp=3 fp=0 fn=0 $0.0562 ( 25.9s) cum=$17.381
+[   8/953] claude-opus-5        single       valibot-0cb97f72b3     passes= 1 tp=1 fp=1 fn=0 $0.0251 ( 12.2s) cum=$17.406
+[   9/953] claude-opus-5        single       valibot-ef4166c04e     passes= 1 tp=3 fp=0 fn=5 $0.0397 ( 14.9s) cum=$17.446
+[  10/953] claude-opus-5        single       chi-878fe71fc9         passes= 1 tp=1 fp=0 fn=2 $0.0170 (  8.0s) cum=$17.463
+[  11/953] claude-opus-5        single       chi-818fdcfc47         passes= 1 tp=1 fp=0 fn=0 $0.0456 ( 22.8s) cum=$17.508
+[  12/953] claude-opus-5        single       chi-4ef87eaf2c         passes= 1 tp=1 fp=0 fn=0 $0.0153 (  7.1s) cum=$17.524
+[  13/953] claude-opus-5        single       chi-05f1ef7bb5         passes= 1 tp=1 fp=0 fn=0 $0.0174 (  8.9s) cum=$17.541
+[  14/953] claude-opus-5        single       chi-b750c805b4         passes= 1 tp=1 fp=0 fn=0 $0.0192 (  8.4s) cum=$17.560
+[  15/953] claude-opus-5        single       pgrust-cb60ac482a      passes= 1 tp=1 fp=0 fn=0 $0.0157 (  7.1s) cum=$17.576
+[  16/953] claude-opus-5        single       pgrust-da0531b249      passes= 1 tp=2 fp=0 fn=0 $0.0457 ( 16.7s) cum=$17.622
+[  17/953] claude-opus-5        single       pgrust-4e4126c1b1      passes= 1 tp=4 fp=0 fn=1 $0.0668 ( 27.0s) cum=$17.688
+[  18/953] claude-opus-5        single       pgrust-b09c0f9aa6      passes= 1 tp=3 fp=0 fn=3 $0.0598 ( 20.8s) cum=$17.748
+[  19/953] claude-opus-5        single       pgrust-c76dce36c8      passes= 1 tp=1 fp=1 fn=0 $0.0255 ( 11.0s) cum=$17.774
+[  20/953] claude-opus-5        single       pgrust-931761fd34      passes= 1 tp=2 fp=2 fn=0 $0.0463 ( 16.3s) cum=$17.820
+[  21/953] claude-opus-5        single       pgrust-1b8b1896fc      passes= 1 tp=2 fp=1 fn=0 $0.0393 ( 15.3s) cum=$17.859
+[  22/953] claude-opus-5        single       pgrust-e447385f06      passes= 1 tp=1 fp=1 fn=0 $0.0225 ( 10.2s) cum=$17.882
+[  23/953] claude-opus-5        single       pgrust-29576c75c0      passes= 1 tp=2 fp=0 fn=0 $0.0223 (  8.7s) cum=$17.904
+Traceback (most recent call last):
+  File "/home/research/workspace/review-orchestration-bench/scripts/run_pilot.py", line 139, in <module>
+    main()
+    ~~~~^^
+  File "/home/research/workspace/review-orchestration-bench/scripts/run_pilot.py", line 97, in main
+    result = runner(pkg, per_item_client, model)
+  File "/home/research/workspace/review-orchestration-bench/src/harness/review.py", line 172, in run_parallel
+    text, cost, _ = _call(client, model, hint + "\n\n" + BASE_SYSTEM,
+                    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                          pr_prompt(pkg), pkg["id"], "parallel", f"aspect:{name}")
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/src/harness/review.py", line 147, in _call
+    r = client.chat(
+        model=model, system=system, user=user, max_tokens=max_tokens,
+        context={"item": item_id, "config": config, "pass": pass_name, "model": model},
+    )
+  File "/home/research/workspace/review-orchestration-bench/src/harness/llm.py", line 90, in chat
+    resp = self._anthropic.messages.create(
+        model=model, max_tokens=max_tokens, system=system,
+        messages=[{"role": "user", "content": user}])
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/anthropic/_utils/_utils.py", line 294, in wrapper
+    return func(*args, **kwargs)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/anthropic/resources/messages/messages.py", line 1050, in create
+    return self._post(
+           ~~~~~~~~~~^
+        "/v1/messages",
+        ^^^^^^^^^^^^^^^
+    ...<30 lines>...
+        stream_cls=Stream[RawMessageStreamEvent],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/anthropic/_base_client.py", line 1536, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/anthropic/_base_client.py", line 1137, in request
+    response, prepared = self._attempt_request(
+                         ~~~~~~~~~~~~~~~~~~~~~^
+        model_copy(input_options), stream=stream, retries_taken=retries_taken
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/anthropic/_base_client.py", line 1295, in _attempt_request
+    response = self._client.send(
+        request,
+        stream=stream or self._should_stream_response_body(request=request),
+        **kwargs,
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+        request,
+    ...<2 lines>...
+        history=[],
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+        request,
+        follow_redirects=follow_redirects,
+        history=history,
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
+    response = self._send_single_request(request)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_client.py", line 1014, in _send_single_request
+    response = transport.handle_request(request)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpx/_transports/default.py", line 250, in handle_request
+    resp = self._pool.handle_request(req)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
+    raise exc from None
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
+    response = connection.handle_request(
+        pool_request.request
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
+    return self._connection.handle_request(request)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
+    raise exc
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 106, in handle_request
+    ) = self._receive_response_headers(**kwargs)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 177, in _receive_response_headers
+    event = self._receive_event(timeout=timeout)
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_sync/http11.py", line 217, in _receive_event
+    data = self._network_stream.read(
+        self.READ_NUM_BYTES, timeout=timeout
+    )
+  File "/home/research/workspace/review-orchestration-bench/.venv/lib/python3.14/site-packages/httpcore/_backends/sync.py", line 128, in read
+    return self._sock.recv(max_bytes)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/home/linuxbrew/.linuxbrew/opt/python@3.14/lib/python3.14/ssl.py", line 1285, in recv
+    return self.read(buflen)
+           ~~~~~~~~~^^^^^^^^
+  File "/home/linuxbrew/.linuxbrew/opt/python@3.14/lib/python3.14/ssl.py", line 1140, in read
+    return self._sslobj.read(len)
+           ~~~~~~~~~~~~~~~~~^^^^^
+KeyboardInterrupt

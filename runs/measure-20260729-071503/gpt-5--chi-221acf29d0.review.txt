@@ -1,0 +1,7 @@
+- file and line range: context.go: 101-105 (RouteContext)
+  severity: high
+  explanation: Switching from the comma-ok type assertion to a direct assertion introduces a panic if the RouteCtxKey value is absent from the context or is of the wrong type. Previously, RouteContext returned nil in these cases, allowing callers to safely check for presence and avoiding crashes outside chi’s routing middleware (e.g., in tests, utilities, or misconfigured handlers). This is a breaking behavioral change that can convert benign misuse into a runtime panic.
+
+- file and line range: context.go: 99-105 (RouteContext doc + implementation)
+  severity: medium
+  explanation: The doc comment does not reflect the new behavior that RouteContext will now panic if the routing context is not present. Given the exported API can be called with arbitrary contexts, the lack of an explicit precondition or panic note makes the change surprising and harder to diagnose for consumers who previously relied on a nil return instead of a crash.

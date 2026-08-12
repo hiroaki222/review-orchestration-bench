@@ -1,0 +1,3 @@
+- file and line range: middleware/route_headers.go:79-85
+  severity: high
+  explanation: Removing the return after next.ServeHTTP allows execution to fall through into the subsequent routing logic and any final fall-through path. In typical middleware patterns, there is an unconditional next.ServeHTTP (or other response-writing path) after the route-matching loop. With hr empty, this change would invoke next.ServeHTTP once in the empty-route branch and then again at the end, resulting in the downstream handler being called twice and potentially writing the response twice. In net/http this can corrupt responses or cause panics. The original early return was necessary to prevent double invocation.
