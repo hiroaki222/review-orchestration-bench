@@ -18,6 +18,8 @@ repos/*
 *.dvi
 *.bbl
 *.blg
+*.bcf
+*.run.xml
 
 # ...except experiment stdout logs under runs/
 !runs/**/*.log
