@@ -14,6 +14,7 @@
 \usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{multirow}
+\usepackage{qrcode}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, fit, calc}
 \usepackage{luatexja-fontspec}
@@ -212,15 +213,18 @@
 
 \begin{frame}{見逃しの方が対処コストが高いので $F_2$ を主指標に置く}
     \begin{equation*}
+        F_\beta = \frac{(1 + \beta^2)\,PR}{\beta^2 P + R}
+        \qquad\text{本研究は }\ \alert{\beta = 2}
+        \quad\Rightarrow\quad
         F_2 = \frac{5PR}{4P + R}
-        \qquad
-        \text{(再現率 $R$ を適合率 $P$ の \alert{4 倍} 重視)}
     \end{equation*}
 
     \begin{itemize}
-        \item 誤指摘の却下はレビュアの確認で済むが，\\
-            見逃したバグの発見には人手レビューを要する．この非対称性に合わせ，見逃しを減らす側に重みを置いた．
-        \item 検出判定：指摘の (file, line 範囲) と正解ハンクの重なり ($\pm 2$ 行) を機械判定する．
+        \item $\beta$ は再現率 $R$ を適合率 $P$ の何倍重視するかの重み．\\
+            $\beta = 2$ は $\beta^2 = 4$，すなわち\alert{再現率を 4 倍重視}することを意味する．
+        \item 誤指摘は却下すれば済むが，見逃したバグの発見には人手レビューが要る．\\
+            この非対称性に合わせ，見逃しを減らす側に重みを置いた．
+        \item 検出判定：指摘の (file, 行範囲) が正解の変更範囲と重なるかを機械判定 (許容 $\pm 2$ 行)．
         \item 規模：\nVendors{} ベンダ \nModels{} モデル $\times$ \nConfigs{} 構成 $\times$ \nItems{} 件 $=$ \alert{\nCombos{} 実行}，総 API 支出 \totalSpend{}．
     \end{itemize}
 \end{frame}
@@ -234,14 +238,14 @@
     \end{center}
 \end{frame}
 
-\begin{frame}{Multi-run が全 $\beta$ 帯で最高，Parallel の優位は残らない}
+\begin{frame}{再現率の重みを変えても Multi-run が最高}
     \begin{columns}[T]
     \begin{column}{0.44\textwidth}
         \centering
         \small 構成別の平均 $F_\beta$\\[3pt]
         \footnotesize
         \input{../../paper/sigagi/tables/table_beta}\\[4pt]
-        \scriptsize $\beta$ を 1〜3 に振っても Multi-run は全帯で最高
+        \scriptsize $\beta$ を 1〜3 に振っても Multi-run が最高
     \end{column}
     \begin{column}{0.54\textwidth}
         \begin{itemize}
@@ -348,7 +352,14 @@
     \end{itemize}
 
     \vfill
-    \scriptsize ベンチマーク・実験ハーネス・全実行記録：\url{https://github.com/hiroaki222/review-orchestration-bench}
+    \begin{minipage}[b]{0.74\textwidth}
+        \scriptsize ベンチマーク・実験ハーネス・全実行記録：\\
+        \url{https://github.com/hiroaki222/review-orchestration-bench}
+    \end{minipage}\hfill
+    \begin{minipage}[b]{0.20\textwidth}
+        \raggedleft
+        \qrcode[height=2cm, level=M]{https://github.com/hiroaki222/review-orchestration-bench}
+    \end{minipage}
 \end{frame}
 
 \appendix
